@@ -1,5 +1,6 @@
 ﻿using Insurance.Application.Clients.Commands;
 using Insurance.Application.Clients.DTOs;
+using Insurance.Application.Clients.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,5 +26,12 @@ namespace Insurance.WebApi.Controllers
             return Ok(new { id = clientId });
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetClientById(Guid id, CancellationToken cancellationToken)
+        {
+            var query = new GetClientByIdQuery(id);
+            var client = await _mediator.Send(query, cancellationToken);
+            return Ok(client);
+        }
     }
 }
