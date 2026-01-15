@@ -22,11 +22,6 @@ namespace Insurance.Domain.Exceptions
         public ConflictException(string message) : base(message) { }
     }
 
-    public class ValidationException : BusinessException
-    {
-        public ValidationException(string message) : base(message) { }
-    }
-
     public class ForbiddenBusinessException : BusinessException
     {
         public ForbiddenBusinessException(string message) : base(message) { }

@@ -1,4 +1,5 @@
 ﻿using Insurance.Application.Clients.Commands;
+using Insurance.Application.Clients.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,9 +16,12 @@ namespace Insurance.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateClient(CreateClientCommand command, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateClient(CreateClientDto dto, CancellationToken cancellationToken)
         {
-            var clientId = await _mediator.Send(command);
+            var command = new CreateClientCommand(dto);
+
+            var clientId = await _mediator.Send(command, cancellationToken);
+
             return Ok(new { id = clientId });
         }
 

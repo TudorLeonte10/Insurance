@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using FluentValidation;
+using Insurance.Application.Common.Behaviours;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,6 +18,17 @@ namespace Insurance.Application
 
             services.AddAutoMapper(
                 typeof(DependencyInjection).Assembly);
+
+            services.AddValidatorsFromAssembly(
+                typeof(DependencyInjection).Assembly);
+
+            services.AddTransient(
+                 typeof(IPipelineBehavior<,>),
+                 typeof(LoggingBehaviour<,>));
+
+            services.AddTransient(
+                typeof(IPipelineBehavior<,>),
+                typeof(ValidationBehaviour<,>));
 
             return services;
         }

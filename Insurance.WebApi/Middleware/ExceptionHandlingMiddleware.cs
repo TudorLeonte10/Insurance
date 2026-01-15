@@ -1,4 +1,5 @@
-﻿using Insurance.Domain.Exceptions;
+﻿using FluentValidation;
+using Insurance.Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -36,8 +37,8 @@ namespace Insurance.WebApi.Middleware
 
             var (statusCode, message) = exception switch
             {
-                ValidationException =>
-                    (HttpStatusCode.BadRequest, exception.Message),
+                ValidationException fvEx =>
+                    (HttpStatusCode.BadRequest, string.Join("; ", fvEx.Errors.Select(e => e.ErrorMessage))),
 
                 NotFoundException =>
                     (HttpStatusCode.NotFound, exception.Message),
