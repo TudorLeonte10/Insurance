@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Insurance.Application.Common.Behaviours
 {
-    public class LoggingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
+    public class LoggingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
         private readonly ILogger<LoggingBehaviour<TRequest, TResponse>> _logger;
 
