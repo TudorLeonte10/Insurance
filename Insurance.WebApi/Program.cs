@@ -1,23 +1,22 @@
+using Insurance.Application;
+using Insurance.Infrastructure;
 using Insurance.Infrastructure.Persistence;
 using Insurance.Infrastructure.Persistence.Seed;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using Insurance.WebApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.AddControllers();
 
-builder.Services.AddDbContext<InsuranceDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -26,7 +25,6 @@ using (var scope = app.Services.CreateScope())
 
     await DatabaseSeeder.SeedAsync(context, env);
 }
-
 
 if (app.Environment.IsDevelopment())
 {
