@@ -8,10 +8,10 @@ namespace Insurance.WebApi.Controllers
 {
     [ApiController]
     [Route("api/broker/[controller]")]
-    public class ClientController : ControllerBase
+    public class ClientsController : ControllerBase
     {
         private readonly IMediator _mediator;
-        public ClientController(IMediator mediator)
+        public ClientsController(IMediator mediator)
         {
             _mediator = mediator;
         }

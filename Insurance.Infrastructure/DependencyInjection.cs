@@ -1,4 +1,5 @@
 ﻿using Insurance.Application.Abstractions;
+using Insurance.Application.Abstractions.Repositories;
 using Insurance.Domain.Abstractions.Repositories;
 using Insurance.Infrastructure.Persistence;
 using Insurance.Infrastructure.Persistence.Repositories;
@@ -22,6 +23,7 @@ namespace Insurance.Infrastructure
                     configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<IClientRepository, ClientRepository>();
+            services.AddScoped<IGeographyRepository, GeographyRepository>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
