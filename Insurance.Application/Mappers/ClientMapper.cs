@@ -13,6 +13,7 @@ namespace Insurance.Application.Mappers
         {
             CreateMap<CreateClientDto, Client>().ReverseMap();
             CreateMap<ClientDetailsDto, Client>().ReverseMap();
+            CreateMap<UpdateClientDto, Client>().ReverseMap();
         }
     }
 }

@@ -6,14 +6,14 @@ using System.Text;
 
 namespace Insurance.Application.Clients.Validators
 {
-    public class CreateClientCommandValidator
-    : AbstractValidator<CreateClientCommand>
+    public class UpdateClientCommandValidator : AbstractValidator<UpdateClientCommand>
     {
-        public CreateClientCommandValidator()
+        public UpdateClientCommandValidator()
         {
             RuleFor(x => x.Dto)
-                .NotNull()
-                .SetValidator(new CreateClientDtoValidator());
+            .NotNull()
+            .SetValidator(new UpdateClientDtoValidator());
         }
     }
+
 }
