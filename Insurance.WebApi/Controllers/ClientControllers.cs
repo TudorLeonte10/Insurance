@@ -33,5 +33,15 @@ namespace Insurance.WebApi.Controllers
             var client = await _mediator.Send(query, cancellationToken);
             return Ok(client);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetClients([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _mediator.Send(
+                new GetClientsQuery(pageNumber, pageSize));
+
+            return Ok(result);
+        }
+
     }
 }

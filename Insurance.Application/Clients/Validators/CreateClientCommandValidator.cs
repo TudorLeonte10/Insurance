@@ -18,7 +18,11 @@ namespace Insurance.Application.Clients.Validators
 
             RuleFor(c => c.Dto.Type).IsInEnum().WithMessage("Invalid client type.");
 
-            RuleFor(c => c.Dto.ContactInfo).NotEmpty().WithMessage("Contact information is required.");
+            RuleFor(c => c.Dto.Email).NotEmpty().WithMessage("Email is required.")
+                .EmailAddress().WithMessage("Invalid email format.");
+
+            RuleFor(c => c.Dto.PhoneNumber).NotEmpty().WithMessage("Phone number is required.");
+
         }
     }
 }

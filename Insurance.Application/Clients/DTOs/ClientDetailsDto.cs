@@ -11,7 +11,9 @@ namespace Insurance.Application.Clients.DTOs
         public string Name { get; init; } = null!;
         public string IdentificationNumber { get; init; } = null!;
         public ClientType Type { get; init; }
-        public string ContactInfo { get; init; } = null!;
+        public string Email { get; init; } = null!;
+        public string PhoneNumber { get; init; } = null!;
+        public string? Address { get; init; }
     }
 
 }
