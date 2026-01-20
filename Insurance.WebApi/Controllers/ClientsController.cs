@@ -20,10 +20,8 @@ namespace Insurance.WebApi.Controllers
         public async Task<IActionResult> CreateClient(CreateClientDto dto, CancellationToken cancellationToken)
         {
             var command = new CreateClientCommand(dto);
-
             var clientId = await _mediator.Send(command, cancellationToken);
-
-            return Ok(new { id = clientId });
+            return CreatedAtAction(nameof(GetClientById), new { clientId }, null);
         }
 
         [HttpGet("{clientId}")]

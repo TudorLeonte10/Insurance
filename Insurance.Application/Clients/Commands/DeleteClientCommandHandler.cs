@@ -4,6 +4,7 @@ using Insurance.Domain.Exceptions;
 using MediatR;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Insurance.Application.Clients.Commands
@@ -28,6 +29,9 @@ namespace Insurance.Application.Clients.Commands
 
             if (client is null)
                 throw new NotFoundException("Client not found");
+
+            if (client.Buildings.Any())
+                throw new ValidationException("Client has buildings and cannot be deleted.");
 
             await _clientRepository.DeleteAsync(client.Id);
 

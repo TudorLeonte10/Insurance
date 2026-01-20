@@ -10,5 +10,6 @@ namespace Insurance.Application.Abstractions.Repositories
         Task<IReadOnlyList<Country>> GetAllCountriesAsync(CancellationToken cancellationToken);
         Task<IReadOnlyList<County>> GetCountiesByCountryIdAsync(Guid countryId, CancellationToken cancellationToken);
         Task<IReadOnlyList<City>> GetCitiesByCountyIdAsync(Guid countyId, CancellationToken cancellationToken);
+        Task<bool> ExistsCityAsync(Guid cityId, CancellationToken cancellationToken);
     }
 }

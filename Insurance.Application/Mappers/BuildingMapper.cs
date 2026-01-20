@@ -16,6 +16,14 @@ namespace Insurance.Application.Mappers
                 .ForMember(dest => dest.County, opt => opt.MapFrom(src => src.City.County.Name))
                 .ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.City.County.Country.Name))
                 .ForMember(dest => dest.RiskIndicators, opt => opt.MapFrom(src => src.RiskIndicators.Select(ri => ri.RiskIndicator.ToString())));
+
+            CreateMap<CreateBuildingDto, Building>()
+                .ForMember(dest => dest.City, opt => opt.Ignore())
+                .ForMember(dest => dest.RiskIndicators, opt => opt.Ignore());
+
+            CreateMap<UpdateBuildingDto, Building>()
+                .ForMember(dest => dest.City, opt => opt.Ignore())
+                .ForMember(dest => dest.RiskIndicators, opt => opt.Ignore());
         }
     }
 }

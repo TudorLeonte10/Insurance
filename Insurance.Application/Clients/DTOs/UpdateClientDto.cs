@@ -11,6 +11,5 @@ namespace Insurance.Application.Clients.DTOs
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public string? Address { get; set; }
-        public ClientType Type { get; set; }
     }
 }

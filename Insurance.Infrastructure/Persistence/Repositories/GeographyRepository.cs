@@ -41,5 +41,12 @@ namespace Insurance.Infrastructure.Persistence.Repositories
                 .OrderBy(c => c.Name)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<bool> ExistsCityAsync(Guid cityId, CancellationToken cancellationToken)
+        {
+            return await _context.Cities
+                .AsNoTracking()
+                .AnyAsync(c => c.Id == cityId, cancellationToken);
+        }
     }
 }

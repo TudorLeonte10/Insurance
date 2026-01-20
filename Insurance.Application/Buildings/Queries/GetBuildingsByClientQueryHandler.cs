@@ -20,7 +20,7 @@ namespace Insurance.Application.Buildings.Queries
 
         public async Task<IReadOnlyList<BuildingDetailsDto>> Handle(GetBuildingsByClientQuery request, CancellationToken cancellationToken)
         {
-            var buildings = await _buildingRepository.GetAllBuildingsByClientId(request.ClientId, cancellationToken);
+            var buildings = await _buildingRepository.GetAllBuildingsByClientIdAsync(request.ClientId, cancellationToken);
             return _mapper.Map<IReadOnlyList<BuildingDetailsDto>>(buildings);
         }
     }
