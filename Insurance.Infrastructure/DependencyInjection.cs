@@ -24,6 +24,7 @@ namespace Insurance.Infrastructure
 
             services.AddScoped<IClientRepository, ClientRepository>();
             services.AddScoped<IGeographyRepository, GeographyRepository>();
+            services.AddScoped<IBuildingRepository, BuildingRepository>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 

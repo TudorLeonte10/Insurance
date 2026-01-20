@@ -13,6 +13,9 @@ namespace Insurance.Infrastructure.Persistence.Seed
                 return;
 
             await GeographySeeder.SeedAsync(context);
+            await ClientSeeder.SeedAsync(context);
+            await BuildingSeeder.SeedAsync(context);
+            await BuildingRiskIndicatorSeeder.SeedAsync(context);
         }
     }
 }
