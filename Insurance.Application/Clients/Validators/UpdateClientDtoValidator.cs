@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Insurance.Application.Clients.Validators.Client
+namespace Insurance.Application.Clients.Validators
 {
     public class UpdateClientDtoValidator
     : AbstractValidator<UpdateClientDto>

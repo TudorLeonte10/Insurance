@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Insurance.Application.Clients.Validators.Building
+namespace Insurance.Application.Buildings.Validators
 {
     public class UpdateBuildingCommandValidator : AbstractValidator<UpdateBuildingCommand>
     {
@@ -19,5 +19,4 @@ namespace Insurance.Application.Clients.Validators.Building
                 .SetValidator(new UpdateBuildingDtoValidator());
         }
     }
-
 }
