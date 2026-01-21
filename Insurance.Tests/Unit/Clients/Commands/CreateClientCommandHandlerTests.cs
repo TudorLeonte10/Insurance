@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using FluentAssertions;
 using Insurance.Application.Abstractions;
 using Insurance.Application.Clients.Commands;
 using Insurance.Application.Clients.Commands.CreateClient;
@@ -9,30 +8,26 @@ using Insurance.Domain.Clients;
 using Insurance.Domain.Exceptions;
 using Moq;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace Insurance.Tests.Unit.Clients.Commands
 {
     public class CreateClientCommandHandlerTests
     {
-        private readonly Mock<IClientRepository> _clientRepositoryMock;
-        private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-        private readonly Mock<IMapper> _mapperMock;
+        private readonly Mock<IClientRepository> _clientRepositoryMock = new();
+        private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
+        private readonly Mock<IMapper> _mapperMock = new();
 
         private readonly CreateClientCommandHandler _handler;
 
         public CreateClientCommandHandlerTests()
         {
-            _clientRepositoryMock = new Mock<IClientRepository>();
-            _unitOfWorkMock = new Mock<IUnitOfWork>();
-            _mapperMock = new Mock<IMapper>();
-
             _handler = new CreateClientCommandHandler(
                 _clientRepositoryMock.Object,
                 _unitOfWorkMock.Object,
-                _mapperMock.Object
-            );
+                _mapperMock.Object);
         }
 
         [Fact]
@@ -47,17 +42,14 @@ namespace Insurance.Tests.Unit.Clients.Commands
                 Type = ClientType.Individual
             };
 
-            var command = new CreateClientCommand(dto);
-
             _clientRepositoryMock
                 .Setup(x => x.ExistsByIdentifierAsync(dto.IdentificationNumber, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
-            Func<Task> act = async () =>
-                await _handler.Handle(command, CancellationToken.None);
+            var command = new CreateClientCommand(dto);
 
-            await act.Should()
-                .ThrowAsync<ConflictException>();
+            await Assert.ThrowsAsync<ConflictException>(() =>
+                _handler.Handle(command, CancellationToken.None));
         }
 
         [Fact]
@@ -86,10 +78,15 @@ namespace Insurance.Tests.Unit.Clients.Commands
 
             var result = await _handler.Handle(command, CancellationToken.None);
 
-            result.Should().Be(client.Id);
+            Assert.Equal(client.Id, result);
 
-            _clientRepositoryMock.Verify(x => x.AddAsync(client, It.IsAny<CancellationToken>()), Times.Once);
-            _unitOfWorkMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _clientRepositoryMock.Verify(
+                x => x.AddAsync(client, It.IsAny<CancellationToken>()),
+                Times.Once);
+
+            _unitOfWorkMock.Verify(
+                x => x.SaveChangesAsync(It.IsAny<CancellationToken>()),
+                Times.Once);
         }
     }
 }

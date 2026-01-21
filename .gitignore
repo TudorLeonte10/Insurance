@@ -110,3 +110,7 @@ yarn-error.log*
 ####################################
 # Ignore everything else that is generated
 ####################################
+
+.sonarqube/
+TestResults/
+coverage.opencover.xml

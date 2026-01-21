@@ -64,7 +64,5 @@ namespace Insurance.Tests.Unit.Clients.Validators
 
             result.ShouldHaveValidationErrorFor(x => x.Email);
         }
-        
-
     }
 }
