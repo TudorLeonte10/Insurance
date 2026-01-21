@@ -14,5 +14,7 @@ namespace Insurance.Domain.Abstractions.Repositories
         Task<Client?> GetByIdentificationNumberAsync(string identifier, CancellationToken cancellationToken);
 
         Task<PagedResult<ClientDetailsDto>> GetPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
+        Task<PagedResult<ClientDetailsDto>> SearchAsync(string? name, string? identifier, int pageNumber, int pageSize, CancellationToken cancellationToken);
+
     }
 }

@@ -6,10 +6,18 @@ namespace Insurance.Application.Common.Paging
 {
     public class PagedResult<T>
     {
-        public IReadOnlyList<T> Items { get; init; } = [];
-        public int PageNumber { get; init; }
-        public int PageSize { get; init; }
-        public int TotalCount { get; init; }
+        public IReadOnlyList<T> Items { get; }
+        public int PageNumber { get; }
+        public int PageSize { get; }
+        public int TotalCount { get; }
+
+        public PagedResult(IReadOnlyList<T> items, int pageNumber, int pageSize, int totalCount)
+        {
+            Items = items;
+            PageNumber = pageNumber;
+            PageSize = pageSize;
+            TotalCount = totalCount;
+        }
     }
 
 }

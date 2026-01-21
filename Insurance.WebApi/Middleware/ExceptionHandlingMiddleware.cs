@@ -37,8 +37,8 @@ namespace Insurance.WebApi.Middleware
 
             var (statusCode, message) = exception switch
             {
-                ValidationException fvEx =>
-                    (HttpStatusCode.BadRequest, string.Join("; ", fvEx.Errors.Select(e => e.ErrorMessage))),
+                ValidationException vEx =>
+                    (HttpStatusCode.BadRequest, string.Join("; ", vEx.Errors.Select(e => e.ErrorMessage))),
 
                 NotFoundException =>
                     (HttpStatusCode.NotFound, exception.Message),

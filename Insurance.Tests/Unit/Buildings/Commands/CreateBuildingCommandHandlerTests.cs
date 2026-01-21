@@ -82,7 +82,6 @@ namespace Insurance.Tests.Unit.Buildings.Commands
         [Fact]
         public async Task Given_NonExistingCity_Should_ThrowNotFoundException()
         {
-            // Given
             var clientId = Guid.NewGuid();
             var cityId = Guid.NewGuid();
 
@@ -96,11 +95,9 @@ namespace Insurance.Tests.Unit.Buildings.Commands
 
             var command = CreateValidCommand(clientId, cityId);
 
-            // When
             Func<Task> act = async () =>
                 await _handler.Handle(command, CancellationToken.None);
 
-            // Should
             await act.Should()
                 .ThrowAsync<NotFoundException>()
                 .WithMessage($"*{cityId}*");

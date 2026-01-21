@@ -12,12 +12,10 @@ namespace Insurance.Infrastructure.Persistence.Repositories
     public class BuildingRepository : IBuildingRepository
     {
         private readonly InsuranceDbContext _context;
-        private readonly IMapper _mapper;
 
-        public BuildingRepository(InsuranceDbContext context, IMapper mapper)
+        public BuildingRepository(InsuranceDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public async Task<IReadOnlyList<Building>> GetAllBuildingsByClientIdAsync(Guid clientId, CancellationToken cancellationToken)

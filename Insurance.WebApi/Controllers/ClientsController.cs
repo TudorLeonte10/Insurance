@@ -32,7 +32,7 @@ namespace Insurance.WebApi.Controllers
             return Ok(client);
         }
 
-        [HttpGet]
+        [HttpGet("all")]
         public async Task<IActionResult> GetClients([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var query = new GetClientsQuery(pageNumber, pageSize);
@@ -55,5 +55,14 @@ namespace Insurance.WebApi.Controllers
             await _mediator.Send(command, ct);
             return NoContent();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchClients([FromQuery] string? name, [FromQuery] string? identifier, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
+        {
+            var query = new SearchClientsQuery(name, identifier, pageNumber, pageSize);
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
+        }
     }
 }
+

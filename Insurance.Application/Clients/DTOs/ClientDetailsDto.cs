@@ -7,13 +7,13 @@ namespace Insurance.Application.Clients.DTOs
 {
     public class ClientDetailsDto
     {
-        public Guid Id { get; init; }
-        public string Name { get; init; } = null!;
-        public string IdentificationNumber { get; init; } = null!;
-        public ClientType Type { get; init; }
-        public string Email { get; init; } = null!;
-        public string PhoneNumber { get; init; } = null!;
-        public string? Address { get; init; }
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string IdentificationNumber { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
+        public string? Address { get; set; }
     }
 
 }
