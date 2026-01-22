@@ -7,5 +7,5 @@ using System.Text;
 
 namespace Insurance.Application.Clients.Queries
 {
-    public record GetClientsQuery(int PageNumber = 1, int PageSize = 10) : IRequest<PagedResult<ClientDetailsDto>>;
+    public record GetClientsQuery(int pageNumber = 1, int pageSize = 10) : IRequest<PagedResult<ClientDetailsDto>>;
 }

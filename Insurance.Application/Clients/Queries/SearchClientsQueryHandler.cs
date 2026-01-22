@@ -21,10 +21,10 @@ namespace Insurance.Application.Clients.Queries
         public async Task<PagedResult<ClientDetailsDto>> Handle(SearchClientsQuery request, CancellationToken cancellationToken)
         {
             return await _clientRepository.SearchAsync(
-                request.Name, 
-                request.IdentificationNumber, 
-                request.PageNumber, 
-                request.PageSize, 
+                request.name, 
+                request.identificationNumber, 
+                request.pageNumber, 
+                request.pageSize, 
                 cancellationToken);
 
         }
