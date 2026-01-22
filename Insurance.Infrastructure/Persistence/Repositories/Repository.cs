@@ -41,7 +41,7 @@ namespace Insurance.Infrastructure.Persistence.Repositories
             return Task.CompletedTask;
         }
 
-        public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
         {
             var entity = await DbContext.Set<T>().FindAsync(id, cancellationToken);
 

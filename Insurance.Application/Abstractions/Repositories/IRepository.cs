@@ -14,9 +14,9 @@ namespace Insurance.Domain.Abstractions.Repositories
 
         Task AddAsync(T entity, CancellationToken cancellationToken);
 
-        Task UpdateAsync(T entity, CancellationToken cancellationToken = default);
+        Task UpdateAsync(T entity, CancellationToken cancellationToken);
 
-        Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+        Task DeleteAsync(Guid id, CancellationToken cancellationToken);
     }
 }
 

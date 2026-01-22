@@ -33,7 +33,7 @@ namespace Insurance.Application.Clients.Commands
             if (client.Buildings.Any())
                 throw new ValidationException("Client has buildings and cannot be deleted.");
 
-            await _clientRepository.DeleteAsync(client.Id);
+            await _clientRepository.DeleteAsync(client.Id, cancellationToken);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 

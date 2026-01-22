@@ -12,11 +12,9 @@ namespace Insurance.Application.Clients.Queries
     public class SearchClientsQueryHandler : IRequestHandler<SearchClientsQuery, PagedResult<ClientDetailsDto>>
     {
         private readonly IClientRepository _clientRepository;
-        private readonly IMapper _mapper;
-        public SearchClientsQueryHandler(IClientRepository clientRepository, IMapper mapper)
+        public SearchClientsQueryHandler(IClientRepository clientRepository)
         {
             _clientRepository = clientRepository;
-            _mapper = mapper;
         }
         public async Task<PagedResult<ClientDetailsDto>> Handle(SearchClientsQuery request, CancellationToken cancellationToken)
         {

@@ -23,9 +23,9 @@ namespace Insurance.Application.Buildings.Commands
             _mapper = mapper;
         }
 
-        public async Task<Guid> Handle(UpdateBuildingCommand request, CancellationToken ct)
+        public async Task<Guid> Handle(UpdateBuildingCommand request, CancellationToken cancellationToken)
         {
-            var building = await _repository.GetBuildingByIdAsync(request.BuildingId, ct);
+            var building = await _repository.GetBuildingByIdAsync(request.BuildingId, cancellationToken);
 
             if (building is null)
                 throw new NotFoundException($"Building not found");
@@ -39,7 +39,7 @@ namespace Insurance.Application.Buildings.Commands
             })
             .ToList();
 
-            await _uow.SaveChangesAsync(ct);
+            await _uow.SaveChangesAsync(cancellationToken);
             return building.Id;
         }
     }

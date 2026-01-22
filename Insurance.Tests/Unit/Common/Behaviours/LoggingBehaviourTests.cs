@@ -19,12 +19,13 @@ namespace Insurance.Tests.Unit.Common.Behaviours
         private static void VerifyLoggerLog(Mock<ILogger<LoggingBehaviour<TestRequest, int>>> loggerMock, LogLevel level, Times times)
         {
             loggerMock.Verify(
-                x => x.Log(
-                    level,
-                    It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString().Contains(nameof(TestRequest))),
-                    It.IsAny<Exception>(),
-                    It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                x => x.Log(level,It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) =>
+                        v != null &&
+                        v.ToString() != null &&
+                        v.ToString()!.Contains(nameof(TestRequest))),
+                    It.IsAny<Exception?>(),
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 times);
         }
 

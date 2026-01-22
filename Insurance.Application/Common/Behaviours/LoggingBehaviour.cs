@@ -37,9 +37,11 @@ namespace Insurance.Application.Common.Behaviours
             {
                 stopwatch.Stop();
 
-                _logger.LogWarning(ex, "Validation or error occured for {RequestName}", requestName);
-
-                _logger.LogError(ex, "Error handling {RequestName} after {ElapsedMilliseconds} ms", requestName, stopwatch.ElapsedMilliseconds);
+                _logger.LogError(ex,
+                    "Error handling {RequestName} after {ElapsedMilliseconds} ms. Exception type: {ExceptionType}",
+                    requestName,
+                    stopwatch.ElapsedMilliseconds,
+                    ex.GetType().Name);
 
                 throw;
             }

@@ -29,7 +29,7 @@ namespace Insurance.Tests.Unit.Buildings.Commands
                 _mapperMock.Object);
         }
 
-        private UpdateBuildingCommand CreateValidCommand(Guid buildingId)
+        private static UpdateBuildingCommand CreateValidCommand(Guid buildingId)
         {
             return new UpdateBuildingCommand(buildingId, new UpdateBuildingDto
             {
@@ -38,7 +38,7 @@ namespace Insurance.Tests.Unit.Buildings.Commands
             });
         }
 
-        private Building CreateExistingBuilding(Guid id)
+        private static Building CreateExistingBuilding(Guid id)
         {
             return new Building
             {

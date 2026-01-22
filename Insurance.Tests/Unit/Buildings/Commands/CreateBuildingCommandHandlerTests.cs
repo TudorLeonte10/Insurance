@@ -35,7 +35,7 @@ namespace Insurance.Tests.Unit.Buildings.Commands
                 _mapperMock.Object);
         }
 
-        private CreateBuildingCommand CreateValidCommand(Guid clientId, Guid cityId)
+        private static CreateBuildingCommand CreateValidCommand(Guid clientId, Guid cityId)
         {
             return new CreateBuildingCommand(
                 clientId,

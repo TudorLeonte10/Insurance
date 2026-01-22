@@ -25,9 +25,9 @@ namespace Insurance.Tests.Unit.Clients.Commands
                 _uowMock.Object);
         }
 
-        private DeleteClientCommand CreateCommand(Guid clientId) => new DeleteClientCommand(clientId);
+        private static DeleteClientCommand CreateCommand(Guid clientId) => new DeleteClientCommand(clientId);
 
-        private Client CreateClient(Guid id) => new Client { Id = id, Name = "X", IdentificationNumber = "ID" };
+        private static Client CreateClient(Guid id) => new Client { Id = id, Name = "X", IdentificationNumber = "ID" };
 
         [Fact]
         public async Task Given_NonExistingClient_Should_ThrowNotFoundException()

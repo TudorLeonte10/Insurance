@@ -12,12 +12,10 @@ namespace Insurance.Application.Clients.Queries
     public class GetClientsQueryHandler : IRequestHandler<GetClientsQuery, PagedResult<ClientDetailsDto>>
     {
         private readonly IClientRepository _clientRepository;
-        private readonly IMapper _mapper;
 
-        public GetClientsQueryHandler(IClientRepository clientRepository, IMapper mapper)
+        public GetClientsQueryHandler(IClientRepository clientRepository)
         {
             _clientRepository = clientRepository;
-            _mapper = mapper;
         }
 
         public async Task<PagedResult<ClientDetailsDto>> Handle(GetClientsQuery request, CancellationToken cancellationToken)

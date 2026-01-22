@@ -13,15 +13,12 @@ namespace Insurance.Tests.Unit.Clients.Queries
     public class SearchClientsQueryHandlerTests
     {
         private readonly Mock<IClientRepository> _clientRepositoryMock = new();
-        private readonly Mock<IMapper> _mapperMock = new();
 
         private readonly SearchClientsQueryHandler _handler;
 
         public SearchClientsQueryHandlerTests()
         {
-            _handler = new SearchClientsQueryHandler(
-                _clientRepositoryMock.Object,
-                _mapperMock.Object);
+            _handler = new SearchClientsQueryHandler(_clientRepositoryMock.Object);
         }
 
         [Fact]

@@ -31,6 +31,7 @@ namespace Insurance.WebApi.Middleware
             }
         }
 
+
         private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             context.Response.ContentType = "application/json";
@@ -40,14 +41,8 @@ namespace Insurance.WebApi.Middleware
                 ValidationException vEx =>
                     (HttpStatusCode.BadRequest, string.Join("; ", vEx.Errors.Select(e => e.ErrorMessage))),
 
-                NotFoundException =>
-                    (HttpStatusCode.NotFound, exception.Message),
-
-                ConflictException =>
-                    (HttpStatusCode.Conflict, exception.Message),
-
-                ForbiddenBusinessException =>
-                    (HttpStatusCode.Forbidden, exception.Message),
+               BusinessException bEx =>
+                    MapBusinessException(bEx),
 
                 DbUpdateException =>
                     (HttpStatusCode.Conflict,
@@ -67,6 +62,24 @@ namespace Insurance.WebApi.Middleware
 
             await context.Response.WriteAsync(
                 JsonSerializer.Serialize(response));
+        }
+
+        private static (HttpStatusCode, string) MapBusinessException(BusinessException ex)
+        {
+            return ex switch
+            {
+                NotFoundException =>
+                    (HttpStatusCode.NotFound, ex.Message),
+
+                ConflictException =>
+                    (HttpStatusCode.Conflict, ex.Message),
+
+                ForbiddenBusinessException =>
+                    (HttpStatusCode.Forbidden, ex.Message),
+
+                _ =>
+                    (HttpStatusCode.BadRequest, ex.Message)
+            };
         }
     }
 }
