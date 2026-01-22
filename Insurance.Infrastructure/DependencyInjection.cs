@@ -18,16 +18,20 @@ namespace Insurance.Infrastructure
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddDbContext<InsuranceDbContext>(options =>
-                options.UseSqlServer(
-                    configuration.GetConnectionString("DefaultConnection")));
-
             services.AddScoped<IClientRepository, ClientRepository>();
             services.AddScoped<IGeographyRepository, GeographyRepository>();
             services.AddScoped<IBuildingRepository, BuildingRepository>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+            return services;
+        }
+
+        public static IServiceCollection AddSqlServerDbContext(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddDbContext<InsuranceDbContext>(options =>
+                options.UseSqlServer(
+                    configuration.GetConnectionString("DefaultConnection")));
             return services;
         }
     }

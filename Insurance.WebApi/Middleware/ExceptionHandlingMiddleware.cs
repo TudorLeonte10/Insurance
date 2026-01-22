@@ -49,12 +49,9 @@ namespace Insurance.WebApi.Middleware
                 ForbiddenBusinessException =>
                     (HttpStatusCode.Forbidden, exception.Message),
 
-                DbUpdateException dbEx when
-                    dbEx.InnerException is SqlException sqlEx &&
-                    sqlEx.Number == 2627 =>
-                        (HttpStatusCode.Conflict,
-                         "A resource with the same unique value already exists."),
-
+                DbUpdateException =>
+                    (HttpStatusCode.Conflict,
+                     "A resource with the same unique value already exists."),
                 _ =>
                     (HttpStatusCode.InternalServerError,
                      "An unexpected error occurred.")

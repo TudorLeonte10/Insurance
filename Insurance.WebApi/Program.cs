@@ -12,6 +12,11 @@ builder.Services.AddControllers();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
+if (!builder.Environment.IsEnvironment("Test"))
+{
+    builder.Services.AddSqlServerDbContext(builder.Configuration);
+}
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -22,9 +27,11 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<InsuranceDbContext>();
     var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
 
-    await context.Database.MigrateAsync();
-
-    await DatabaseSeeder.SeedAsync(context, env);
+    if (!env.IsEnvironment("Test"))
+    {
+        await context.Database.MigrateAsync();
+        await DatabaseSeeder.SeedAsync(context, env);
+    }
 }
 
 if (app.Environment.IsDevelopment())

@@ -12,6 +12,9 @@ namespace Insurance.Infrastructure.Persistence.Seed
             if(!environment.IsDevelopment())
                 return;
 
+            if (environment.IsEnvironment("Test"))
+                return;
+
             await GeographySeeder.SeedAsync(context);
             await ClientSeeder.SeedAsync(context);
             await BuildingSeeder.SeedAsync(context);

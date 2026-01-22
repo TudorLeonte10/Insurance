@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Insurance.WebApi.Controllers
 {
     [ApiController]
-    [Route("api/broker/[controller]")]
+    [Route("api/brokers/[controller]")]
     public class ClientsController : ControllerBase
     {
         private readonly IMediator _mediator;
