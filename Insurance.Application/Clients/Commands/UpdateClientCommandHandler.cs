@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Insurance.Application.Abstractions;
+using Insurance.Application.Abstractions.Audit;
 using Insurance.Domain.Abstractions.Repositories;
 using Insurance.Domain.Exceptions;
 using MediatR;
@@ -13,13 +14,13 @@ namespace Insurance.Application.Clients.Commands
     {
         private readonly IClientRepository _clientRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        private readonly IAuditLogService _auditLogService;
 
-        public UpdateClientCommandHandler(IClientRepository clientRepository, IUnitOfWork unitOfWork, IMapper mapper)
+        public UpdateClientCommandHandler(IClientRepository clientRepository, IUnitOfWork unitOfWork, IAuditLogService auditLogService)
         {
             _clientRepository = clientRepository;
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
+            _auditLogService = auditLogService;
         }
 
         public async Task<Guid> Handle(UpdateClientCommand request, CancellationToken cancellationToken)
@@ -30,11 +31,51 @@ namespace Insurance.Application.Clients.Commands
             if (client is null)
                 throw new NotFoundException("Client not found");
 
-            var updatedClient = _mapper.Map(request.Dto, client);
+
+            var exists = await _clientRepository
+                .ExistsByIdentifierAsync(request.Dto.IdentificationNumber, cancellationToken);
+
+            if (exists && client.IdentificationNumber != request.Dto.IdentificationNumber)
+                throw new ConflictException("Another client with the same identification number already exists");
+
+            var originalIdentificationNumber = client.IdentificationNumber;
+
+            client.UpdateDetails(
+                request.Dto.Name,
+                request.Dto.Email,
+                request.Dto.PhoneNumber,
+                request.Dto.Address,
+                request.Dto.IdentificationNumber);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return updatedClient.Id;
+            var identificationNumberChanged = originalIdentificationNumber != client.IdentificationNumber;
+
+            if (identificationNumberChanged)
+            {
+                var auditEntry = new AuditEntry
+                {
+                    EntityType = "Client",
+                    EntityId = client.Id,
+                    ChangedAt = DateTime.UtcNow,
+                    ChangedBy = "BrokerId",
+                    Changes = new[]
+                    {
+                    new AuditChangeEntry
+                    {
+                        Field = "IdentificationNumber",
+                        OldValue = originalIdentificationNumber,
+                        NewValue = client.IdentificationNumber
+                    }
+                   }
+                };
+                Console.WriteLine("Audit before insert");
+                await _auditLogService.LogAsync(auditEntry, cancellationToken);
+                Console.WriteLine("Audit after insert");
+            }
+
+
+            return client.Id;
         }
     }
 }

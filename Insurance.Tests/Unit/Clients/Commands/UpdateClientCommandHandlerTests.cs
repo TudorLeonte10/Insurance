@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Insurance.Application.Abstractions;
+using Insurance.Application.Abstractions.Audit;
 using Insurance.Application.Clients.Commands;
 using Insurance.Application.Clients.Commands.CreateClient;
 using Insurance.Application.Clients.DTOs;
@@ -17,7 +18,7 @@ namespace Insurance.Tests.Unit.Clients.Commands
     {
         private readonly Mock<IClientRepository> _clientRepositoryMock = new();
         private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
-        private readonly Mock<IMapper> _mapperMock = new();
+        private readonly Mock<IAuditLogService> _auditLogServiceMock = new();
 
         private readonly UpdateClientCommandHandler _handler;
 
@@ -26,7 +27,7 @@ namespace Insurance.Tests.Unit.Clients.Commands
             _handler = new UpdateClientCommandHandler(
                 _clientRepositoryMock.Object,
                 _unitOfWorkMock.Object,
-                _mapperMock.Object);
+                _auditLogServiceMock.Object);
         }
 
         [Fact]
@@ -53,37 +54,44 @@ namespace Insurance.Tests.Unit.Clients.Commands
         [Fact]
         public async Task Given_ExistingClient_Should_UpdateAndSave()
         {
-            var clientId = Guid.NewGuid();
-            var client = new Client { Id = clientId, Name = "Old Name" };
+            var client = Client.Create(
+                ClientType.Individual,
+                "Old Name",
+                "1234567890123",
+                "old@test.ro",
+                "0712345678",
+                "Str. Test 1"
+            );
+
+            var clientId = client.Id;
 
             _clientRepositoryMock
                 .Setup(r => r.GetByIdAsync(clientId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(client);
 
-            _mapperMock
-                .Setup(m => m.Map(It.IsAny<UpdateClientDto>(), It.IsAny<Client>()))
-                .Returns((UpdateClientDto dto, Client c) =>
-                {
-                    c.Name = dto.Name;
-                    c.Email = dto.Email;
-                    c.PhoneNumber = dto.PhoneNumber;
-                    return c;
-                });
-
             var command = new UpdateClientCommand(
                 clientId,
-                new UpdateClientDto { Name = "Updated Name" });
+                new UpdateClientDto
+                {
+                    Name = "Updated Name",
+                    Email = "new@test.ro",
+                    PhoneNumber = "0799999999",
+                    Address = "Str. Noua 2",
+                    IdentificationNumber = "1234567890123" 
+                });
 
             var result = await _handler.Handle(command, CancellationToken.None);
 
             Assert.Equal(clientId, result);
             Assert.Equal("Updated Name", client.Name);
+            Assert.Equal("new@test.ro", client.Email);
+            Assert.Equal("0799999999", client.PhoneNumber);
+            Assert.Equal("Str. Noua 2", client.Address);
 
             _unitOfWorkMock.Verify(
                 u => u.SaveChangesAsync(It.IsAny<CancellationToken>()),
                 Times.Once);
         }
-
 
     }
 }

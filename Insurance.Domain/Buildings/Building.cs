@@ -11,11 +11,11 @@ namespace Insurance.Domain.Buildings
     {
         public Guid Id { get; set; }
         public Guid ClientId { get; set; }
-        public Client Client { get; set; } = null!;
+        public Client Client { get; set; }
         public string Street { get; set; } = string.Empty;
         public string Number { get; set; } = string.Empty;
         public Guid CityId { get; set; }
-        public City City { get; set; } = null!;
+        public City City { get; set; }
         public int ConstructionYear { get; set; }
         public BuildingType Type { get; set; }
         public double SurfaceArea { get; set; }

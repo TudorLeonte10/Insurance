@@ -24,11 +24,15 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<InsuranceDbContext>();
     var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
+    var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
-    if (!env.IsEnvironment("Test"))
+    var connectionString = config.GetConnectionString("DefaultConnection");
+
+    if (!env.IsEnvironment("Test") && !string.IsNullOrWhiteSpace(connectionString))
     {
+        var context = scope.ServiceProvider.GetRequiredService<InsuranceDbContext>();
+
         await context.Database.MigrateAsync();
         await DatabaseSeeder.SeedAsync(context, env);
     }

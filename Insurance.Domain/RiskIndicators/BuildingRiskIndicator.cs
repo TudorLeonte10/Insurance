@@ -7,6 +7,8 @@ namespace Insurance.Domain.RiskIndicators
 {
     public class BuildingRiskIndicator
     {
+        public Guid Id { get; set; } = Guid.NewGuid();
+
         public Guid BuildingId { get; set; }
         public Building Building { get; set; } = null!;
 

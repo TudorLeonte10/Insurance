@@ -61,32 +61,36 @@ namespace Insurance.Tests.Unit.Clients.Commands
                 IdentificationNumber = "123456789",
                 Email = "valid@test.ro",
                 PhoneNumber = "0712345678",
-                Type = ClientType.Individual
+                Type = ClientType.Individual,
+                Address = "Str. Validului 1"
             };
-
-            var client = new Client { Id = Guid.NewGuid() };
 
             _clientRepositoryMock
                 .Setup(x => x.ExistsByIdentifierAsync(dto.IdentificationNumber, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(false);
 
-            _mapperMock
-                .Setup(x => x.Map<Client>(dto))
-                .Returns(client);
+            _clientRepositoryMock
+                .Setup(x => x.AddAsync(It.IsAny<Client>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             var command = new CreateClientCommand(dto);
 
             var result = await _handler.Handle(command, CancellationToken.None);
 
-            Assert.Equal(client.Id, result);
+            Assert.NotEqual(Guid.Empty, result);  
 
             _clientRepositoryMock.Verify(
-                x => x.AddAsync(client, It.IsAny<CancellationToken>()),
+                x => x.ExistsByIdentifierAsync(dto.IdentificationNumber, It.IsAny<CancellationToken>()),
+                Times.Once);
+
+            _clientRepositoryMock.Verify(
+                x => x.AddAsync(It.IsAny<Client>(), It.IsAny<CancellationToken>()),
                 Times.Once);
 
             _unitOfWorkMock.Verify(
                 x => x.SaveChangesAsync(It.IsAny<CancellationToken>()),
                 Times.Once);
         }
+
     }
 }

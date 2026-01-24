@@ -12,38 +12,34 @@ namespace Insurance.Infrastructure.Persistence.Seed
             if (context.Clients.Any())
                 return;
 
-            var client1 = new Client
-            {
-                Id = Guid.NewGuid(),
-                Name = "Ion Popescu",
-                IdentificationNumber = "1234567890123",
-                Type = ClientType.Individual,
-                Email = "ion.popescu@test.ro",
-                PhoneNumber = "0712345678",
-                Address = "Str. Libertatii 10"
-            };
+            var client1 = Client.Create(
+                ClientType.Individual,
+                "Ion Popescu",
+                "1234567890123",
+                "ion.popescu@test.ro",
+                "0712345678",
+                "Str. Libertatii 10"
+            );
 
-            var client2 = new Client
-            {
-                Id = Guid.NewGuid(),
-                Name = "SC Test Construct SRL",
-                IdentificationNumber = "RO12345678",
-                Type = ClientType.Company,
-                Email = "office@testconstruct.ro",
-                PhoneNumber = "0211234567",
-                Address = "Bd. Unirii 20"
-            };
+            var client2 = Client.Create(
+                ClientType.Company,
+                "SC Test Construct SRL",
+                "RO12345678",
+                "office@testconstruct.ro",
+                "0211234567",
+                "Bd. Unirii 20"
+            );
 
-            var client3 = new Client
-            {
-                Id = Guid.NewGuid(),
-                Name = "Maria Ionescu",
-                IdentificationNumber = "2980101123456",
-                Type = ClientType.Individual,
-                Email = "maria.ionescu@test.ro",
-                PhoneNumber = "0722333444",
-                Address = "Str. Florilor 5"
-            };
+                
+
+            var client3 = Client.Create(
+                ClientType.Individual,
+                "Maria Ionescu",
+                "2980101123456",
+                "maria.ionescu@test.ro",
+                "0722333444",
+                "Str. Florilor 5"
+            );
 
             context.Clients.AddRange(client1, client2, client3);
 
@@ -51,3 +47,6 @@ namespace Insurance.Infrastructure.Persistence.Seed
         }
     }
 }
+
+
+

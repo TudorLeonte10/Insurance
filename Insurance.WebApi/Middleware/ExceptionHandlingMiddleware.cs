@@ -74,7 +74,7 @@ namespace Insurance.WebApi.Middleware
                 ConflictException =>
                     (HttpStatusCode.Conflict, ex.Message),
 
-                ForbiddenBusinessException =>
+                ForbiddenException =>
                     (HttpStatusCode.Forbidden, ex.Message),
 
                 _ =>

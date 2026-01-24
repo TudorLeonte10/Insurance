@@ -27,7 +27,15 @@ namespace Insurance.Tests.Unit.Clients.Commands
 
         private static DeleteClientCommand CreateCommand(Guid clientId) => new DeleteClientCommand(clientId);
 
-        private static Client CreateClient(Guid id) => new Client { Id = id, Name = "X", IdentificationNumber = "ID" };
+        private static Client CreateClient() => Client.Create(
+            ClientType.Individual,
+            "X",
+            "ID",
+            "x@test.ro",
+            "0712345678",
+            "Str. Test 1"
+        );
+
 
         [Fact]
         public async Task Given_NonExistingClient_Should_ThrowNotFoundException()
@@ -53,9 +61,8 @@ namespace Insurance.Tests.Unit.Clients.Commands
         [Fact]
         public async Task Given_ExistingClient_Should_DeleteAndSave()
         {
-            // Given
-            var clientId = Guid.NewGuid();
-            var client = CreateClient(clientId);
+            var client = CreateClient();
+            var clientId = client.Id;
 
             _clientRepositoryMock
                 .Setup(r => r.GetByIdAsync(clientId, It.IsAny<CancellationToken>()))
@@ -69,7 +76,9 @@ namespace Insurance.Tests.Unit.Clients.Commands
 
             _clientRepositoryMock.Verify(
                 r => r.DeleteAsync(clientId, It.IsAny<CancellationToken>()), Times.Once);
-            _uowMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+
+            _uowMock.Verify(
+                u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

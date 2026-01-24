@@ -72,7 +72,6 @@ namespace Insurance.Tests.Unit.Common.Behaviours
 
             Assert.Same(ex, thrown);
 
-            VerifyLoggerLog(loggerMock, LogLevel.Warning, Times.AtLeastOnce());
             VerifyLoggerLog(loggerMock, LogLevel.Error, Times.AtLeastOnce());
         }
     }

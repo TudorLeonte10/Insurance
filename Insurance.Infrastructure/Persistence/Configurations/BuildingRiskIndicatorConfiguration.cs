@@ -13,7 +13,10 @@ namespace Insurance.Infrastructure.Persistence.Configurations
         {
             builder.ToTable("BuildingRiskIndicators");
 
-            builder.HasKey(x => new { x.BuildingId, x.RiskIndicator });
+            builder.HasKey(x => x.Id);
+
+            builder.HasIndex(x => new { x.BuildingId, x.RiskIndicator })
+                   .IsUnique();
 
             builder.Property(x => x.RiskIndicator)
                 .IsRequired();
@@ -23,5 +26,6 @@ namespace Insurance.Infrastructure.Persistence.Configurations
                 .HasForeignKey(x => x.BuildingId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
+
     }
 }

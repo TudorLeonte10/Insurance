@@ -31,16 +31,22 @@ namespace Insurance.Tests.Unit.Clients.Queries
         {
             var clientId = Guid.NewGuid();
 
-            var client = new Client
-            {
-                Id = clientId,
-                Name = "Test Client"
-            };
+            var client = Client.Create(
+                ClientType.Individual,
+                "Test Client",
+                "123456789",
+                "test@test.ro",
+                "0712345678",
+                "Str. Test 1"
+            );
 
             var dto = new ClientDetailsDto
             {
                 Id = clientId,
-                Name = "Test Client"
+                Name = "Test Client",
+                Email = "test@test.ro",
+                PhoneNumber = "0712345678",
+                Address = "Str. Test 1"
             };
 
             _clientRepositoryMock
@@ -58,6 +64,9 @@ namespace Insurance.Tests.Unit.Clients.Queries
             Assert.NotNull(result);
             Assert.Equal(clientId, result.Id);
             Assert.Equal("Test Client", result.Name);
+            Assert.Equal("test@test.ro", result.Email);
+            Assert.Equal("0712345678", result.PhoneNumber);
+            Assert.Equal("Str. Test 1", result.Address);
         }
 
         [Fact]

@@ -29,14 +29,19 @@ namespace Insurance.Application.Clients.Commands.CreateClient
                 .ExistsByIdentifierAsync(request.Dto.IdentificationNumber, cancellationToken);
 
             if (exists)
-            {
-                throw new ConflictException($"Client with Identification Number '{request.Dto.IdentificationNumber}' already exists.");
-            }
+                throw new ConflictException(
+                    $"Client with Identification Number '{request.Dto.IdentificationNumber}' already exists.");
 
-            var client = _mapper.Map<Client>(request.Dto);
+            var client = Client.Create(
+                request.Dto.Type,
+                request.Dto.Name,
+                request.Dto.IdentificationNumber,
+                request.Dto.Email,
+                request.Dto.PhoneNumber,
+                request.Dto.Address ?? string.Empty
+            );
 
             await _clientRepository.AddAsync(client, cancellationToken);
-
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return client.Id;
