@@ -14,13 +14,11 @@ namespace Insurance.Application.Clients.Commands.CreateClient
     {
         private readonly IClientRepository _clientRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
-        public CreateClientCommandHandler(IClientRepository clientRepository, IUnitOfWork unitOfWork, IMapper mapper)
+        public CreateClientCommandHandler(IClientRepository clientRepository, IUnitOfWork unitOfWork)
         {
             _clientRepository = clientRepository;
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
         public async Task<Guid> Handle(CreateClientCommand request, CancellationToken cancellationToken)

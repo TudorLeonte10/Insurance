@@ -17,7 +17,6 @@ namespace Insurance.Tests.Unit.Buildings.Commands
     {
         private readonly Mock<IBuildingRepository> _buildingRepositoryMock = new();
         private readonly Mock<IUnitOfWork> _uowMock = new();
-        private readonly Mock<IMapper> _mapperMock = new();
 
         private readonly UpdateBuildingCommandHandler _handler;
 
@@ -25,8 +24,7 @@ namespace Insurance.Tests.Unit.Buildings.Commands
         {
             _handler = new UpdateBuildingCommandHandler(
                 _buildingRepositoryMock.Object,
-                _uowMock.Object,
-                _mapperMock.Object);
+                _uowMock.Object);
         }
 
         private static UpdateBuildingCommand CreateValidCommand(Guid buildingId)

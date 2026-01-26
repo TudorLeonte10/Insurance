@@ -20,5 +20,12 @@ namespace Insurance.Application.Abstractions.Audit
         public string Field { get; init; } = string.Empty;
         public string OldValue { get; init; }
         public string NewValue { get; init; }
+
+        public AuditChangeEntry(string field, string oldValue, string newValue)
+        {
+            Field = field;
+            OldValue = oldValue;
+            NewValue = newValue;
+        }
     }
 }

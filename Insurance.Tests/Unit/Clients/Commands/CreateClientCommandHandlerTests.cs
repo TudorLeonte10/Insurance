@@ -18,7 +18,6 @@ namespace Insurance.Tests.Unit.Clients.Commands
     {
         private readonly Mock<IClientRepository> _clientRepositoryMock = new();
         private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
-        private readonly Mock<IMapper> _mapperMock = new();
 
         private readonly CreateClientCommandHandler _handler;
 
@@ -26,8 +25,7 @@ namespace Insurance.Tests.Unit.Clients.Commands
         {
             _handler = new CreateClientCommandHandler(
                 _clientRepositoryMock.Object,
-                _unitOfWorkMock.Object,
-                _mapperMock.Object);
+                _unitOfWorkMock.Object);
         }
 
         [Fact]

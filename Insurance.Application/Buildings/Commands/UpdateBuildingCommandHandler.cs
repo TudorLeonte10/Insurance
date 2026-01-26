@@ -14,13 +14,11 @@ namespace Insurance.Application.Buildings.Commands
     {
         private readonly IBuildingRepository _repository;
         private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
 
-        public UpdateBuildingCommandHandler(IBuildingRepository repository, IUnitOfWork uow, IMapper mapper)
+        public UpdateBuildingCommandHandler(IBuildingRepository repository, IUnitOfWork uow)
         {
             _repository = repository;
             _uow = uow;
-            _mapper = mapper;
         }
 
         public async Task<Guid> Handle(UpdateBuildingCommand request, CancellationToken cancellationToken)
@@ -28,18 +26,18 @@ namespace Insurance.Application.Buildings.Commands
             var building = await _repository.GetBuildingByIdAsync(request.BuildingId, cancellationToken);
 
             if (building is null)
-                throw new NotFoundException($"Building not found");
+                throw new NotFoundException("Building not found");
 
-            _mapper.Map(request.BuildingDto, building);
+            building.Street = request.BuildingDto.Street;
+            building.Number = request.BuildingDto.Number;
+            building.ConstructionYear = request.BuildingDto.ConstructionYear;
+            building.SurfaceArea = request.BuildingDto.SurfaceArea;
+            building.NumberOfFloors = request.BuildingDto.NumberOfFloors;
+            building.InsuredValue = request.BuildingDto.InsuredValue;
 
-            building.RiskIndicators = request.BuildingDto.RiskIndicators.Distinct()
-            .Select(r => new BuildingRiskIndicator
-            {
-                RiskIndicator = r
-            })
-            .ToList();
-
+            await _repository.UpdateAsync(building, request.BuildingDto.RiskIndicators, cancellationToken);
             await _uow.SaveChangesAsync(cancellationToken);
+
             return building.Id;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Insurance.Application.Buildings.DTOs;
 using Insurance.Domain.Buildings;
+using Insurance.Domain.RiskIndicators;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,6 +12,6 @@ namespace Insurance.Application.Abstractions.Repositories
         Task<IReadOnlyList<Building>> GetAllBuildingsByClientIdAsync(Guid clientId, CancellationToken cancellationToken);
         Task<Building> GetBuildingByIdAsync(Guid buildingId, CancellationToken cancellationToken);
         Task AddBuildingAsync(Building building, CancellationToken cancellationToken);
-        void UpdateBuilding(Building building, CancellationToken cancellationToken);
+        Task UpdateAsync(Building building, IEnumerable<RiskIndicatorType> riskIndicators, CancellationToken cancellationToken);
     }
 }

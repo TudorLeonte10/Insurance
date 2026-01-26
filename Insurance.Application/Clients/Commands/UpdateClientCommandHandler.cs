@@ -61,20 +61,12 @@ namespace Insurance.Application.Clients.Commands
                     ChangedBy = "BrokerId",
                     Changes = new[]
                     {
-                    new AuditChangeEntry
-                    {
-                        Field = "IdentificationNumber",
-                        OldValue = originalIdentificationNumber,
-                        NewValue = client.IdentificationNumber
+                        new AuditChangeEntry("IdentificationNumber", originalIdentificationNumber, client.IdentificationNumber)
                     }
-                   }
                 };
-                Console.WriteLine("Audit before insert");
+
                 await _auditLogService.LogAsync(auditEntry, cancellationToken);
-                Console.WriteLine("Audit after insert");
             }
-
-
             return client.Id;
         }
     }
