@@ -41,7 +41,7 @@ namespace Insurance.WebApi.Middleware
                 ValidationException vEx =>
                     (HttpStatusCode.BadRequest, string.Join("; ", vEx.Errors.Select(e => e.ErrorMessage))),
 
-               BusinessException bEx =>
+                BusinessException bEx =>
                     MapBusinessException(bEx),
 
                 DbUpdateException =>

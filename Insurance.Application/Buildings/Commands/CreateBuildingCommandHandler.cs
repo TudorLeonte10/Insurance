@@ -30,31 +30,50 @@ namespace Insurance.Application.Buildings.Commands
         }
         public async Task<Guid> Handle(CreateBuildingCommand request, CancellationToken cancellationToken)
         {
-            if (!await _clientRepository.ExistsAsync(request.ClientId, cancellationToken))
-            {
-                throw new NotFoundException($"Client with Id {request.ClientId} was not found.");
-            }
+            await ValidateCreateBuildingAsync(request, cancellationToken);
 
-            if(!await _geographyRepository.ExistsCityAsync(request.BuildingDto.CityId, cancellationToken))
-            {
-                throw new NotFoundException($"City with Id {request.BuildingDto.CityId} was not found.");
-            }
-
-            var building = _mapper.Map<Building>(request.BuildingDto);
-
-            building.ClientId = request.ClientId;
-
-            building.RiskIndicators = request.BuildingDto.RiskIndicators.Distinct()
-            .Select(r => new BuildingRiskIndicator
-                {
-                    RiskIndicator = r
-                })
-                .ToList();
+            var building = CreateBuilding(request);
 
             await _buildingRepository.AddBuildingAsync(building, cancellationToken);
             await _uow.SaveChangesAsync(cancellationToken);
 
             return building.Id;
         }
+
+
+        private async Task ValidateCreateBuildingAsync(CreateBuildingCommand request, CancellationToken cancellationToken)
+        {
+            if (!await _clientRepository.ExistsAsync(request.ClientId, cancellationToken))
+            {
+                throw new NotFoundException(
+                    $"Client with Id {request.ClientId} was not found.");
+            }
+
+            if (!await _geographyRepository.ExistsCityAsync(
+                    request.BuildingDto.CityId,
+                    cancellationToken))
+            {
+                throw new NotFoundException(
+                    $"City with Id {request.BuildingDto.CityId} was not found.");
+            }
+        }
+
+        private Building CreateBuilding(CreateBuildingCommand request)
+        {
+            var building = _mapper.Map<Building>(request.BuildingDto);
+
+            building.ClientId = request.ClientId;
+
+            building.RiskIndicators = request.BuildingDto.RiskIndicators
+                .Distinct()
+                .Select(r => new BuildingRiskIndicator
+                {
+                    RiskIndicator = r
+                })
+                .ToList();
+
+            return building;
+        }
+
     }
 }
