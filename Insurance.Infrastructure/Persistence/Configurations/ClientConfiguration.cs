@@ -1,33 +1,45 @@
-﻿using Insurance.Domain.Clients;
+﻿using Insurance.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Insurance.Infrastructure.Persistence.Configurations
+namespace Insurance.Infrastructure.Persistence.Configurations;
+
+public class ClientEntityConfiguration
+    : IEntityTypeConfiguration<ClientEntity>
 {
-    public class ClientConfiguration : IEntityTypeConfiguration<Client>
+    public void Configure(EntityTypeBuilder<ClientEntity> builder)
     {
-        public void Configure(EntityTypeBuilder<Client> builder)
-        {
-            builder.ToTable("Clients");
+        builder.ToTable("Clients");
 
-            builder.HasKey(c => c.Id);
+        builder.HasKey(c => c.Id);
 
-            builder.Property(c => c.Name)
-                .IsRequired()
-                .HasMaxLength(200);
+        builder.Property(c => c.Name)
+            .IsRequired()
+            .HasMaxLength(200);
 
-            builder.Property(c => c.IdentificationNumber)
-                .IsRequired()
-                .HasMaxLength(20);
+        builder.Property(c => c.IdentificationNumber)
+            .IsRequired()
+            .HasMaxLength(20);
 
-            builder.Property(c => c.Type)
-                .IsRequired();
+        builder.Property(c => c.Type)
+            .IsRequired()
+            .HasMaxLength(50);
 
-            builder.HasIndex(c => c.IdentificationNumber)
-                .IsUnique();
-        }
+        builder.Property(c => c.Email)
+            .HasMaxLength(200);
+
+        builder.Property(c => c.PhoneNumber)
+            .HasMaxLength(50);
+
+        builder.Property(c => c.Address)
+            .HasMaxLength(300);
+
+        builder.HasIndex(c => c.IdentificationNumber)
+            .IsUnique();
+
+        builder.HasMany(c => c.Buildings)
+            .WithOne(b => b.Client)
+            .HasForeignKey(b => b.ClientId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

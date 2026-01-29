@@ -2,75 +2,48 @@
 using AutoMapper.QueryableExtensions;
 using Insurance.Application.Clients.DTOs;
 using Insurance.Application.Common.Paging;
-using Insurance.Domain.Abstractions.Repositories;
+using Insurance.Infrastructure.Persistence.Mappers;
 using Insurance.Domain.Clients;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Persistence.Repositories
 {
-    public class ClientRepository : Repository<Client>, IClientRepository
+    [ExcludeFromCodeCoverage]
+    public class ClientRepository : IClientRepository
     {
-        private readonly IMapper _mapper;
-        public ClientRepository(InsuranceDbContext dbContext, IMapper mapper) : base(dbContext) 
+        private readonly InsuranceDbContext _dbContext;
+
+        public ClientRepository(InsuranceDbContext dbContext)
         {
-            _mapper = mapper;
+            _dbContext = dbContext;
         }
 
-        public async Task<bool> ExistsByIdentifierAsync(string identifier, CancellationToken cancellationToken)
+        public async Task<Client?> GetByIdAsync(Guid id, CancellationToken ct)
         {
-            return await DbContext.Set<Client>().AnyAsync(
-                c => c.IdentificationNumber == identifier, cancellationToken);
+            var entity = await _dbContext.Clients
+                .Include(c => c.Buildings)
+                .FirstOrDefaultAsync(c => c.Id == id, ct);
+
+            return entity is null ? null : ClientMapper.ToDomain(entity);
         }
 
-        public async Task<Client?> GetByIdentificationNumberAsync(string identifier, CancellationToken cancellationToken)
+        public async Task AddAsync(Client client, CancellationToken ct)
         {
-            return await DbContext.Set<Client>().FirstOrDefaultAsync(
-                    c => c.IdentificationNumber == identifier, cancellationToken);
+            var entity = ClientMapper.ToEntity(client);
+            await _dbContext.Clients.AddAsync(entity, ct);
         }
 
-        public async Task<PagedResult<ClientDetailsDto>> GetPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
+        public Task UpdateAsync(Client client, CancellationToken ct)
         {
-            var query = DbContext.Set<Client>()
-                .AsNoTracking();
-
-            var totalCount = await query.CountAsync(cancellationToken);
-
-            var items = await query
-                .OrderBy(c => c.Name)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ProjectTo<ClientDetailsDto>(_mapper.ConfigurationProvider)
-                .ToListAsync(cancellationToken);
-
-            return new PagedResult<ClientDetailsDto>(items, pageNumber, pageSize, totalCount);
-
-        }
-
-        public async Task<PagedResult<ClientDetailsDto>> SearchAsync(string? name, string? identifier, int pageNumber, int pageSize,CancellationToken cancellationToken)
-        {
-            var query = DbContext.Set<Client>()
-                .AsNoTracking();
-
-            if (!string.IsNullOrWhiteSpace(name))
-                query = query.Where(c => c.Name.Contains(name));
-
-            if (!string.IsNullOrWhiteSpace(identifier))
-                query = query.Where(c => c.IdentificationNumber == identifier);
-
-            var totalCount = await query.CountAsync(cancellationToken);
-
-            var items = await query
-                .OrderBy(c => c.Name)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ProjectTo<ClientDetailsDto>(_mapper.ConfigurationProvider)
-                .ToListAsync(cancellationToken);
-
-            return new PagedResult<ClientDetailsDto>(items, pageNumber, pageSize, totalCount);
+            var entity = ClientMapper.ToEntity(client);
+            _dbContext.Clients.Update(entity);
+            return Task.CompletedTask;
         }
 
     }
 }
+

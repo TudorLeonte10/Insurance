@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Insurance.Application.Abstractions;
-using Insurance.Domain.Abstractions.Repositories;
 using Insurance.Domain.Clients;
 using Insurance.Domain.Exceptions;
 using MediatR;
@@ -23,12 +22,6 @@ namespace Insurance.Application.Clients.Commands.CreateClient
 
         public async Task<Guid> Handle(CreateClientCommand request, CancellationToken cancellationToken)
         {
-            var exists = await _clientRepository
-                .ExistsByIdentifierAsync(request.Dto.IdentificationNumber, cancellationToken);
-
-            if (exists)
-                throw new ConflictException(
-                    $"Client with Identification Number '{request.Dto.IdentificationNumber}' already exists.");
 
             var client = Client.Create(
                 request.Dto.Type,
@@ -39,11 +32,13 @@ namespace Insurance.Application.Clients.Commands.CreateClient
                 request.Dto.Address ?? string.Empty
             );
 
+     
             await _clientRepository.AddAsync(client, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return client.Id;
         }
+
     }
 }
 

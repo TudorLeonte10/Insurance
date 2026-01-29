@@ -1,73 +1,64 @@
 ﻿using Insurance.Domain.Buildings;
+using Insurance.Infrastructure.Persistence.Entities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Persistence.Seed
 {
-    public static class BuildingSeeder
+    [ExcludeFromCodeCoverage]
+    public class BuildingSeeder
     {
-        public static async Task SeedAsync(InsuranceDbContext context)
+        private readonly InsuranceDbContext _context;
+
+        public BuildingSeeder(InsuranceDbContext context)
         {
-            if (context.Buildings.Any())
+            _context = context;
+        }
+
+        public async Task SeedAsync()
+        {
+            if (_context.Buildings.Any())
                 return;
 
-            // luăm date deja existente
-            var clients = context.Clients.ToList();
-            var cities = context.Cities.ToList();
+            var client = _context.Clients.First();
+            var city = _context.Cities.First();
 
-            if (!clients.Any() || !cities.Any())
-                return;
-
-            var bucuresti = cities.First(c => c.Name == "Bucuresti");
-            var iasi = cities.First(c => c.Name == "Iasi");
-
-            var building1 = new Building
+            var buildings = new List<BuildingEntity>
+        {
+            new()
             {
                 Id = Guid.NewGuid(),
-                ClientId = clients[0].Id,
-                CityId = bucuresti.Id,
-                Street = "Calea Victoriei",
-                Number = "15",
-                ConstructionYear = 1990,
-                Type = BuildingType.Residential,
-                SurfaceArea = 120,
-                NumberOfFloors = 2,
-                InsuredValue = 120_000m
-            };
-
-            var building2 = new Building
-            {
-                Id = Guid.NewGuid(),
-                ClientId = clients[0].Id,
-                CityId = iasi.Id,
-                Street = "Str. Stefan cel Mare",
-                Number = "8",
+                ClientId = client.Id,
+                CityId = city.Id,
+                Street = "Str. Memorandumului",
+                Number = "10",
+                Type = "Residential",
                 ConstructionYear = 2005,
-                Type = BuildingType.Residential,
-                SurfaceArea = 90,
-                NumberOfFloors = 1,
-                InsuredValue = 90_000m
-            };
-
-            var building3 = new Building
+                NumberOfFloors = 2,
+                SurfaceArea = 120,
+                InsuredValue = 150000
+            },
+            new()
             {
                 Id = Guid.NewGuid(),
-                ClientId = clients[1].Id,
-                CityId = bucuresti.Id,
-                Street = "Bd. Unirii",
-                Number = "45",
-                ConstructionYear = 2010,
-                Type = BuildingType.Office,
+                ClientId = client.Id,
+                CityId = city.Id,
+                Street = "Str. Eroilor",
+                Number = "25A",
+                Type = "Office",
+                ConstructionYear = 2015,
+                NumberOfFloors = 4,
                 SurfaceArea = 300,
-                NumberOfFloors = 5,
-                InsuredValue = 500_000m
-            };
+                InsuredValue = 450000
+            }
+        };
 
-            context.Buildings.AddRange(building1, building2, building3);
-
-            await context.SaveChangesAsync();
+            _context.Buildings.AddRange(buildings);
+            await _context.SaveChangesAsync();
         }
     }
+
 }
 

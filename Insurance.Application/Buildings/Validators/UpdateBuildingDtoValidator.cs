@@ -29,9 +29,6 @@ namespace Insurance.Application.Buildings.Validators
 
             RuleFor(x => x.InsuredValue)
                 .GreaterThan(0);
-
-            RuleForEach(x => x.RiskIndicators)
-                .IsInEnum();
         }
     }
 }

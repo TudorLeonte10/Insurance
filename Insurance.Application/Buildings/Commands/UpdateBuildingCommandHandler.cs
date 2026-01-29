@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Repositories;
+using Insurance.Domain.Buildings;
 using Insurance.Domain.Exceptions;
 using Insurance.Domain.RiskIndicators;
 using MediatR;
@@ -23,19 +24,20 @@ namespace Insurance.Application.Buildings.Commands
 
         public async Task<Guid> Handle(UpdateBuildingCommand request, CancellationToken cancellationToken)
         {
-            var building = await _repository.GetBuildingByIdAsync(request.BuildingId, cancellationToken);
+            var building = await _repository.GetByIdAsync(request.BuildingId, cancellationToken);
 
             if (building is null)
                 throw new NotFoundException("Building not found");
 
-            building.Street = request.BuildingDto.Street;
-            building.Number = request.BuildingDto.Number;
-            building.ConstructionYear = request.BuildingDto.ConstructionYear;
-            building.SurfaceArea = request.BuildingDto.SurfaceArea;
-            building.NumberOfFloors = request.BuildingDto.NumberOfFloors;
-            building.InsuredValue = request.BuildingDto.InsuredValue;
+            building.UpdateDetails(
+                request.BuildingDto.ConstructionYear,
+                request.BuildingDto.NumberOfFloors,
+                request.BuildingDto.SurfaceArea,
+                request.BuildingDto.InsuredValue,
+                request.BuildingDto.Street,
+                request.BuildingDto.Number);
 
-            await _repository.UpdateAsync(building, request.BuildingDto.RiskIndicators, cancellationToken);
+            await _repository.UpdateAsync(building, cancellationToken);
             await _uow.SaveChangesAsync(cancellationToken);
 
             return building.Id;

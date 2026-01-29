@@ -10,9 +10,9 @@ namespace Insurance.Application.Geography.Queries
 {
     public class GetCitiesByCountyQueryHandler : IRequestHandler<GetCitiesByCountyQuery, IReadOnlyList<CityDto>>
     {
-        private readonly IGeographyRepository _geographyRepository;
+        private readonly IGeographyReadRepository _geographyRepository;
         private readonly IMapper _mapper;
-        public GetCitiesByCountyQueryHandler(IGeographyRepository geographyRepository, IMapper mapper)
+        public GetCitiesByCountyQueryHandler(IGeographyReadRepository geographyRepository, IMapper mapper)
         {
             _geographyRepository = geographyRepository;
             _mapper = mapper;

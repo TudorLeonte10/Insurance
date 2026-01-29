@@ -1,24 +1,28 @@
 ﻿using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Persistence.Seed
 {
-    public static class DatabaseSeeder
+    [ExcludeFromCodeCoverage]
+    public class DatabaseSeeder
     {
-        public static async Task SeedAsync(InsuranceDbContext context, IHostEnvironment environment)
+        private readonly InsuranceDbContext _context;
+
+        public DatabaseSeeder(InsuranceDbContext context)
         {
-            if(!environment.IsDevelopment())
-                return;
+            _context = context;
+        }
 
-            if (environment.IsEnvironment("Test"))
-                return;
-
-            await GeographySeeder.SeedAsync(context);
-            await ClientSeeder.SeedAsync(context);
-            await BuildingSeeder.SeedAsync(context);
-            await BuildingRiskIndicatorSeeder.SeedAsync(context);
+        public async Task SeedAsync()
+        {
+            await new GeographySeeder(_context).SeedAsync();
+            await new ClientSeeder(_context).SeedAsync();
+            await new BuildingSeeder(_context).SeedAsync();
+            await new BuildingRiskIndicatorSeeder(_context).SeedAsync();
         }
     }
+
 }

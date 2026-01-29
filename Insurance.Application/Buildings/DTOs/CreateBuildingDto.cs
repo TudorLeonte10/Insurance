@@ -13,7 +13,7 @@ namespace Insurance.Application.Buildings.DTOs
         public Guid CityId { get; set; }
         public int ConstructionYear { get; set; }
         public BuildingType Type { get; set; }
-        public double SurfaceArea { get; set; }
+        public decimal SurfaceArea { get; set; }
         public int NumberOfFloors { get; set; }
         public decimal InsuredValue { get; set; }
 

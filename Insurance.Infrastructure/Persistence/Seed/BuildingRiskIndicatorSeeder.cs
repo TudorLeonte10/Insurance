@@ -1,50 +1,47 @@
 ﻿using Insurance.Domain.RiskIndicators;
+using Insurance.Infrastructure.Persistence.Entities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Persistence.Seed
 {
-    public static class BuildingRiskIndicatorSeeder
+    [ExcludeFromCodeCoverage]
+    public class BuildingRiskIndicatorSeeder
     {
-        public static async Task SeedAsync(InsuranceDbContext context)
+        private readonly InsuranceDbContext _context;
+
+        public BuildingRiskIndicatorSeeder(InsuranceDbContext context)
         {
-            if (context.RiskIndicators.Any())
+            _context = context;
+        }
+
+        public async Task SeedAsync()
+        {
+            if (_context.BuildingRiskIndicators.Any())
                 return;
 
-            var buildings = context.Buildings.ToList();
+            var building = _context.Buildings.First();
 
-            if (!buildings.Any())
-                return;
-
-            var building1 = buildings.First();
-            var building2 = buildings.Skip(1).FirstOrDefault();
-
-            context.RiskIndicators.AddRange(
-                new BuildingRiskIndicator
-                {
-                    BuildingId = building1.Id,
-                    RiskIndicator = RiskIndicatorType.FloodRisk
-                },
-                new BuildingRiskIndicator
-                {
-                    BuildingId = building1.Id,
-                    RiskIndicator = RiskIndicatorType.EarthquakeRisk
-                }
-            );
-
-            if (building2 != null)
+            var indicators = new List<BuildingRiskIndicatorEntity>
+        {
+            new()
             {
-                context.RiskIndicators.Add(
-                    new BuildingRiskIndicator
-                    {
-                        BuildingId = building2.Id,
-                        RiskIndicator = RiskIndicatorType.FireRisk
-                    }
-                );
+                Id = Guid.NewGuid(),
+                BuildingId = building.Id,
+                RiskIndicator = RiskIndicatorType.TheftRisk.ToString()
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                BuildingId = building.Id,
+                RiskIndicator = RiskIndicatorType.EarthquakeRisk.ToString()
             }
+        };
 
-            await context.SaveChangesAsync();
+            _context.BuildingRiskIndicators.AddRange(indicators);
+            await _context.SaveChangesAsync();
         }
     }
 }

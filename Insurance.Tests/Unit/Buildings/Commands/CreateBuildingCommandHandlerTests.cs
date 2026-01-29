@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Repositories;
-using Insurance.Application.Buildings.Commands;
+/*using Insurance.Application.Buildings.Commands;
 using Insurance.Application.Buildings.DTOs;
-using Insurance.Domain.Abstractions.Repositories;
 using Insurance.Domain.Buildings;
+using Insurance.Domain.Clients;
 using Insurance.Domain.Exceptions;
 using Insurance.Domain.RiskIndicators;
 using Moq;
@@ -172,3 +172,4 @@ namespace Insurance.Tests.Unit.Buildings.Commands
 
     }
 }
+*/

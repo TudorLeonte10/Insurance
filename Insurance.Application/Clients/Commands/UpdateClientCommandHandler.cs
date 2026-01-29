@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Audit;
-using Insurance.Domain.Abstractions.Repositories;
 using Insurance.Domain.Clients;
 using Insurance.Domain.Exceptions;
 using MediatR;
@@ -27,8 +26,6 @@ namespace Insurance.Application.Clients.Commands
         public async Task<Guid> Handle(UpdateClientCommand request, CancellationToken cancellationToken)
         {
             var client = await GetClientOrThrowAsync(request.ClientId, cancellationToken);
-
-            await EnsureIdentificationNumberIsUniqueAsync(client, request.Dto.IdentificationNumber, cancellationToken);
 
             var originalIdentificationNumber = client.IdentificationNumber;
 
@@ -57,15 +54,6 @@ namespace Insurance.Application.Clients.Commands
             return client;
         }
 
-        private async Task EnsureIdentificationNumberIsUniqueAsync(Client client, string newIdentificationNumber, CancellationToken cancellationToken)
-        {
-            var exists = await _clientRepository
-                .ExistsByIdentifierAsync(newIdentificationNumber, cancellationToken);
-
-            if (exists && client.IdentificationNumber != newIdentificationNumber)
-                throw new ConflictException(
-                    "Another client with the same identification number already exists");
-        }
 
         private async Task AuditIdentificationNumberChangeIfNeededAsync(Client client, string originalIdentificationNumber, CancellationToken cancellationToken)
         {
@@ -89,7 +77,5 @@ namespace Insurance.Application.Clients.Commands
 
             await _auditLogService.LogAsync(auditEntry, cancellationToken);
         }
-
-
     }
 }

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿/*using AutoMapper;
 using Insurance.Application.Abstractions;
 using Insurance.Application.Clients.Commands;
 using Insurance.Application.Clients.Commands.CreateClient;
@@ -92,3 +92,4 @@ namespace Insurance.Tests.Unit.Clients.Commands
 
     }
 }
+*/

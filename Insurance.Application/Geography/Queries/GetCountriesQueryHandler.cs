@@ -10,16 +10,16 @@ namespace Insurance.Application.Geography.Queries
 {
     public class GetCountriesQueryHandler : IRequestHandler<GetCountriesQuery, IReadOnlyList<CountryDto>>
     {
-        private readonly IGeographyRepository _geographyRepository;
+        private readonly IGeographyReadRepository _geographyRepository;
         private readonly IMapper _mapper;
-        public GetCountriesQueryHandler(IGeographyRepository geographyRepository, IMapper mapper)
+        public GetCountriesQueryHandler(IGeographyReadRepository geographyRepository, IMapper mapper)
         {
             _geographyRepository = geographyRepository;
             _mapper = mapper;
         }
         public async Task<IReadOnlyList<CountryDto>> Handle(GetCountriesQuery request, CancellationToken cancellationToken)
         {
-            var countries =  await _geographyRepository.GetAllCountriesAsync(cancellationToken);
+            var countries =  await _geographyRepository.GetCountriesAsync(cancellationToken);
             return _mapper.Map<IReadOnlyList<CountryDto>>(countries);
         }
     }

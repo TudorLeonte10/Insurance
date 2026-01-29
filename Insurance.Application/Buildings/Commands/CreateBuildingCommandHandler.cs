@@ -1,79 +1,70 @@
-﻿using AutoMapper;
-using Insurance.Application.Abstractions;
+﻿using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Repositories;
-using Insurance.Domain.Abstractions.Repositories;
+using Insurance.Application.Buildings.Commands;
 using Insurance.Domain.Buildings;
+using Insurance.Domain.Clients;
 using Insurance.Domain.Exceptions;
-using Insurance.Domain.RiskIndicators;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Insurance.Application.Buildings.Commands
+public class CreateBuildingCommandHandler
+    : IRequestHandler<CreateBuildingCommand, Guid>
 {
-    public class CreateBuildingCommandHandler : IRequestHandler<CreateBuildingCommand, Guid>
+    private readonly IBuildingRepository _buildingRepository;
+    private readonly IClientRepository _clientRepository;
+    private readonly IGeographyReadRepository _geographyRepository;
+    private readonly IUnitOfWork _uow;
+
+    public CreateBuildingCommandHandler(
+        IBuildingRepository buildingRepository,
+        IClientRepository clientRepository,
+        IGeographyReadRepository geographyRepository,
+        IUnitOfWork uow)
     {
-        private readonly IBuildingRepository _buildingRepository;
-        private readonly IClientRepository _clientRepository;
-        private readonly IGeographyRepository _geographyRepository;
-        private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
+        _buildingRepository = buildingRepository;
+        _clientRepository = clientRepository;
+        _geographyRepository = geographyRepository;
+        _uow = uow;
+    }
 
-        public CreateBuildingCommandHandler(IBuildingRepository buildingRepository, IClientRepository clientRepository, IGeographyRepository geographyRepositor, IUnitOfWork uow, IMapper mapper)
-        {
-            _buildingRepository = buildingRepository;
-            _clientRepository = clientRepository;
-            _geographyRepository = geographyRepositor;
-            _uow = uow;
-            _mapper = mapper;
-        }
-        public async Task<Guid> Handle(CreateBuildingCommand request, CancellationToken cancellationToken)
-        {
-            await ValidateCreateBuildingAsync(request, cancellationToken);
+    public async Task<Guid> Handle(
+        CreateBuildingCommand request,
+        CancellationToken cancellationToken)
+    {
+        await ValidateAsync(request, cancellationToken);
 
-            var building = CreateBuilding(request);
+        var dto = request.BuildingDto;
 
-            await _buildingRepository.AddBuildingAsync(building, cancellationToken);
-            await _uow.SaveChangesAsync(cancellationToken);
+        var building = Building.Create(
+            request.ClientId,
+            dto.CityId,
+            dto.Type,
+            dto.Street,
+            dto.Number,
+            dto.ConstructionYear,
+            dto.NumberOfFloors,
+            dto.SurfaceArea,
+            dto.InsuredValue);
 
-            return building.Id;
-        }
+        await _buildingRepository.AddAsync(
+            building,
+            dto.RiskIndicators,
+            cancellationToken);
+
+        await _uow.SaveChangesAsync(cancellationToken);
+
+        return building.Id;
+    }
+
+    private async Task ValidateAsync(CreateBuildingCommand request, CancellationToken ct)
+    {
+        var client = await _clientRepository.GetByIdAsync(request.ClientId, ct);
+
+        if (client is null)
+            throw new NotFoundException($"Client with id {request.ClientId} not found");
 
 
-        private async Task ValidateCreateBuildingAsync(CreateBuildingCommand request, CancellationToken cancellationToken)
-        {
-            if (!await _clientRepository.ExistsAsync(request.ClientId, cancellationToken))
-            {
-                throw new NotFoundException(
-                    $"Client with Id {request.ClientId} was not found.");
-            }
-
-            if (!await _geographyRepository.ExistsCityAsync(
-                    request.BuildingDto.CityId,
-                    cancellationToken))
-            {
-                throw new NotFoundException(
-                    $"City with Id {request.BuildingDto.CityId} was not found.");
-            }
-        }
-
-        private Building CreateBuilding(CreateBuildingCommand request)
-        {
-            var building = _mapper.Map<Building>(request.BuildingDto);
-
-            building.ClientId = request.ClientId;
-
-            building.RiskIndicators = request.BuildingDto.RiskIndicators
-                .Distinct()
-                .Select(r => new BuildingRiskIndicator
-                {
-                    RiskIndicator = r
-                })
-                .ToList();
-
-            return building;
-        }
-
+        var city = await _geographyRepository.GetCityByIdAsync(request.BuildingDto.CityId, ct);
+        if(city is null)
+            throw new NotFoundException($"City with id {request.BuildingDto.CityId} not found");
     }
 }

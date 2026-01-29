@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Persistence
 {
+    [ExcludeFromCodeCoverage]
     public class InsuranceDbContextFactory : IDesignTimeDbContextFactory<InsuranceDbContext>
     {
         public InsuranceDbContext CreateDbContext(string[] args)

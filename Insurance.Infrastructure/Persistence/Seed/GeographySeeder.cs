@@ -1,65 +1,81 @@
-﻿using Insurance.Domain.Geography;
+﻿
+using Insurance.Infrastructure.Persistence.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Persistence.Seed
 {
-    public static class GeographySeeder
+    [ExcludeFromCodeCoverage]
+    public class GeographySeeder
     {
-        public static async Task SeedAsync(InsuranceDbContext context)
+        private readonly InsuranceDbContext _context;
+
+        public GeographySeeder(InsuranceDbContext context)
         {
-            if (context.Countries.Any())
+            _context = context;
+        }
+
+        public async Task SeedAsync()
+        {
+            if (_context.Countries.Any())
                 return;
 
-            var romania = new Country
+            var romania = new CountryEntity
             {
                 Id = Guid.NewGuid(),
-                Name = "Romania",
-                Counties = new List<County>()
+                Name = "Romania"
             };
 
-            var iasi = new County
+            var cluj = new CountyEntity
             {
                 Id = Guid.NewGuid(),
-                Name = "Iasi",
-                Country = romania,
-                Cities = new List<City>()
+                Name = "Cluj",
+                CountryId = romania.Id
             };
 
-            var bucurestiCounty = new County
+            var bucuresti = new CountyEntity
             {
                 Id = Guid.NewGuid(),
                 Name = "Bucuresti",
-                Country = romania,
-                Cities = new List<City>()
+                CountryId = romania.Id
             };
 
-            iasi.Cities.Add(new City
+            var cities = new List<CityEntity>
+        {
+            new CityEntity
             {
                 Id = Guid.NewGuid(),
-                Name = "Iasi"
-            });
-
-            iasi.Cities.Add(new City
+                Name = "Cluj-Napoca",
+                CountyId = cluj.Id
+            },
+            new CityEntity
             {
                 Id = Guid.NewGuid(),
-                Name = "Pascani"
-            });
-
-            bucurestiCounty.Cities.Add(new City
+                Name = "Turda",
+                CountyId = cluj.Id
+            },
+            new CityEntity
             {
-                Id = Guid.NewGuid(), 
-                Name = "Bucuresti" 
-            });
+                Id = Guid.NewGuid(),
+                Name = "Sector 1",
+                CountyId = bucuresti.Id
+            },
+            new CityEntity
+            {
+                Id = Guid.NewGuid(),
+                Name = "Sector 3",
+                CountyId = bucuresti.Id
+            }
+        };
 
-            romania.Counties.Add(iasi);
-            romania.Counties.Add(bucurestiCounty);
+            _context.Countries.Add(romania);
+            _context.Counties.AddRange(cluj, bucuresti);
+            _context.Cities.AddRange(cities);
 
-            context.Countries.Add(romania);
-
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
     }
-
 }

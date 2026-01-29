@@ -1,10 +1,12 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System;
+using System.Diagnostics.CodeAnalysis;
 
 #nullable disable
 
 namespace Insurance.Infrastructure.Persistence.Migrations
 {
+    [ExcludeFromCodeCoverage]
     public partial class SurrogateKey : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

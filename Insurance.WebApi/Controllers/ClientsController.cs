@@ -27,18 +27,12 @@ namespace Insurance.WebApi.Controllers
         [HttpGet("{clientId}")]
         public async Task<IActionResult> GetClientById(Guid clientId, CancellationToken cancellationToken)
         {
-            var query = new GetClientByIdQuery(clientId);
-            var client = await _mediator.Send(query, cancellationToken);
-            return Ok(client);
+            return Ok(await _mediator.Send(new GetClientsQuery
+            {
+                ClientId = clientId
+            }));
         }
 
-        [HttpGet("all")]
-        public async Task<IActionResult> GetClients([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
-        {
-            var query = new GetClientsQuery(pageNumber, pageSize);
-            var result = await _mediator.Send(query);
-            return Ok(result);
-        }
 
         [HttpPut("{clientId}")]
         public async Task<IActionResult> UpdateClient([FromRoute] Guid clientId, [FromBody] UpdateClientDto dto, CancellationToken ct)
@@ -48,20 +42,16 @@ namespace Insurance.WebApi.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{clientId}")]
-        public async Task<IActionResult> DeleteClient([FromRoute] Guid clientId, CancellationToken ct)
+        [HttpGet("clients")]
+        public async Task<IActionResult> SearchClients([FromQuery] string? name, [FromQuery] string? identifier, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var command = new DeleteClientCommand(clientId);
-            await _mediator.Send(command, ct);
-            return NoContent();
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> SearchClients([FromQuery] string? name, [FromQuery] string? identifier, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
-        {
-            var query = new SearchClientsQuery(name, identifier, pageNumber, pageSize);
-            var result = await _mediator.Send(query, cancellationToken);
-            return Ok(result);
+            return Ok(await _mediator.Send(new GetClientsQuery
+            {
+                Name = name,
+                IdentificationNumber = identifier,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            }));
         }
     }
 }

@@ -1,5 +1,6 @@
-﻿using Insurance.Domain.Geography;
+﻿
 using Insurance.Infrastructure.Persistence;
+using Insurance.Infrastructure.Persistence.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -37,9 +38,9 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
     public void SeedTestData(InsuranceDbContext db)
     {
-        var country = new Country { Name = "Romania" };
-        var county = new County { Name = "Iasi", Country = country };
-        var city = new City { Name = "Pascani", County = county };
+        var country = new CountryEntity { Name = "Romania" };
+        var county = new CountyEntity { Name = "Iasi", Country = country };
+        var city = new CityEntity { Name = "Pascani", County = county };
 
         db.AddRange(country, county, city);
         db.SaveChanges();

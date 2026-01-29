@@ -1,7 +1,8 @@
 ﻿using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Audit;
 using Insurance.Application.Abstractions.Repositories;
-using Insurance.Domain.Abstractions.Repositories;
+using Insurance.Domain.Buildings;
+using Insurance.Domain.Clients;
 using Insurance.Infrastructure.Audit;
 using Insurance.Infrastructure.Persistence;
 using Insurance.Infrastructure.Persistence.Repositories;
@@ -12,10 +13,12 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure
 {
+    [ExcludeFromCodeCoverage]
     public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructure(
@@ -23,9 +26,14 @@ namespace Insurance.Infrastructure
             IConfiguration configuration)
         {
 
+            services.AddAutoMapper(typeof(DependencyInjection).Assembly);
+
             services.AddScoped<IClientRepository, ClientRepository>();
-            services.AddScoped<IGeographyRepository, GeographyRepository>();
+            services.AddScoped<IGeographyReadRepository, GeographyReadRepository>();
             services.AddScoped<IBuildingRepository, BuildingRepository>();
+            services.AddScoped<IBuildingReadRepository, BuildingReadRepository>();
+            services.AddScoped<IClientReadRepository, ClientReadRepository>();
+            services.AddScoped<IClientSearchRepository, ClientSearchRepository>();
 
             services.AddSingleton<IMongoClient>(sp =>
             {

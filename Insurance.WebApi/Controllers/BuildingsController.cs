@@ -19,15 +19,24 @@ namespace Insurance.WebApi.Controllers
         [HttpGet("clients/{clientId}/buildings")]
         public async Task<IActionResult> GetBuildingsByClient([FromRoute] Guid clientId, CancellationToken cancellationToken)
         {
-            var query = new GetBuildingsByClientQuery(clientId);
+            var query = new GetBuildingsQuery
+            {
+                ClientId = clientId
+            };
+
             var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
+
         }
 
         [HttpGet("buildings/{buildingId}")]
         public async Task<IActionResult> GetBuildingById([FromRoute] Guid buildingId, CancellationToken cancellationToken)
         {
-            var query = new GetBuildingByIdQuery(buildingId);
+            var query = new GetBuildingsQuery
+            {
+                BuildingId = buildingId
+            };
+
             var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
         }

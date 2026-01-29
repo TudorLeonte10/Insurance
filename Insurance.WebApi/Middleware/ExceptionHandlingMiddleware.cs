@@ -44,9 +44,15 @@ namespace Insurance.WebApi.Middleware
                 BusinessException bEx =>
                     MapBusinessException(bEx),
 
+                DbUpdateException dbEx when IsUniqueConstraintViolation(dbEx) =>
+                (HttpStatusCode.Conflict,
+                 "A resource with the same unique value already exists."),
+
                 DbUpdateException =>
-                    (HttpStatusCode.Conflict,
-                     "A resource with the same unique value already exists."),
+               (HttpStatusCode.InternalServerError,
+                "Database error occurred."),
+
+
                 _ =>
                     (HttpStatusCode.InternalServerError,
                      "An unexpected error occurred.")
@@ -81,5 +87,14 @@ namespace Insurance.WebApi.Middleware
                     (HttpStatusCode.BadRequest, ex.Message)
             };
         }
+
+        private static bool IsUniqueConstraintViolation(DbUpdateException ex)
+        {
+            if (ex.InnerException is SqlException sqlEx)
+                return sqlEx.Number == 2601 || sqlEx.Number == 2627;
+
+            return false;
+        }
+
     }
 }

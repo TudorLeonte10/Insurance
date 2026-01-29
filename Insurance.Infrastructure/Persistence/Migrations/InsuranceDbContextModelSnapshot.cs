@@ -22,7 +22,7 @@ namespace Insurance.Infrastructure.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Insurance.Domain.Buildings.Building", b =>
+            modelBuilder.Entity("Insurance.Infrastructure.Persistence.Entities.BuildingEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -41,7 +41,6 @@ namespace Insurance.Infrastructure.Persistence.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Number")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
@@ -49,15 +48,16 @@ namespace Insurance.Infrastructure.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Street")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<double>("SurfaceArea")
-                        .HasColumnType("float");
+                    b.Property<decimal>("SurfaceArea")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -68,17 +68,65 @@ namespace Insurance.Infrastructure.Persistence.Migrations
                     b.ToTable("Buildings", (string)null);
                 });
 
-            modelBuilder.Entity("Insurance.Domain.Clients.Client", b =>
+            modelBuilder.Entity("Insurance.Infrastructure.Persistence.Entities.BuildingRiskIndicatorEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BuildingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RiskIndicator")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BuildingId", "RiskIndicator")
+                        .IsUnique();
+
+                    b.ToTable("BuildingRiskIndicators", (string)null);
+                });
+
+            modelBuilder.Entity("Insurance.Infrastructure.Persistence.Entities.CityEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CountyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountyId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("Cities", (string)null);
+                });
+
+            modelBuilder.Entity("Insurance.Infrastructure.Persistence.Entities.ClientEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("IdentificationNumber")
                         .IsRequired()
@@ -91,10 +139,14 @@ namespace Insurance.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -104,28 +156,7 @@ namespace Insurance.Infrastructure.Persistence.Migrations
                     b.ToTable("Clients", (string)null);
                 });
 
-            modelBuilder.Entity("Insurance.Domain.Geography.City", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CountyId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CountyId");
-
-                    b.ToTable("Cities", (string)null);
-                });
-
-            modelBuilder.Entity("Insurance.Domain.Geography.Country", b =>
+            modelBuilder.Entity("Insurance.Infrastructure.Persistence.Entities.CountryEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -133,15 +164,18 @@ namespace Insurance.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Countries", (string)null);
                 });
 
-            modelBuilder.Entity("Insurance.Domain.Geography.County", b =>
+            modelBuilder.Entity("Insurance.Infrastructure.Persistence.Entities.CountyEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -152,45 +186,26 @@ namespace Insurance.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CountryId");
+                    b.HasIndex("CountryId", "Name")
+                        .IsUnique();
 
                     b.ToTable("Counties", (string)null);
                 });
 
-            modelBuilder.Entity("Insurance.Domain.RiskIndicators.BuildingRiskIndicator", b =>
+            modelBuilder.Entity("Insurance.Infrastructure.Persistence.Entities.BuildingEntity", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("BuildingId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("RiskIndicator")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BuildingId", "RiskIndicator")
-                        .IsUnique();
-
-                    b.ToTable("BuildingRiskIndicators", (string)null);
-                });
-
-            modelBuilder.Entity("Insurance.Domain.Buildings.Building", b =>
-                {
-                    b.HasOne("Insurance.Domain.Geography.City", "City")
+                    b.HasOne("Insurance.Infrastructure.Persistence.Entities.CityEntity", "City")
                         .WithMany("Buildings")
                         .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Insurance.Domain.Clients.Client", "Client")
+                    b.HasOne("Insurance.Infrastructure.Persistence.Entities.ClientEntity", "Client")
                         .WithMany("Buildings")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -201,31 +216,9 @@ namespace Insurance.Infrastructure.Persistence.Migrations
                     b.Navigation("Client");
                 });
 
-            modelBuilder.Entity("Insurance.Domain.Geography.City", b =>
+            modelBuilder.Entity("Insurance.Infrastructure.Persistence.Entities.BuildingRiskIndicatorEntity", b =>
                 {
-                    b.HasOne("Insurance.Domain.Geography.County", "County")
-                        .WithMany("Cities")
-                        .HasForeignKey("CountyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("County");
-                });
-
-            modelBuilder.Entity("Insurance.Domain.Geography.County", b =>
-                {
-                    b.HasOne("Insurance.Domain.Geography.Country", "Country")
-                        .WithMany("Counties")
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Country");
-                });
-
-            modelBuilder.Entity("Insurance.Domain.RiskIndicators.BuildingRiskIndicator", b =>
-                {
-                    b.HasOne("Insurance.Domain.Buildings.Building", "Building")
+                    b.HasOne("Insurance.Infrastructure.Persistence.Entities.BuildingEntity", "Building")
                         .WithMany("RiskIndicators")
                         .HasForeignKey("BuildingId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -234,27 +227,49 @@ namespace Insurance.Infrastructure.Persistence.Migrations
                     b.Navigation("Building");
                 });
 
-            modelBuilder.Entity("Insurance.Domain.Buildings.Building", b =>
+            modelBuilder.Entity("Insurance.Infrastructure.Persistence.Entities.CityEntity", b =>
+                {
+                    b.HasOne("Insurance.Infrastructure.Persistence.Entities.CountyEntity", "County")
+                        .WithMany("Cities")
+                        .HasForeignKey("CountyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("County");
+                });
+
+            modelBuilder.Entity("Insurance.Infrastructure.Persistence.Entities.CountyEntity", b =>
+                {
+                    b.HasOne("Insurance.Infrastructure.Persistence.Entities.CountryEntity", "Country")
+                        .WithMany("Counties")
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("Insurance.Infrastructure.Persistence.Entities.BuildingEntity", b =>
                 {
                     b.Navigation("RiskIndicators");
                 });
 
-            modelBuilder.Entity("Insurance.Domain.Clients.Client", b =>
+            modelBuilder.Entity("Insurance.Infrastructure.Persistence.Entities.CityEntity", b =>
                 {
                     b.Navigation("Buildings");
                 });
 
-            modelBuilder.Entity("Insurance.Domain.Geography.City", b =>
+            modelBuilder.Entity("Insurance.Infrastructure.Persistence.Entities.ClientEntity", b =>
                 {
                     b.Navigation("Buildings");
                 });
 
-            modelBuilder.Entity("Insurance.Domain.Geography.Country", b =>
+            modelBuilder.Entity("Insurance.Infrastructure.Persistence.Entities.CountryEntity", b =>
                 {
                     b.Navigation("Counties");
                 });
 
-            modelBuilder.Entity("Insurance.Domain.Geography.County", b =>
+            modelBuilder.Entity("Insurance.Infrastructure.Persistence.Entities.CountyEntity", b =>
                 {
                     b.Navigation("Cities");
                 });

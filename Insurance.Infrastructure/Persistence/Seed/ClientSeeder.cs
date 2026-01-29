@@ -1,51 +1,56 @@
 ﻿using Insurance.Domain.Clients;
+using Insurance.Infrastructure.Persistence.Entities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Persistence.Seed
 {
-    public static class ClientSeeder
+    [ExcludeFromCodeCoverage]
+    public class ClientSeeder
     {
-        public static async Task SeedAsync(InsuranceDbContext context)
+        private readonly InsuranceDbContext _context;
+
+        public ClientSeeder(InsuranceDbContext context)
         {
-            if (context.Clients.Any())
+            _context = context;
+        }
+
+        public async Task SeedAsync()
+        {
+            if (_context.Clients.Any())
                 return;
 
-            var client1 = Client.Create(
-                ClientType.Individual,
-                "Ion Popescu",
-                "1234567890123",
-                "ion.popescu@test.ro",
-                "0712345678",
-                "Str. Libertatii 10"
-            );
+            var clients = new List<ClientEntity>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Type = "Individual",
+                Name = "Ion Popescu",
+                IdentificationNumber = "1234567890123",
+                Email = "ion@test.ro",
+                PhoneNumber = "0711111111",
+                Address = "Cluj"
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Type = "Company",
+                Name = "SC Test SRL",
+                IdentificationNumber = "RO123456",
+                Email = "office@test.ro",
+                PhoneNumber = "0722222222",
+                Address = "Bucuresti"
+            }
+        };
 
-            var client2 = Client.Create(
-                ClientType.Company,
-                "SC Test Construct SRL",
-                "RO12345678",
-                "office@testconstruct.ro",
-                "0211234567",
-                "Bd. Unirii 20"
-            );
-
-                
-
-            var client3 = Client.Create(
-                ClientType.Individual,
-                "Maria Ionescu",
-                "2980101123456",
-                "maria.ionescu@test.ro",
-                "0722333444",
-                "Str. Florilor 5"
-            );
-
-            context.Clients.AddRange(client1, client2, client3);
-
-            await context.SaveChangesAsync();
+            _context.Clients.AddRange(clients);
+            await _context.SaveChangesAsync();
         }
     }
+
 }
 
 

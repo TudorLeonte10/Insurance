@@ -34,7 +34,9 @@ using (var scope = app.Services.CreateScope())
         var context = scope.ServiceProvider.GetRequiredService<InsuranceDbContext>();
 
         await context.Database.MigrateAsync();
-        await DatabaseSeeder.SeedAsync(context, env);
+
+        var seeder = new DatabaseSeeder(context);
+        await seeder.SeedAsync();
     }
 }
 

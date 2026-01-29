@@ -3,70 +3,76 @@ using Insurance.Application.Abstractions.Repositories;
 using Insurance.Application.Buildings.DTOs;
 using Insurance.Domain.Buildings;
 using Insurance.Domain.RiskIndicators;
+using Insurance.Infrastructure.Persistence.Entities;
+using Insurance.Infrastructure.Persistence.Mappers;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Persistence.Repositories
 {
+    [ExcludeFromCodeCoverage]
     public class BuildingRepository : IBuildingRepository
     {
-        private readonly InsuranceDbContext _context;
+        private readonly InsuranceDbContext _dbContext;
 
-        public BuildingRepository(InsuranceDbContext context)
+        public BuildingRepository(InsuranceDbContext dbContext)
         {
-            _context = context;
+            _dbContext = dbContext;
         }
 
-        public async Task<IReadOnlyList<Building>> GetAllBuildingsByClientIdAsync(Guid clientId, CancellationToken cancellationToken)
+        public async Task<Building?> GetByIdAsync(Guid id, CancellationToken ct)
         {
-            return await _context.Buildings
-                .Where(b => b.ClientId == clientId)
-                .Include(b => b.City)
-                    .ThenInclude(c => c.County)
-                        .ThenInclude(co => co.Country)
-                .Include(b => b.RiskIndicators)
-                .ToListAsync(cancellationToken);
+            var entity = await _dbContext.Buildings
+                .FirstOrDefaultAsync(b => b.Id == id, ct);
+
+            return entity is null ? null : BuildingMapper.ToDomain(entity);
         }
 
-        public async Task<Building?> GetBuildingByIdAsync(Guid buildingId, CancellationToken cancellationToken)
+        public async Task AddAsync(
+            Building building,
+            IReadOnlyCollection<RiskIndicatorType> riskIndicators,
+            CancellationToken ct)
         {
-            return await _context.Buildings
-                .AsNoTracking()
-                .Include(b => b.City)
-                    .ThenInclude(c => c.County)
-                        .ThenInclude(co => co.Country)
-                .Include(b => b.RiskIndicators)
-                .FirstOrDefaultAsync(b => b.Id == buildingId, cancellationToken);
-        }
+            var entity = BuildingMapper.ToEntity(building);
 
-        public async Task AddBuildingAsync(Building building, CancellationToken cancellationToken)
-        {
-            await _context.Buildings.AddAsync(building, cancellationToken);
-        }
+            await _dbContext.Buildings.AddAsync(entity, ct);
 
-        public async Task UpdateAsync(Building building,IEnumerable<RiskIndicatorType> riskIndicators, CancellationToken cancellationToken)
-        {
-            _context.Attach(building);
-
-            _context.Entry(building).State = EntityState.Modified;
-
-            var existingRisks = _context.Set<BuildingRiskIndicator>()
-                .Where(r => r.BuildingId == building.Id);
-
-            _context.RemoveRange(existingRisks);
-
-            foreach (var risk in riskIndicators.Distinct())
+            if (riskIndicators.Any())
             {
-                _context.Add(new BuildingRiskIndicator
-                {
-                    Id = Guid.NewGuid(),
-                    BuildingId = building.Id,
-                    RiskIndicator = risk
-                });
+                var indicators = riskIndicators
+                    .Distinct()
+                    .Select(r => new BuildingRiskIndicatorEntity
+                    {
+                        Id = Guid.NewGuid(),
+                        BuildingId = entity.Id,
+                        RiskIndicator = r.ToString()
+                    });
+
+                await _dbContext.BuildingRiskIndicators
+                    .AddRangeAsync(indicators, ct);
             }
         }
 
+        public async Task UpdateAsync(Building building, CancellationToken ct)
+{
+            var entity = await _dbContext.Buildings
+                .FirstOrDefaultAsync(b => b.Id == building.Id, ct);
+
+            if (entity is null)
+                throw new InvalidOperationException("Building not found");
+
+            entity.Type = building.Type.ToString();
+            entity.Street = building.Street;
+            entity.Number = building.Number;
+            entity.ConstructionYear = building.ConstructionYear;
+            entity.NumberOfFloors = building.NumberOfFloors;
+            entity.SurfaceArea = building.SurfaceArea;
+            entity.InsuredValue = building.InsuredValue;
+     }
     }
 }
+
+
