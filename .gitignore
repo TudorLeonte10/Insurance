@@ -114,3 +114,6 @@ yarn-error.log*
 .sonarqube/
 TestResults/
 coverage.opencover.xml
+
+# Test coverage reports
+Insurance.Tests/coveragereport/
