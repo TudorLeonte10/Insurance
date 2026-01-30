@@ -1,0 +1,24 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Security.AccessControl;
+using System.Text;
+
+namespace Insurance.Infrastructure.Persistence.Entities
+{
+    public class FeeConfigurationEntity
+    {
+        public Guid Id { get; set; }
+
+        public string Name { get; set; } = null!;
+
+        public FeeType Type { get; set; }
+
+        public decimal Percentage { get; set; }
+
+        public DateTime EffectiveFrom { get; set; }
+        public DateTime? EffectiveTo { get; set; }
+
+        public bool IsActive { get; set; }
+    }
+
+}
