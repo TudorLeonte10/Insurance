@@ -1,9 +1,12 @@
 ﻿using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Audit;
+using Insurance.Application.Abstractions.Loggers;
 using Insurance.Application.Abstractions.Repositories;
+using Insurance.Domain.Brokers;
 using Insurance.Domain.Buildings;
 using Insurance.Domain.Clients;
 using Insurance.Infrastructure.Audit;
+using Insurance.Infrastructure.Loggers;
 using Insurance.Infrastructure.Persistence;
 using Insurance.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +37,10 @@ namespace Insurance.Infrastructure
             services.AddScoped<IBuildingReadRepository, BuildingReadRepository>();
             services.AddScoped<IClientReadRepository, ClientReadRepository>();
             services.AddScoped<IClientSearchRepository, ClientSearchRepository>();
+            services.AddScoped<IBrokerRepository, BrokerRepository>();
+
+            services.AddScoped<IApplicationLogger, ApplicationLogger>();
+            services.AddScoped<IAuditLogger, AuditLogger>();
 
             services.AddSingleton<IMongoClient>(sp =>
             {
