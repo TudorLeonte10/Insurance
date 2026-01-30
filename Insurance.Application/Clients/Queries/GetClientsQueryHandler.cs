@@ -2,7 +2,7 @@
 using Insurance.Application.Abstractions.Repositories;
 using Insurance.Application.Clients.DTOs;
 using Insurance.Application.Common.Paging;
-
+using Insurance.Application.Exceptions;
 using Insurance.Domain.Clients;
 using Insurance.Domain.Exceptions;
 using MediatR;

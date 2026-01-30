@@ -1,4 +1,5 @@
 ﻿using Insurance.Domain.Clients;
+using Insurance.Domain.Exceptions;
 using Insurance.Domain.RiskIndicators;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,10 @@ namespace Insurance.Domain.Buildings
             decimal surfaceArea,
             decimal insuredValue)
         {
+            if(constructionYear < 1700 || constructionYear>DateTime.Now.Year)
+            {
+                throw new BuildingConstructionYearNotAllowedException("Invalid construction year.");
+            }
 
             return new Building
             {

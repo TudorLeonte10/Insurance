@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Repositories;
+using Insurance.Application.Exceptions;
 using Insurance.Domain.Buildings;
 using Insurance.Domain.Exceptions;
 using Insurance.Domain.RiskIndicators;

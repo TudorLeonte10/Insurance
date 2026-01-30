@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using Insurance.Domain.Exceptions;
+using Insurance.Application.Exceptions;
 
 namespace Insurance.Infrastructure.Persistence.Repositories
 {
@@ -37,11 +39,18 @@ namespace Insurance.Infrastructure.Persistence.Repositories
             await _dbContext.Clients.AddAsync(entity, ct);
         }
 
-        public Task UpdateAsync(Client client, CancellationToken ct)
+        public async Task UpdateAsync(Client client, CancellationToken ct)
         {
-            var entity = ClientMapper.ToEntity(client);
-            _dbContext.Clients.Update(entity);
-            return Task.CompletedTask;
+            var entity = await _dbContext.Clients.FirstOrDefaultAsync(c => c.Id == client.Id);
+
+            if (entity is null)
+                throw new NotFoundException($"Entity with id {client.Id} not found");
+
+            entity.Name = client.Name;
+            entity.Email = client.Email;
+            entity.PhoneNumber = client.PhoneNumber;
+            entity.Address = client.Address;
+            entity.IdentificationNumber = client.IdentificationNumber;
         }
 
     }

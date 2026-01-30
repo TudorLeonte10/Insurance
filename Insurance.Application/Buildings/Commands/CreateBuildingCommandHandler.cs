@@ -1,6 +1,7 @@
 ﻿using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Repositories;
 using Insurance.Application.Buildings.Commands;
+using Insurance.Application.Exceptions;
 using Insurance.Domain.Buildings;
 using Insurance.Domain.Clients;
 using Insurance.Domain.Exceptions;

@@ -14,18 +14,12 @@ namespace Insurance.Domain.Exceptions
         }
     }
 
-    public class NotFoundException : BusinessException
+    public class BuildingConstructionYearNotAllowedException : BusinessException
     {
-        public NotFoundException(string message) : base(message) {}
-    }
+        public BuildingConstructionYearNotAllowedException(string message)
+            : base(message)
+        {
+        }
 
-    public class ConflictException : BusinessException
-    {
-        public ConflictException(string message) : base(message) { }
-    }
-
-    public class ForbiddenException : BusinessException
-    {
-        public ForbiddenException(string message) : base(message) { }
     }
 }

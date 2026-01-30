@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Audit;
+using Insurance.Application.Exceptions;
 using Insurance.Domain.Clients;
 using Insurance.Domain.Exceptions;
 using MediatR;
@@ -36,6 +37,7 @@ namespace Insurance.Application.Clients.Commands
                 request.Dto.Address,
                 request.Dto.IdentificationNumber);
 
+            await _clientRepository.UpdateAsync(client, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             await AuditIdentificationNumberChangeIfNeededAsync(client, originalIdentificationNumber, cancellationToken);

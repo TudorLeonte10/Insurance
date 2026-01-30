@@ -1,5 +1,6 @@
 ﻿using Insurance.Application.Abstractions.Repositories;
 using Insurance.Application.Buildings.DTOs;
+using Insurance.Application.Exceptions;
 using Insurance.Domain.Exceptions;
 using MediatR;
 using System;
