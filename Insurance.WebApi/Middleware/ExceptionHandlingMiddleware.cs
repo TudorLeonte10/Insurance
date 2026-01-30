@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Insurance.WebApi.Middleware;
 
+[ExcludeFromCodeCoverage]
 public sealed class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;

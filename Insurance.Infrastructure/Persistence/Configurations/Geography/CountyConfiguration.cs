@@ -1,9 +1,11 @@
 ﻿using Insurance.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Insurance.Infrastructure.Persistence.Configurations;
 
+[ExcludeFromCodeCoverage]
 public class CountyEntityConfiguration
     : IEntityTypeConfiguration<CountyEntity>
 {

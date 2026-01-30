@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Insurance.Domain.Metadata.Enums;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.AccessControl;
 using System.Text;
 
 namespace Insurance.Infrastructure.Persistence.Entities
 {
+    [ExcludeFromCodeCoverage]
     public class FeeConfigurationEntity
     {
         public Guid Id { get; set; }

@@ -43,7 +43,6 @@ namespace Insurance.Infrastructure.Persistence.Repositories
             if (riskIndicators.Any())
             {
                 var indicators = riskIndicators
-                    .Distinct()
                     .Select(r => new BuildingRiskIndicatorEntity
                     {
                         Id = Guid.NewGuid(),

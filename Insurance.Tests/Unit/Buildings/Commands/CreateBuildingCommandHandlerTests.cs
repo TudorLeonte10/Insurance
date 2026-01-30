@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Repositories;
-/*using Insurance.Application.Buildings.Commands;
+using Insurance.Application.Buildings.Commands;
 using Insurance.Application.Buildings.DTOs;
+using Insurance.Application.Exceptions;
+using Insurance.Application.Geography.DTOs;
 using Insurance.Domain.Buildings;
 using Insurance.Domain.Clients;
 using Insurance.Domain.Exceptions;
@@ -19,9 +21,8 @@ namespace Insurance.Tests.Unit.Buildings.Commands
     {
         private readonly Mock<IBuildingRepository> _buildingRepositoryMock = new();
         private readonly Mock<IClientRepository> _clientRepositoryMock = new();
-        private readonly Mock<IGeographyRepository> _geographyRepositoryMock = new();
+        private readonly Mock<IGeographyReadRepository> _geographyRepositoryMock = new();
         private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
-        private readonly Mock<IMapper> _mapperMock = new();
 
         private readonly CreateBuildingCommandHandler _handler;
 
@@ -31,9 +32,9 @@ namespace Insurance.Tests.Unit.Buildings.Commands
                 _buildingRepositoryMock.Object,
                 _clientRepositoryMock.Object,
                 _geographyRepositoryMock.Object,
-                _unitOfWorkMock.Object,
-                _mapperMock.Object);
+                _unitOfWorkMock.Object);
         }
+
 
         private static CreateBuildingCommand CreateValidCommand(Guid clientId, Guid cityId)
         {
@@ -42,12 +43,17 @@ namespace Insurance.Tests.Unit.Buildings.Commands
                 new CreateBuildingDto
                 {
                     CityId = cityId,
-                    InsuredValue = 100000,
+                    Type = BuildingType.Residential,
+                    Street = "Main",
+                    Number = "10",
+                    ConstructionYear = 2000,
+                    NumberOfFloors = 2,
                     SurfaceArea = 120,
+                    InsuredValue = 100000,
                     RiskIndicators = new[]
                     {
-                        RiskIndicatorType.FireRisk,
-                        RiskIndicatorType.FloodRisk
+                RiskIndicatorType.FireRisk,
+                RiskIndicatorType.FloodRisk
                     }
                 });
         }
@@ -58,8 +64,8 @@ namespace Insurance.Tests.Unit.Buildings.Commands
             var clientId = Guid.NewGuid();
 
             _clientRepositoryMock
-                .Setup(x => x.ExistsAsync(clientId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(false);
+                .Setup(x => x.GetByIdAsync(clientId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Client?)null);
 
             var command = CreateValidCommand(clientId, Guid.NewGuid());
 
@@ -67,19 +73,29 @@ namespace Insurance.Tests.Unit.Buildings.Commands
                 _handler.Handle(command, CancellationToken.None));
         }
 
+
         [Fact]
         public async Task Given_NonExistingCity_Should_ThrowNotFoundException()
         {
             var clientId = Guid.NewGuid();
             var cityId = Guid.NewGuid();
 
+            var client = Client.Create(
+                ClientType.Individual,
+                "John Doe",
+                "123456789",
+                "john@test.com",
+                "0712345678",
+                "Some address");
+
             _clientRepositoryMock
-                .Setup(x => x.ExistsAsync(clientId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
+                .Setup(x => x.GetByIdAsync(clientId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(client);
+
 
             _geographyRepositoryMock
-                .Setup(x => x.ExistsCityAsync(cityId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(false);
+                .Setup(x => x.GetCityByIdAsync(cityId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync((CityDto?)null);
 
             var command = CreateValidCommand(clientId, cityId);
 
@@ -87,35 +103,47 @@ namespace Insurance.Tests.Unit.Buildings.Commands
                 _handler.Handle(command, CancellationToken.None));
         }
 
+
         [Fact]
         public async Task Given_ValidBuilding_Should_CreateBuildingSuccessfully()
         {
             var clientId = Guid.NewGuid();
             var cityId = Guid.NewGuid();
-            var buildingId = Guid.NewGuid();
 
-            var building = new Building { Id = buildingId };
+            var client = Client.Create(
+                ClientType.Individual,
+                "John Doe",
+                "123456789",
+                "john@test.com",
+                "0712345678",
+                "Some address");
 
             _clientRepositoryMock
-                .Setup(x => x.ExistsAsync(clientId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
+                .Setup(x => x.GetByIdAsync(clientId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(client);
 
             _geographyRepositoryMock
-                .Setup(x => x.ExistsCityAsync(cityId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
+            .Setup(x => x.GetCityByIdAsync(cityId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new CityDto(cityId, "test city"));
 
-            _mapperMock
-                .Setup(x => x.Map<Building>(It.IsAny<CreateBuildingDto>()))
-                .Returns(building);
+            _buildingRepositoryMock
+                .Setup(x => x.AddAsync(
+                    It.IsAny<Building>(),
+                    It.IsAny<IReadOnlyCollection<RiskIndicatorType>>(),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             var command = CreateValidCommand(clientId, cityId);
 
             var result = await _handler.Handle(command, CancellationToken.None);
 
-            Assert.Equal(buildingId, result);
+            Assert.NotEqual(Guid.Empty, result);
 
             _buildingRepositoryMock.Verify(
-                x => x.AddBuildingAsync(building, It.IsAny<CancellationToken>()),
+                x => x.AddAsync(
+                    It.IsAny<Building>(),
+                    It.Is<IReadOnlyCollection<RiskIndicatorType>>(r => r.Count == 2),
+                    It.IsAny<CancellationToken>()),
                 Times.Once);
 
             _unitOfWorkMock.Verify(
@@ -124,52 +152,65 @@ namespace Insurance.Tests.Unit.Buildings.Commands
         }
 
         [Fact]
-        public async Task Given_DuplicateRiskIndicators_Should_SaveDistinctOnBuilding()
+        public async Task Given_DuplicateRiskIndicators_Should_PassDistinctToRepository()
         {
             var clientId = Guid.NewGuid();
             var cityId = Guid.NewGuid();
-            var buildingId = Guid.NewGuid();
 
-            var building = new Building { Id = buildingId };
+            var client = Client.Create(
+                ClientType.Individual,
+                "John Doe",
+                "123456789",
+                "john@test.com",
+                "0712345678",
+                "Some address");
 
             _clientRepositoryMock
-                .Setup(x => x.ExistsAsync(clientId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
+                .Setup(x => x.GetByIdAsync(clientId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(client);
 
             _geographyRepositoryMock
-                .Setup(x => x.ExistsCityAsync(cityId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
+            .Setup(x => x.GetCityByIdAsync(cityId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new CityDto(cityId, "test city"));
 
-            _mapperMock
-                .Setup(x => x.Map<Building>(It.IsAny<CreateBuildingDto>()))
-                .Returns(building);
+            IReadOnlyCollection<RiskIndicatorType>? passedIndicators = null;
+
+            _buildingRepositoryMock
+                .Setup(x => x.AddAsync(
+                    It.IsAny<Building>(),
+                    It.IsAny<IReadOnlyCollection<RiskIndicatorType>>(),
+                    It.IsAny<CancellationToken>()))
+                .Callback<Building, IReadOnlyCollection<RiskIndicatorType>, CancellationToken>(
+                    (_, indicators, _) => passedIndicators = indicators)
+                .Returns(Task.CompletedTask);
 
             var command = new CreateBuildingCommand(
                 clientId,
                 new CreateBuildingDto
                 {
                     CityId = cityId,
-                    InsuredValue = 100000,
+                    Type = BuildingType.Residential,
+                    Street = "Main",
+                    Number = "10",
+                    ConstructionYear = 2000,
+                    NumberOfFloors = 2,
                     SurfaceArea = 120,
+                    InsuredValue = 100000,
                     RiskIndicators = new[]
                     {
                 RiskIndicatorType.FireRisk,
-                RiskIndicatorType.FireRisk, // duplicate
+                RiskIndicatorType.FireRisk,
                 RiskIndicatorType.FloodRisk
                     }
                 });
 
-            var result = await _handler.Handle(command, CancellationToken.None);
+            await _handler.Handle(command, CancellationToken.None);
 
-            Assert.Equal(buildingId, result);
-            Assert.Equal(2, building.RiskIndicators.Count);
-
-            _unitOfWorkMock.Verify(
-                u => u.SaveChangesAsync(It.IsAny<CancellationToken>()),
-                Times.Once);
+            Assert.NotNull(passedIndicators);
+            Assert.Equal(2, passedIndicators!.Count);
         }
+
 
 
     }
 }
-*/

@@ -1,11 +1,11 @@
-﻿/*using AutoMapper;
+﻿using AutoMapper;
 using Insurance.Application.Abstractions;
 using Insurance.Application.Clients.Commands;
 using Insurance.Application.Clients.Commands.CreateClient;
 using Insurance.Application.Clients.DTOs;
-using Insurance.Domain.Abstractions.Repositories;
 using Insurance.Domain.Clients;
 using Insurance.Domain.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using System;
 using System.Threading;
@@ -29,28 +29,6 @@ namespace Insurance.Tests.Unit.Clients.Commands
         }
 
         [Fact]
-        public async Task Given_DuplicateIdentificationNumber_Should_ThrowConflictException()
-        {
-            var dto = new CreateClientDto
-            {
-                Name = "Test Client",
-                IdentificationNumber = "123456789",
-                Email = "test@test.ro",
-                PhoneNumber = "0712345678",
-                Type = ClientType.Individual
-            };
-
-            _clientRepositoryMock
-                .Setup(x => x.ExistsByIdentifierAsync(dto.IdentificationNumber, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
-
-            var command = new CreateClientCommand(dto);
-
-            await Assert.ThrowsAsync<ConflictException>(() =>
-                _handler.Handle(command, CancellationToken.None));
-        }
-
-        [Fact]
         public async Task Given_ValidClient_Should_CreateClientSuccessfully()
         {
             var dto = new CreateClientDto
@@ -64,10 +42,6 @@ namespace Insurance.Tests.Unit.Clients.Commands
             };
 
             _clientRepositoryMock
-                .Setup(x => x.ExistsByIdentifierAsync(dto.IdentificationNumber, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(false);
-
-            _clientRepositoryMock
                 .Setup(x => x.AddAsync(It.IsAny<Client>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
@@ -75,11 +49,7 @@ namespace Insurance.Tests.Unit.Clients.Commands
 
             var result = await _handler.Handle(command, CancellationToken.None);
 
-            Assert.NotEqual(Guid.Empty, result);  
-
-            _clientRepositoryMock.Verify(
-                x => x.ExistsByIdentifierAsync(dto.IdentificationNumber, It.IsAny<CancellationToken>()),
-                Times.Once);
+            Assert.NotEqual(Guid.Empty, result);
 
             _clientRepositoryMock.Verify(
                 x => x.AddAsync(It.IsAny<Client>(), It.IsAny<CancellationToken>()),
@@ -90,6 +60,32 @@ namespace Insurance.Tests.Unit.Clients.Commands
                 Times.Once);
         }
 
+        [Fact]
+        public async Task Given_DbConflict_Should_PropagateException()
+        {
+            var dto = new CreateClientDto
+            {
+                Name = "Client",
+                IdentificationNumber = "123",
+                Email = "x@test.ro",
+                PhoneNumber = "0700000000",
+                Type = ClientType.Individual
+            };
+
+            _clientRepositoryMock
+                .Setup(x => x.AddAsync(It.IsAny<Client>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            _unitOfWorkMock
+                .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new DbUpdateException());
+
+            var command = new CreateClientCommand(dto);
+
+            await Assert.ThrowsAsync<DbUpdateException>(() =>
+                _handler.Handle(command, CancellationToken.None));
+        }
+
+
     }
 }
-*/

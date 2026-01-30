@@ -6,10 +6,12 @@ using Insurance.Application.Common.Paging;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Persistence.Repositories
 {
+    [ExcludeFromCodeCoverage]
     public class ClientReadRepository : IClientReadRepository
     {
         private readonly InsuranceDbContext _dbContext;

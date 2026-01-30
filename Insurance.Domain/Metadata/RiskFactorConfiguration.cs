@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Insurance.Domain.Metadata.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text;
 

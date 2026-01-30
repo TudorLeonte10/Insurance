@@ -1,15 +1,16 @@
-﻿/*using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Moq;
-using Xunit;
-using Insurance.Application.Abstractions;
+﻿using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Repositories;
 using Insurance.Application.Buildings.Commands;
 using Insurance.Application.Buildings.DTOs;
+using Insurance.Application.Exceptions;
 using Insurance.Domain.Buildings;
 using Insurance.Domain.Exceptions;
-using AutoMapper;
+using Insurance.Domain.RiskIndicators;
+using Moq;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace Insurance.Tests.Unit.Buildings.Commands
 {
@@ -29,39 +30,51 @@ namespace Insurance.Tests.Unit.Buildings.Commands
 
         private static UpdateBuildingCommand CreateValidCommand(Guid buildingId)
         {
-            return new UpdateBuildingCommand(buildingId, new UpdateBuildingDto
-            {
-                InsuredValue = 200000,
-                SurfaceArea = 150
-            });
+            return new UpdateBuildingCommand(
+                buildingId,
+                new UpdateBuildingDto
+                {
+                    Street = "Updated Street",
+                    Number = "20A",
+                    ConstructionYear = 2010,
+                    NumberOfFloors = 3,
+                    SurfaceArea = 150,
+                    InsuredValue = 200000,
+                });
         }
 
         private static Building CreateExistingBuilding(Guid id)
         {
-            return new Building
-            {
-                Id = id,
-                SurfaceArea = 120,
-                InsuredValue = 100000
-            };
+            return Building.Create(
+                clientId: Guid.NewGuid(),
+                cityId: Guid.NewGuid(),
+                type: BuildingType.Residential,
+                street: "Old Street",
+                number: "10",
+                constructionYear: 2000,
+                numberOfFloors: 2,
+                surfaceArea: 120,
+                insuredValue: 100000
+            );
         }
 
         [Fact]
         public async Task Given_NonExistingBuilding_Should_ThrowNotFoundException()
         {
-
             var buildingId = Guid.NewGuid();
 
             _buildingRepositoryMock
-                .Setup(r => r.GetBuildingByIdAsync(buildingId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Building)null!);
+                .Setup(r => r.GetByIdAsync(buildingId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Building?)null);
 
             var command = CreateValidCommand(buildingId);
 
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 _handler.Handle(command, CancellationToken.None));
 
-            _uowMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+            _uowMock.Verify(
+                u => u.SaveChangesAsync(It.IsAny<CancellationToken>()),
+                Times.Never);
         }
 
         [Fact]
@@ -71,17 +84,30 @@ namespace Insurance.Tests.Unit.Buildings.Commands
             var existing = CreateExistingBuilding(buildingId);
 
             _buildingRepositoryMock
-                .Setup(r => r.GetBuildingByIdAsync(buildingId, It.IsAny<CancellationToken>()))
+                .Setup(r => r.GetByIdAsync(buildingId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(existing);
+
+            _buildingRepositoryMock
+                .Setup(r => r.UpdateAsync(
+                    existing,
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             var command = CreateValidCommand(buildingId);
 
             var result = await _handler.Handle(command, CancellationToken.None);
 
-            Assert.Equal(buildingId, result);
+            Assert.Equal(existing.Id, result);
 
-            _uowMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _buildingRepositoryMock.Verify(
+                r => r.UpdateAsync(
+                    existing,
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+
+            _uowMock.Verify(
+                u => u.SaveChangesAsync(It.IsAny<CancellationToken>()),
+                Times.Once);
         }
     }
 }
-*/

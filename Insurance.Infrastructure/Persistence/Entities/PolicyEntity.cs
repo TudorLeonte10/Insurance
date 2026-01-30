@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Insurance.Domain.Policies;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Persistence.Entities
 {
+    [ExcludeFromCodeCoverage]
     public class PolicyEntity
     {
         public Guid Id { get; set; }
