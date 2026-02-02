@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Insurance.Domain.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -35,6 +36,51 @@ namespace Insurance.Domain.Brokers
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             };
+        }
+
+        public void UpdateDetails(
+            string name,
+            string email,
+            string phone)
+        {
+            Name = name;
+            Email = email;
+            Phone = phone;
+        }
+
+        public static Broker Rehydrate(
+            Guid id,
+            string brokerCode,
+            string name,
+            string email,
+            string phone,
+            bool isActive)
+        {
+            return new Broker
+            {
+                Id = id,
+                BrokerCode = brokerCode,
+                Name = name,
+                Email = email,
+                Phone = phone,
+                IsActive = isActive
+            };
+        }
+
+        public void Deactivate()
+        {
+            if(!IsActive)
+                throw new BrokerAlreadyInactiveException("Broker is already inactive.");
+
+            IsActive = false;
+        }
+
+        public void Activate()
+        {
+            if (IsActive)
+                throw new BrokerAlreadyActiveException("Broker is already active.");
+
+            IsActive = true;
         }
     }
 

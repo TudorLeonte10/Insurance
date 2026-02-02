@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Audit;
+using Insurance.Application.Abstractions.Loggers;
 using Insurance.Application.Clients.Commands;
 using Insurance.Application.Clients.Commands.CreateClient;
 using Insurance.Application.Clients.DTOs;
@@ -19,6 +20,7 @@ namespace Insurance.Tests.Unit.Clients.Commands
         private readonly Mock<IClientRepository> _clientRepositoryMock = new();
         private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
         private readonly Mock<IAuditLogService> _auditLogServiceMock = new();
+        private readonly Mock<IAuditLogger> _auditLoggerMock = new();
 
         private readonly UpdateClientCommandHandler _handler;
 
@@ -27,7 +29,8 @@ namespace Insurance.Tests.Unit.Clients.Commands
             _handler = new UpdateClientCommandHandler(
                 _clientRepositoryMock.Object,
                 _unitOfWorkMock.Object,
-                _auditLogServiceMock.Object);
+                _auditLogServiceMock.Object,
+                _auditLoggerMock.Object);
         }
 
         [Fact]

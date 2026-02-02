@@ -38,6 +38,7 @@ namespace Insurance.Infrastructure
             services.AddScoped<IClientReadRepository, ClientReadRepository>();
             services.AddScoped<IClientSearchRepository, ClientSearchRepository>();
             services.AddScoped<IBrokerRepository, BrokerRepository>();
+            services.AddScoped<IBrokerReadRepository, BrokerReadRepository>();
 
             services.AddScoped<IApplicationLogger, ApplicationLogger>();
             services.AddScoped<IAuditLogger, AuditLogger>();

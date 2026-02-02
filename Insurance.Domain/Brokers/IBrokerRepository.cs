@@ -8,5 +8,6 @@ namespace Insurance.Domain.Brokers
     {
         Task<Broker?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
         Task AddAsync(Broker broker, CancellationToken cancellationToken);
+        Task UpdateAsync(Broker broker, CancellationToken cancellationToken);
     }
 }

@@ -97,4 +97,24 @@ public abstract class IntegrationTestBase
         return (clientId, identificationNumber);
     }
 
+    protected async Task<Guid> CreateBrokerAndGetId(HttpClient client)
+    {
+        var dto = new
+        {
+            BrokerCode = "BR" + DateTime.UtcNow.Ticks,
+            Name = "Helper Broker",
+            Email = "broker@test.ro",
+            Phone = "0700000000"
+        };
+
+        var response =
+            await client.PostAsJsonAsync("/api/admin/brokers", dto);
+
+        response.EnsureSuccessStatusCode();
+
+        return Guid.Parse(
+            response.Headers.Location!.Segments.Last());
+    }
+
+
 }

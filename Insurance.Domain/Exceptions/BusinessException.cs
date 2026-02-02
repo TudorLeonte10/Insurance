@@ -20,6 +20,21 @@ namespace Insurance.Domain.Exceptions
             : base(message)
         {
         }
+    }
 
+    public class BrokerAlreadyActiveException : BusinessException
+    {
+        public BrokerAlreadyActiveException(string message)
+            : base(message)
+        {
+        }
+    }
+
+    public class BrokerAlreadyInactiveException : BusinessException
+    {
+        public BrokerAlreadyInactiveException(string message)
+            : base(message)
+        {
+        }
     }
 }

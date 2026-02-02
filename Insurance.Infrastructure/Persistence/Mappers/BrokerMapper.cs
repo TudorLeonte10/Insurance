@@ -10,14 +10,15 @@ namespace Insurance.Infrastructure.Persistence.Mappers
     {
         public static Broker ToDomain(BrokerEntity brokerEntity)
         {
-            var broker = Broker.Create(
+            return Broker.Rehydrate(
+                brokerEntity.Id,
                 brokerEntity.BrokerCode,
                 brokerEntity.Name,
                 brokerEntity.Email,
-                brokerEntity.Phone);
-
-            return broker;
+                brokerEntity.Phone,
+                brokerEntity.IsActive);
         }
+
 
         public static BrokerEntity ToEntity(Broker broker)
         {
@@ -27,9 +28,11 @@ namespace Insurance.Infrastructure.Persistence.Mappers
                 BrokerCode = broker.BrokerCode,
                 Name = broker.Name,
                 Email = broker.Email,
-                Phone = broker.Phone
+                Phone = broker.Phone,
+                IsActive = broker.IsActive,
             };
             return brokerEntity;
         }
+
     }
 }
