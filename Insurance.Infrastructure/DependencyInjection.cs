@@ -5,6 +5,7 @@ using Insurance.Application.Abstractions.Repositories;
 using Insurance.Domain.Brokers;
 using Insurance.Domain.Buildings;
 using Insurance.Domain.Clients;
+using Insurance.Domain.Metadata;
 using Insurance.Infrastructure.Audit;
 using Insurance.Infrastructure.Loggers;
 using Insurance.Infrastructure.Persistence;
@@ -39,6 +40,8 @@ namespace Insurance.Infrastructure
             services.AddScoped<IClientSearchRepository, ClientSearchRepository>();
             services.AddScoped<IBrokerRepository, BrokerRepository>();
             services.AddScoped<IBrokerReadRepository, BrokerReadRepository>();
+            services.AddScoped<IRiskFactorConfigurationRepository, RiskFactorConfigurationRepository>();
+            services.AddScoped<IRiskFactorReadRepository, RiskFactorReadRepository>();
 
             services.AddScoped<IApplicationLogger, ApplicationLogger>();
             services.AddScoped<IAuditLogger, AuditLogger>();

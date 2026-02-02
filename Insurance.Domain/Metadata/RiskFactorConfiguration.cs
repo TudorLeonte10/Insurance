@@ -7,14 +7,14 @@ namespace Insurance.Domain.Metadata
 {
     public class RiskFactorConfiguration
     {
-        public Guid Id { get; private set; }
+        public Guid Id { get; set; }
 
-        public RiskFactorLevel Level { get; private set; }
+        public RiskFactorLevel Level { get; set; }
 
-        public string ReferenceId { get; private set; } = string.Empty;
+        public string ReferenceId { get; set; } = string.Empty;
 
-        public decimal AdjustmentPercentage { get; private set; }
+        public decimal AdjustmentPercentage { get; set; }
 
-        public bool IsActive { get; private set; }
+        public bool IsActive { get; set; }
     }
 }
