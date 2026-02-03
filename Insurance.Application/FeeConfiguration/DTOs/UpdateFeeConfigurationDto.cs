@@ -1,24 +1,18 @@
 ﻿using Insurance.Domain.Metadata.Enums;
 using System;
 using System.Collections.Generic;
-using System.Security.AccessControl;
 using System.Text;
 
-namespace Insurance.Domain.Metadata
+namespace Insurance.Application.FeeConfiguration.DTOs
 {
-    public class FeeConfiguration
+    public class UpdateFeeConfigurationDto
     {
-        public Guid Id { get; set; }
-
         public string Name { get; set; } = string.Empty;
-
         public FeeType Type { get; set; }
-
         public decimal Percentage { get; set; }
-
         public DateTime EffectiveFrom { get; set; }
         public DateTime? EffectiveTo { get; set; }
-
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; }
     }
+
 }

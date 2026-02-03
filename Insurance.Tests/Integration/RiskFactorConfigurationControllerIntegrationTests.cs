@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Insurance.Tests.Integration
 {
@@ -31,7 +33,7 @@ namespace Insurance.Tests.Integration
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.NotNull(response.Headers.Location);
         }
-        
+
 
         [Fact]
         public async Task GET_RiskFactors_Should_Return_List()
@@ -40,7 +42,7 @@ namespace Insurance.Tests.Integration
 
             await client.PostAsJsonAsync("/api/admin/risk-factors", new
             {
-                level = 1,
+                level = "City",           
                 referenceId = "CITY_FIRE",
                 adjustmentPercentage = 10
             });
@@ -49,13 +51,16 @@ namespace Insurance.Tests.Integration
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            var result = await response.Content
-                .ReadFromJsonAsync<PagedResult<RiskFactorConfigurationDto>>();
+            var jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            jsonOptions.Converters.Add(new JsonStringEnumConverter());
 
+            var result = await response.Content
+                .ReadFromJsonAsync<PagedResult<RiskFactorConfigurationDto>>(jsonOptions);
 
             Assert.NotNull(result);
             Assert.NotEmpty(result.Items);
         }
+
 
         [Fact]
         public async Task PUT_RiskFactors_Should_Update_RiskFactor()

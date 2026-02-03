@@ -6,8 +6,8 @@ namespace Insurance.Domain.Metadata
 {
     public interface IRiskFactorConfigurationRepository
     {
-        Task<RiskFactorConfiguration?> GetByIdAsync(Guid id, CancellationToken ct);
-        Task AddAsync(RiskFactorConfiguration riskFactorConfiguration, CancellationToken ct);
-        Task UpdateAsync(RiskFactorConfiguration riskFactorConfiguration, CancellationToken ct);
+        Task<RiskFactorConfiguration?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task AddAsync(RiskFactorConfiguration riskFactorConfiguration, CancellationToken cancellationToken);
+        Task UpdateAsync(RiskFactorConfiguration riskFactorConfiguration, CancellationToken cancellationToken);
     }
 }

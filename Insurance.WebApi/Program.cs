@@ -4,10 +4,14 @@ using Insurance.Infrastructure.Persistence;
 using Insurance.Infrastructure.Persistence.Seed;
 using Insurance.WebApi.Middleware;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+                .AddJsonOptions(options => {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
