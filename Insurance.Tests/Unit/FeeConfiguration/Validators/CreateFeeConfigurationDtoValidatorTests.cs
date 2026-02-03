@@ -1,6 +1,6 @@
 ﻿using FluentValidation.TestHelper;
-using Insurance.Application.FeeConfiguration.DTOs;
-using Insurance.Application.FeeConfiguration.Validators;
+using Insurance.Application.Metadata.FeeConfiguration.DTOs;
+using Insurance.Application.Metadata.FeeConfiguration.Validators;
 using Insurance.Domain.Metadata.Enums;
 using System;
 using System.Collections.Generic;

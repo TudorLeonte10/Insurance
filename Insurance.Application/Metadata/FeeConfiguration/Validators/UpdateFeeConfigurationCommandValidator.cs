@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
-using Insurance.Application.FeeConfiguration.Command;
+using Insurance.Application.Metadata.FeeConfiguration.Command;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Insurance.Application.FeeConfiguration.Validators
+namespace Insurance.Application.Metadata.FeeConfiguration.Validators
 {
     public class UpdateFeeConfigurationCommandValidator : AbstractValidator<UpdateFeeConfigurationCommand>
     {

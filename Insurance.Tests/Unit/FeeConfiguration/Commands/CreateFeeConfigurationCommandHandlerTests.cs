@@ -1,6 +1,6 @@
 ﻿using Insurance.Application.Abstractions;
-using Insurance.Application.FeeConfiguration.Command;
-using Insurance.Application.FeeConfiguration.DTOs;
+using Insurance.Application.Metadata.FeeConfiguration.Command;
+using Insurance.Application.Metadata.FeeConfiguration.DTOs;
 using Insurance.Domain.Metadata;
 using Insurance.Domain.Metadata.Enums;
 using Insurance.Infrastructure.Persistence.Entities;

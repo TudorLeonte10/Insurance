@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
-using Insurance.Application.FeeConfiguration.DTOs;
+using Insurance.Application.Metadata.FeeConfiguration.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Insurance.Application.FeeConfiguration.Validators
+namespace Insurance.Application.Metadata.FeeConfiguration.Validators
 {
     public class UpdateFeeConfigurationDtoValidator : AbstractValidator<UpdateFeeConfigurationDto>
     {

@@ -1,6 +1,7 @@
-﻿using Insurance.Application.FeeConfiguration.Command;
-using Insurance.Application.FeeConfiguration.DTOs;
-using Insurance.Application.FeeConfiguration.Queries;
+﻿
+using Insurance.Application.Metadata.FeeConfiguration.Command;
+using Insurance.Application.Metadata.FeeConfiguration.DTOs;
+using Insurance.Application.Metadata.FeeConfiguration.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

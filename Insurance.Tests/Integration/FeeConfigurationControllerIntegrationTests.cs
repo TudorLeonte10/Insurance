@@ -1,5 +1,5 @@
 ﻿using Insurance.Application.Common.Paging;
-using Insurance.Application.FeeConfiguration.DTOs;
+using Insurance.Application.Metadata.FeeConfiguration.DTOs;
 using Insurance.Tests.Integration.Setup;
 using System;
 using System.Collections.Generic;

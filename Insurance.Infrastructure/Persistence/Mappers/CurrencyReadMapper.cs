@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Insurance.Application.Metadata.FeeConfiguration.DTOs;
+using Insurance.Application.Metadata.Currency.DTOs;
 using Insurance.Infrastructure.Persistence.Entities;
 using System;
 using System.Collections.Generic;
@@ -7,11 +7,11 @@ using System.Text;
 
 namespace Insurance.Infrastructure.Persistence.Mappers
 {
-    public class FeeConfigurationReadMapper : Profile
+    public class CurrencyReadMapper : Profile
     {
-        public FeeConfigurationReadMapper()
+        public CurrencyReadMapper()
         {
-            CreateMap<FeeConfigurationEntity, FeeConfigurationDto>();
+            CreateMap<CurrencyEntity, CurrencyDto>();
         }
     }
 }

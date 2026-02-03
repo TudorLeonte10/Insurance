@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Insurance.Application.FeeConfiguration.Command
+namespace Insurance.Application.Metadata.FeeConfiguration.Command
 {
     public class UpdateFeeConfigurationCommandHandler : IRequestHandler<UpdateFeeConfigurationCommand, Guid>
     {
