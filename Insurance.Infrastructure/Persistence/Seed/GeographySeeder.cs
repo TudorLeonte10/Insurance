@@ -43,39 +43,30 @@ namespace Insurance.Infrastructure.Persistence.Seed
                 CountryId = romania.Id
             };
 
+            var iasi = new CountyEntity
+            {
+                Id = Guid.NewGuid(),
+                Name = "Iasi",
+                CountryId = romania.Id
+            };
+
             var cities = new List<CityEntity>
         {
-            new CityEntity
-            {
-                Id = Guid.NewGuid(),
-                Name = "Cluj-Napoca",
-                CountyId = cluj.Id
-            },
-            new CityEntity
-            {
-                Id = Guid.NewGuid(),
-                Name = "Turda",
-                CountyId = cluj.Id
-            },
-            new CityEntity
-            {
-                Id = Guid.NewGuid(),
-                Name = "Sector 1",
-                CountyId = bucuresti.Id
-            },
-            new CityEntity
-            {
-                Id = Guid.NewGuid(),
-                Name = "Sector 3",
-                CountyId = bucuresti.Id
-            }
+            new() { Id = Guid.NewGuid(), Name = "Cluj-Napoca", CountyId = cluj.Id },
+            new() { Id = Guid.NewGuid(), Name = "Turda", CountyId = cluj.Id },
+
+            new() { Id = Guid.NewGuid(), Name = "Sector 1", CountyId = bucuresti.Id },
+            new() { Id = Guid.NewGuid(), Name = "Sector 3", CountyId = bucuresti.Id },
+
+            new() { Id = Guid.NewGuid(), Name = "Iasi", CountyId = iasi.Id }
         };
 
             _context.Countries.Add(romania);
-            _context.Counties.AddRange(cluj, bucuresti);
+            _context.Counties.AddRange(cluj, bucuresti, iasi);
             _context.Cities.AddRange(cities);
 
             await _context.SaveChangesAsync();
         }
     }
+
 }

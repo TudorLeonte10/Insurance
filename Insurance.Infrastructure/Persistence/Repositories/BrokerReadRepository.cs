@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Insurance.Application.Abstractions.Repositories;
 using Insurance.Application.Brokers.DTOs;
+using Insurance.Application.Clients.DTOs;
 using Insurance.Application.Common.Paging;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -44,5 +45,6 @@ namespace Insurance.Infrastructure.Persistence.Repositories
                 .ProjectTo<BrokerDetailsDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(cancellationToken);
         }
+
     }
 }

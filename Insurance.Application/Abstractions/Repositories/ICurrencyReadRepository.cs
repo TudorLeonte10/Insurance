@@ -9,5 +9,6 @@ namespace Insurance.Application.Abstractions.Repositories
     public interface ICurrencyReadRepository
     {
         Task<PagedResult<CurrencyDto>> GetPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
+
     }
 }

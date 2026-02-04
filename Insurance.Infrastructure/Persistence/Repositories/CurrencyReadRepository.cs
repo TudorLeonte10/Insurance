@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Insurance.Application.Abstractions.Repositories;
+using Insurance.Application.Clients.DTOs;
 using Insurance.Application.Common.Paging;
 using Insurance.Application.Metadata.Currency.DTOs;
 using Microsoft.EntityFrameworkCore;
@@ -31,5 +32,6 @@ namespace Insurance.Infrastructure.Persistence.Repositories
 
             return new PagedResult<CurrencyDto>(currencies, pageNumber, pageSize, totalItems);
         }
+    
     }
 }

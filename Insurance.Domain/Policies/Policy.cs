@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Insurance.Domain.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -28,6 +29,125 @@ namespace Insurance.Domain.Policies
         public DateTime? CancelledAt { get; private set; }
 
         public string? CancellationReason { get; private set; }
+
+        private Policy() { }
+
+        public static Policy CreateDraft(
+            Guid clientId,
+            Guid buildingId,
+            Guid brokerId,
+            Guid currencyId,
+            decimal basePremium,
+            decimal finalPremium,
+            DateTime startDate,
+            DateTime endDate,
+            string policyNumber,
+            DateTime now)
+        {
+            if (basePremium <= 0)
+            {
+                throw new InvalidBasePremiumException("Base premium must be greater than zero.");
+            }
+
+            if (finalPremium < basePremium)
+            {
+                throw new InvalidFinalPremiumException("Final premium cannot be less than base premium.");
+            }
+
+            if (startDate >= endDate)
+            {
+                throw new InvalidPolicyTermException("Start date must be earlier than end date.");
+            }
+
+            return new Policy
+            {
+                Id = Guid.NewGuid(),
+                PolicyNumber = policyNumber,
+                Status = PolicyStatus.Draft,
+                ClientId = clientId,
+                BuildingId = buildingId,
+                BrokerId = brokerId,
+                CurrencyId = currencyId,
+                BasePremium = basePremium,
+                FinalPremium = finalPremium,
+                StartDate = startDate,
+                EndDate = endDate,
+                CreatedAt = now
+            };
+        }
+
+        public void Activate()
+        {
+            if(Status != PolicyStatus.Draft)
+            {
+                throw new InvalidPolicyTransitionException("Only draft policies can be activated.");
+            }
+
+            Status = PolicyStatus.Active;
+            ActivatedAt = DateTime.Now;
+        }
+
+        public void Cancel(string? reason)
+        {
+            if (Status != PolicyStatus.Active)
+            {
+                throw new InvalidPolicyTransitionException("Only active policies can be cancelled.");
+            }
+
+            Status = PolicyStatus.Cancelled;
+            CancellationReason = reason;
+            CancelledAt = DateTime.Now;
+        }
+
+        public void Expire()
+        {
+            if (Status != PolicyStatus.Active)
+            {
+                throw new InvalidPolicyTransitionException("Only active policies can expire.");
+            }
+            Status = PolicyStatus.Expired;
+        }
+
+        public static Policy Rehydrate(
+            Guid id,
+            string policyNumber,
+            PolicyStatus status,
+            Guid clientId,
+            Guid buildingId,
+            Guid brokerId,
+            Guid currencyId,
+            decimal basePremium,
+            decimal finalPremium,
+            DateTime startDate,
+            DateTime endDate,
+            DateTime createdAt,
+            DateTime? activatedAt,
+            DateTime? cancelledAt,
+            string? cancellationReason)
+        {
+            return new Policy
+            {
+                Id = id,
+                PolicyNumber = policyNumber,
+                Status = status,
+
+                ClientId = clientId,
+                BuildingId = buildingId,
+                BrokerId = brokerId,
+                CurrencyId = currencyId,
+
+                BasePremium = basePremium,
+                FinalPremium = finalPremium,
+
+                StartDate = startDate,
+                EndDate = endDate,
+
+                CreatedAt = createdAt,
+                ActivatedAt = activatedAt,
+                CancelledAt = cancelledAt,
+                CancellationReason = cancellationReason
+            };
+        }
 
     }
 

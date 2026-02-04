@@ -289,6 +289,9 @@ namespace Insurance.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("Percentage")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("RiskIndicatorType")
+                        .HasColumnType("int");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 

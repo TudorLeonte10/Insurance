@@ -14,5 +14,7 @@ namespace Insurance.Domain.Metadata
         public decimal ExchangeRateToBase { get; set; }
 
         public bool IsActive { get; set; } = true;
+
+
     }
 }

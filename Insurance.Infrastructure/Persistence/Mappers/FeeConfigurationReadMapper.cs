@@ -11,7 +11,11 @@ namespace Insurance.Infrastructure.Persistence.Mappers
     {
         public FeeConfigurationReadMapper()
         {
-            CreateMap<FeeConfigurationEntity, FeeConfigurationDto>();
+            CreateMap<FeeConfigurationEntity, FeeConfigurationDto>()
+                .ForMember(
+            dest => dest.RiskIndicator,
+            opt => opt.MapFrom(src => src.RiskIndicatorType)
+        ); 
         }
     }
 }

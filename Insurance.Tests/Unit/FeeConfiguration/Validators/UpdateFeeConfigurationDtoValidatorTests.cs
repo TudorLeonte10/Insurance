@@ -15,7 +15,7 @@ namespace Insurance.Tests.Unit.FeeConfiguration.Validators
             var dto = new UpdateFeeConfigurationDto
             {
                 Name = "Standard Fee",
-                Type = Domain.Metadata.Enums.FeeType.ConfigurationFee,
+                Type = Domain.Metadata.Enums.FeeType.AdminFee,
                 Percentage = 0.15m,
                 EffectiveFrom = DateTime.UtcNow,
                 EffectiveTo = DateTime.UtcNow.AddYears(1),

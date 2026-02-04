@@ -1,4 +1,5 @@
 ﻿using Insurance.Domain.Metadata.Enums;
+using Insurance.Domain.RiskIndicators;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -11,10 +12,11 @@ namespace Insurance.Infrastructure.Persistence.Entities
     public class FeeConfigurationEntity
     {
         public Guid Id { get; set; }
-
         public string Name { get; set; } = null!;
 
         public FeeType Type { get; set; }
+
+        public RiskIndicatorType? RiskIndicatorType { get; set; }
 
         public decimal Percentage { get; set; }
 
@@ -23,5 +25,6 @@ namespace Insurance.Infrastructure.Persistence.Entities
 
         public bool IsActive { get; set; }
     }
+
 
 }

@@ -37,4 +37,68 @@ namespace Insurance.Domain.Exceptions
         {
         }
     }
+
+    public class InvalidBasePremiumException : BusinessException
+    {
+        public InvalidBasePremiumException(string message)
+            : base(message)
+        {
+        }
+    }
+
+    public class InvalidFinalPremiumException : BusinessException
+    {
+        public InvalidFinalPremiumException(string message)
+            : base(message)
+        {
+        }
+    }  
+
+    public class InvalidPolicyTermException : BusinessException
+    {
+        public InvalidPolicyTermException(string message)
+            : base(message)
+        {
+        }
+    }
+
+    public class InvalidPolicyTransitionException : BusinessException
+    {
+        public InvalidPolicyTransitionException(string message)
+            : base(message)
+        {
+        }
+    }
+
+    public class InactiveBrokerException : BusinessException
+    {
+        public InactiveBrokerException(string message)
+            : base(message)
+        {
+        }
+    }
+
+    public class InactiveClientException : BusinessException
+    {
+        public InactiveClientException(string message)
+            : base(message)
+        {
+        }
+    }
+
+    public class InactiveCurrencyException : BusinessException
+    {
+        public InactiveCurrencyException(string message)
+            : base(message)
+        {
+        }
+    }
+
+    public class BuildingNotOwnedByClientException : BusinessException
+    {
+        public BuildingNotOwnedByClientException(string message)
+            : base(message)
+        {
+        }
+    }
 }

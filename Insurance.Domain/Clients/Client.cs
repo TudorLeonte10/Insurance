@@ -54,5 +54,6 @@ namespace Insurance.Domain.Clients
             Address = address ?? string.Empty;
             IdentificationNumber = identificationNumber;
         }
+
     }
 }

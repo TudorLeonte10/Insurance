@@ -7,7 +7,7 @@ namespace Insurance.Domain.Metadata.Enums
     public enum FeeType
     {
         BrokerCommission = 1,
-        ConfigurationFee = 2,
+        RiskAdjustment = 2,
         AdminFee = 3
     }
 }
