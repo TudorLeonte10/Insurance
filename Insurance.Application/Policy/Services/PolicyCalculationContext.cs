@@ -8,12 +8,12 @@ namespace Insurance.Application.Policy.Services
 {
     public class PolicyCalculationContext
     {
-        public Guid CityId { get; init; }
-        public Guid CountyId { get; init; }
-        public Guid CountryId { get; init; }
+        public Guid CityId { get; set; }
+        public Guid CountyId { get; set; }
+        public Guid CountryId { get; set; }
 
-        public BuildingType BuildingType { get; init; }
-        public IReadOnlyCollection<RiskIndicatorType>? RiskIndicators { get; init; }
+        public BuildingType BuildingType { get; set; }
+        public IReadOnlyCollection<RiskIndicatorType> RiskIndicators { get; set; } = new List<RiskIndicatorType>();
     }
 
 }

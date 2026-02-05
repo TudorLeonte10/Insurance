@@ -24,11 +24,11 @@ namespace Insurance.Infrastructure.Persistence.Repositories
             Guid policyId,
             CancellationToken ct)
         {
-            return await _db.Policies
+            var entity = await _db.Policies
                 .AsNoTracking()
-                .Where(p => p.Id == policyId)
-                .ProjectTo<PolicyDetailsDto>(_mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync(ct);
+                .FirstAsync(p => p.Id == policyId, ct);
+
+            return _mapper.Map<PolicyDetailsDto>(entity);
         }
     }
 

@@ -18,7 +18,7 @@ namespace Insurance.Application.Policy.FeeStrategies
             PolicyCalculationContext context,
             FeeConfiguration fee)
         {
-            if (!context.RiskIndicators!.Contains(fee.RiskIndicatorType!.Value))
+            if (!context.RiskIndicators.Contains(fee.RiskIndicatorType.Value))
                 return premium;
 
             return premium * (1 + fee.Percentage);

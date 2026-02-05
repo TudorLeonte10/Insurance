@@ -8,6 +8,7 @@ using Insurance.Domain.Clients;
 using Insurance.Domain.Exceptions;
 using Insurance.Domain.Metadata;
 using Insurance.Domain.Policies;
+using Insurance.Domain.RiskIndicators;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -135,7 +136,7 @@ namespace Insurance.Application.Policy.Commands
                 CountyId = geo.CountyId,
                 CountryId = geo.CountryId,
                 BuildingType = geo.BuildingType,
-                RiskIndicators = geo.RiskIndicators
+                RiskIndicators = geo.RiskIndicators ?? new List<RiskIndicatorType>()
             };
         }
 

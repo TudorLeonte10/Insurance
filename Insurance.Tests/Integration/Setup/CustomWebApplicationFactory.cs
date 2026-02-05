@@ -12,6 +12,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     private SqliteConnection _connection = null!;
     public Guid SeededCityId { get; private set; }
+    public Guid SeededCurrencyId { get; private set; }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -42,9 +43,18 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         var county = new CountyEntity { Name = "Iasi", Country = country };
         var city = new CityEntity { Name = "Pascani", County = county };
 
-        db.AddRange(country, county, city);
+        var currency = new CurrencyEntity
+        {
+            Code = "RON",
+            Name = "Romanian Leu",
+            ExchangeRateToBase = 1m,
+            IsActive = true
+        };
+
+        db.AddRange(country, county, city, currency);
         db.SaveChanges();
 
         SeededCityId = city.Id;
+        SeededCurrencyId = currency.Id;
     }
 }

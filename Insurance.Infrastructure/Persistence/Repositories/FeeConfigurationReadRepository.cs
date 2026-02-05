@@ -38,7 +38,7 @@ namespace Insurance.Infrastructure.Persistence.Repositories
 
         public async Task<IReadOnlyList<FeeConfiguration>> GetActiveAsync(CancellationToken cancellationToken)
         {
-            var now = _timeProvider.GetUtcNow();
+            var now = DateTime.UtcNow;
 
             return await _dbContext.FeeConfigurations
                 .AsNoTracking()

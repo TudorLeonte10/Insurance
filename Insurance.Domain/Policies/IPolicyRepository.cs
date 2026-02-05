@@ -8,5 +8,6 @@ namespace Insurance.Domain.Policies
     {
         Task<Policy?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
         Task AddAsync(Policy policy, CancellationToken cancellationToken);
+        Task UpdateAsync(Policy policy, CancellationToken cancellationToken);
     }
 }

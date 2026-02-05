@@ -34,7 +34,7 @@ namespace Insurance.Infrastructure
             IConfiguration configuration)
         {
 
-            services.AddAutoMapper(typeof(DependencyInjection).Assembly);
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddScoped<IClientRepository, ClientRepository>();
             services.AddScoped<IGeographyReadRepository, GeographyReadRepository>();

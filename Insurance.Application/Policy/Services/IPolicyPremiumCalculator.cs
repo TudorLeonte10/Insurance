@@ -9,9 +9,9 @@ namespace Insurance.Application.Policy.Services
     public interface IPolicyPremiumCalculator
     {
         decimal Calculate(
-        decimal basePremium,
-        PolicyCalculationContext context,
-        IEnumerable<FeeConfiguration> fees,
-        IEnumerable<RiskFactorConfiguration> riskFactors);
+            decimal basePremium,
+            PolicyCalculationContext context,
+            IEnumerable<FeeConfiguration> fees,
+            IEnumerable<RiskFactorConfiguration> riskFactors);
     }
 }

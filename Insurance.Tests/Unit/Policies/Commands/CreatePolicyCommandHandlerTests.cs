@@ -138,7 +138,7 @@ namespace Insurance.Tests.Unit.Policy.Commands
                 .Setup(x => x.GetByIdAsync(
                     command.PolicyDto.CurrencyId,
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Domain.Metadata.Currency)null!);
+                .ReturnsAsync((Insurance.Domain.Metadata.Currency)null!);
 
             _buildingReadRepo
                 .Setup(x => x.GetGeoContextAsync(

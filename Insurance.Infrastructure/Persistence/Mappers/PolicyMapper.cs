@@ -2,10 +2,12 @@
 using Insurance.Infrastructure.Persistence.Entities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Persistence.Mappers
 {
+    [ExcludeFromCodeCoverage]
     public static class PolicyMapper
     {
         public static PolicyEntity ToEntity(Policy policy)
@@ -54,6 +56,14 @@ namespace Insurance.Infrastructure.Persistence.Mappers
                 entity.CancellationReason
             );
         }
+
+        public static void UpdateActivation(PolicyEntity entity, Policy policy)
+        {
+            entity.Status = policy.Status;
+            entity.ActivatedAt = policy.ActivatedAt;
+        }
+
+
     }
 
 }

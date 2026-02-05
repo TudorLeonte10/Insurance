@@ -7,11 +7,13 @@ using Insurance.Domain.Metadata;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading;
 
 namespace Insurance.Infrastructure.Persistence.Repositories
 {
+    [ExcludeFromCodeCoverage]
     public class RiskFactorReadRepository : IRiskFactorReadRepository
     {
         private readonly InsuranceDbContext _dbContext;
