@@ -7,7 +7,7 @@ namespace Insurance.Application.Abstractions.Loggers
 {
     public interface IApplicationLogger
     {
-        void LogInformation(string message);
-        void LogError(Exception ex, string message);
+        void LogInformation(string message, params object[] args);
+        void LogError(Exception ex, string message, params object[] args);
     }
 }

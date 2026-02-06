@@ -22,83 +22,88 @@ namespace Insurance.Infrastructure.Persistence.Seed
             if (_context.Buildings.Any())
                 return;
 
-            var client = _context.Clients.First();
-            var cities = _context.Cities.Take(5).ToList();
+            var clients = _context.Clients.ToList();
+            var cities = _context.Cities.ToList();
 
-            var buildings = new List<BuildingEntity>
-        {
-            new()
+            var buildings = new List<BuildingEntity>();
+
+            int index = 0;
+
+            void AddBuilding(
+                ClientEntity client,
+                CityEntity city,
+                string street,
+                string number,
+                BuildingType type,
+                int year,
+                int floors,
+                decimal surface,
+                decimal insuredValue)
             {
-                Id = Guid.NewGuid(),
-                ClientId = client.Id,
-                CityId = cities[0].Id,
-                Street = "Str. Memorandumului",
-                Number = "10",
-                Type = "Residential",
-                ConstructionYear = 2005,
-                NumberOfFloors = 2,
-                SurfaceArea = 120,
-                InsuredValue = 150000
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                ClientId = client.Id,
-                CityId = cities[1].Id,
-                Street = "Str. Eroilor",
-                Number = "25A",
-                Type = "Office",
-                ConstructionYear = 2015,
-                NumberOfFloors = 4,
-                SurfaceArea = 300,
-                InsuredValue = 450000
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                ClientId = client.Id,
-                CityId = cities[2].Id,
-                Street = "Bd. Aviatorilor",
-                Number = "5",
-                Type = "Residential",
-                ConstructionYear = 1998,
-                NumberOfFloors = 8,
-                SurfaceArea = 500,
-                InsuredValue = 600000
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                ClientId = client.Id,
-                CityId = cities[3].Id,
-                Street = "Str. Victoriei",
-                Number = "1",
-                Type = "Office",
-                ConstructionYear = 2010,
-                NumberOfFloors = 6,
-                SurfaceArea = 420,
-                InsuredValue = 520000
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                ClientId = client.Id,
-                CityId = cities[4].Id,
-                Street = "Str. Independentei",
-                Number = "99",
-                Type = "Residential",
-                ConstructionYear = 1985,
-                NumberOfFloors = 3,
-                SurfaceArea = 180,
-                InsuredValue = 200000
+                buildings.Add(new BuildingEntity
+                {
+                    Id = Guid.NewGuid(),
+                    ClientId = client.Id,
+                    CityId = city.Id,
+                    Street = street,
+                    Number = number,
+                    Type = type.ToString(),
+                    ConstructionYear = year,
+                    NumberOfFloors = floors,
+                    SurfaceArea = surface,
+                    InsuredValue = insuredValue
+                });
             }
-        };
+
+            var ion = clients.Single(c => c.Name == "Ion Popescu");
+
+            AddBuilding(ion, cities.Single(c => c.Name == "Cluj-Napoca"),
+                "Str. Memorandumului", "10", BuildingType.Residential, 2005, 2, 120, 150000);
+
+            AddBuilding(ion, cities.Single(c => c.Name == "Turda"),
+                "Str. Eroilor", "25A", BuildingType.Residential, 1998, 1, 90, 100000);
+
+            AddBuilding(ion, cities.Single(c => c.Name == "Sector 1"),
+                "Bd. Aviatorilor", "5", BuildingType.Office, 2012, 6, 400, 550000);
+
+            var maria = clients.Single(c => c.Name == "Maria Ionescu");
+
+            AddBuilding(maria, cities.Single(c => c.Name == "Sector 3"),
+                "Str. Decebal", "45", BuildingType.Residential, 1985, 8, 300, 320000);
+
+            AddBuilding(maria, cities.Single(c => c.Name == "Sector 6"),
+                "Str. Apusului", "12", BuildingType.Residential, 2000, 4, 180, 210000);
+
+            var alpha = clients.Single(c => c.Name == "SC Alpha SRL");
+
+            AddBuilding(alpha, cities.Single(c => c.Name == "Cluj-Napoca"),
+                "Str. Dorobanților", "99", BuildingType.Office, 2018, 5, 600, 800000);
+
+            AddBuilding(alpha, cities.Single(c => c.Name == "Cluj-Napoca"),
+                "Str. Horea", "15", BuildingType.Office, 2016, 3, 420, 620000);
+
+            AddBuilding(alpha, cities.Single(c => c.Name == "Sector 1"),
+                "Bd. Primăverii", "20", BuildingType.Office, 2019, 7, 900, 1200000);
+
+            var beta = clients.Single(c => c.Name == "SC Beta SRL");
+
+            AddBuilding(beta, cities.Single(c => c.Name == "Iasi"),
+                "Str. Independenței", "1", BuildingType.Residential, 1990, 6, 350, 300000);
+
+            AddBuilding(beta, cities.Single(c => c.Name == "Pascani"),
+                "Str. Gării", "7", BuildingType.Residential, 1980, 2, 140, 130000);
+
+            var andrei = clients.Single(c => c.Name == "Andrei Vasilescu");
+
+            AddBuilding(andrei, cities.Single(c => c.Name == "Sector 1"),
+                "Str. Paris", "3", BuildingType.Residential, 2008, 2, 160, 260000);
 
             _context.Buildings.AddRange(buildings);
             await _context.SaveChangesAsync();
         }
     }
-    
+
+
 
 }
 

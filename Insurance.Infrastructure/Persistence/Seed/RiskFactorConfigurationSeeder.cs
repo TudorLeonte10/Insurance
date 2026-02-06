@@ -24,32 +24,69 @@ namespace Insurance.Infrastructure.Persistence.Seed
             if (_context.RiskFactorConfigurations.Any())
                 return;
 
+            var romania = _context.Countries.Single(c => c.Name == "Romania");
+
+            var cluj = _context.Counties.Single(c => c.Name == "Cluj");
+            var bucuresti = _context.Counties.Single(c => c.Name == "Bucuresti");
+            var iasi = _context.Counties.Single(c => c.Name == "Iasi");
+
+            var clujNapoca = _context.Cities.Single(c => c.Name == "Cluj-Napoca");
+            var sector1 = _context.Cities.Single(c => c.Name == "Sector 1");
+            var turda = _context.Cities.Single(c => c.Name == "Turda");
+
             var risks = new List<RiskFactorConfigurationEntity>
         {
             new()
             {
                 Id = Guid.NewGuid(),
                 Level = RiskFactorLevel.Country,
-                ReferenceId = _context.Countries.First().Id.ToString(),
-                AdjustmentPercentage = 0.20m,
+                ReferenceId = romania.Id.ToString(),
+                AdjustmentPercentage = 0.15m,
+                IsActive = true
+            },
+
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Level = RiskFactorLevel.County,
+                ReferenceId = bucuresti.Id.ToString(),
+                AdjustmentPercentage = 0.20m, 
                 IsActive = true
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 Level = RiskFactorLevel.County,
-                ReferenceId = _context.Counties.First().Id.ToString(),
-                AdjustmentPercentage = 0.10m,
+                ReferenceId = cluj.Id.ToString(),
+                AdjustmentPercentage = 0.10m, 
+                IsActive = true
+            },
+
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Level = RiskFactorLevel.City,
+                ReferenceId = clujNapoca.Id.ToString(),
+                AdjustmentPercentage = 0.07m,
                 IsActive = true
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 Level = RiskFactorLevel.City,
-                ReferenceId = _context.Cities.First().Id.ToString(),
-                AdjustmentPercentage = 0.05m,
+                ReferenceId = sector1.Id.ToString(),
+                AdjustmentPercentage = 0.12m,
                 IsActive = true
             },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Level = RiskFactorLevel.City,
+                ReferenceId = turda.Id.ToString(),
+                AdjustmentPercentage = 0.05m,
+                IsActive = false 
+            },
+
             new()
             {
                 Id = Guid.NewGuid(),
@@ -72,7 +109,6 @@ namespace Insurance.Infrastructure.Persistence.Seed
             await _context.SaveChangesAsync();
         }
     }
-
 
 }
 

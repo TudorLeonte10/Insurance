@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Insurance.WebApi.Controllers.Metadata
 {
     [ApiController]
+    //[Authorize(Roles = "Admin")]
     [Route("api/admin/currencies")]
     public class CurrencyController : ControllerBase
     {

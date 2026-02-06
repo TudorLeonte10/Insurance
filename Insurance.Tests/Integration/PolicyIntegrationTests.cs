@@ -60,9 +60,10 @@ namespace Insurance.Tests.Integration
             var root = doc.RootElement;
 
             Assert.Equal(policyId, root.GetProperty("id").GetGuid());
-            Assert.Equal(clientId, root.GetProperty("clientId").GetGuid());
-            Assert.Equal(buildingId, root.GetProperty("buildingId").GetGuid());
-            Assert.Equal(brokerId, root.GetProperty("brokerId").GetGuid());
+            Assert.Equal(clientId, root.GetProperty("client").GetProperty("id").GetGuid());
+
+            Assert.Equal(buildingId, root.GetProperty("building").GetProperty("id").GetGuid());
+
 
             Assert.Equal("Active", root.GetProperty("status").GetString());
         }

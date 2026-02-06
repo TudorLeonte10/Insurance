@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Insurance.Application.Buildings.DTOs;
+using Insurance.Domain.Buildings;
 using Insurance.Infrastructure.Persistence.Entities;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,9 @@ namespace Insurance.Infrastructure.Persistence.Mappers
                 .ForMember(dest => dest.RiskIndicators,
                     opt => opt.MapFrom(src =>
                         src.RiskIndicators.Select(ri => ri.RiskIndicator)));
+
+            CreateMap<BuildingEntity, BuildingSummaryDto>()
+                .ForMember(d => d.Geography, opt => opt.MapFrom(s => s.City));
         }
     }
 }

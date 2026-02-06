@@ -54,11 +54,15 @@ namespace Insurance.Infrastructure.Persistence.Seed
         {
             new() { Id = Guid.NewGuid(), Name = "Cluj-Napoca", CountyId = cluj.Id },
             new() { Id = Guid.NewGuid(), Name = "Turda", CountyId = cluj.Id },
+            new() { Id = Guid.NewGuid(), Name = "Dej", CountyId = cluj.Id },
 
+ 
             new() { Id = Guid.NewGuid(), Name = "Sector 1", CountyId = bucuresti.Id },
             new() { Id = Guid.NewGuid(), Name = "Sector 3", CountyId = bucuresti.Id },
+            new() { Id = Guid.NewGuid(), Name = "Sector 6", CountyId = bucuresti.Id },
 
-            new() { Id = Guid.NewGuid(), Name = "Iasi", CountyId = iasi.Id }
+            new() { Id = Guid.NewGuid(), Name = "Iasi", CountyId = iasi.Id },
+            new() { Id = Guid.NewGuid(), Name = "Pascani", CountyId = iasi.Id }
         };
 
             _context.Countries.Add(romania);
@@ -68,5 +72,6 @@ namespace Insurance.Infrastructure.Persistence.Seed
             await _context.SaveChangesAsync();
         }
     }
+
 
 }

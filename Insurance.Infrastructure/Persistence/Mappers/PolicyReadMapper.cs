@@ -13,10 +13,10 @@ namespace Insurance.Infrastructure.Persistence.Mappers
         public PolicyReadMapper()
         {
             CreateMap<PolicyEntity, PolicyDetailsDto>()
-    .ForMember(d => d.ClientId, opt => opt.MapFrom(s => s.ClientId))
-    .ForMember(d => d.BuildingId, opt => opt.MapFrom(s => s.BuildingId))
-    .ForMember(d => d.BrokerId, opt => opt.MapFrom(s => s.BrokerId))
-    .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status));
+            .ForMember(d => d.Client, opt => opt.MapFrom(s => s.Client))
+            .ForMember(d => d.Building, opt => opt.MapFrom(s => s.Building))
+            .ForMember(d => d.Currency, opt => opt.MapFrom(s => s.Currency))
+            .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status));
 
 
 

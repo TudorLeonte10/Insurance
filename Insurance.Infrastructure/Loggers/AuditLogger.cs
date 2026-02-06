@@ -16,7 +16,11 @@ namespace Insurance.Infrastructure.Loggers
         }
         public void LogAudit(string action, string entity, Guid entityId)
         {
-            _logger.LogInformation($"Audit Log - Action: {action}, Entity: {entity}, EntityId: {entityId}");
+            _logger.LogInformation(
+                "Audit event. Action={Action}, Entity={Entity}, EntityId={EntityId}",
+                action,
+                entity,
+                entityId);
         }
     }
 }

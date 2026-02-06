@@ -2,11 +2,13 @@
 using Insurance.Application.Brokers.DTOs;
 using Insurance.Application.Brokers.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Insurance.WebApi.Controllers
 {
     [ApiController]
+    //[Authorize(Roles = "Admin")]
     [Route("api/admin/brokers")]
     public class BrokersController : ControllerBase
     {

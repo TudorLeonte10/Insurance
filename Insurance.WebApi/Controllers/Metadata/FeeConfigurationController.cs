@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Insurance.WebApi.Controllers.Metadata
 {
     [ApiController]
+    //[Authorize(Roles = "Admin")]
     [Route("api/admin/fees")]
     public class FeeConfigurationController : ControllerBase
     {

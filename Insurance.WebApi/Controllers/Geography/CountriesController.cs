@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Insurance.WebApi.Controllers.Geography
 {
     [ApiController]
+    //[Authorize(Roles = "Broker")]
     [Route("api/brokers/[controller]")]
     public class CountriesController : ControllerBase
     {

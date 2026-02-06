@@ -27,6 +27,8 @@ namespace Insurance.Infrastructure.Persistence.Seed
             await new ClientSeeder(_context).SeedAsync();
             await new BuildingSeeder(_context).SeedAsync();
             await new BuildingRiskIndicatorSeeder(_context).SeedAsync();
+            await new UserSeeder(_context).SeedAsync();
+            await new PolicySeeder(_context).SeedAsync();   
         }
     }
 
