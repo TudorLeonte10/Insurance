@@ -4,12 +4,13 @@ using Insurance.Application.Policy.DTOs;
 using Insurance.Application.Policy.Queries;
 using Insurance.Domain.Policies;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Insurance.WebApi.Controllers
 {
     [ApiController]
-    //[Authorize(Roles = "Broker")]
+   //[Authorize(Roles = "Broker")]
     [Route("api/brokers/policies")]
     public class PolicyController : ControllerBase
     {

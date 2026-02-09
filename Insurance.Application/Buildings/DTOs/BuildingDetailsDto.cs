@@ -3,10 +3,12 @@ using Insurance.Domain.Clients;
 using Insurance.Domain.RiskIndicators;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Application.Buildings.DTOs
 {
+    [ExcludeFromCodeCoverage]
     public class BuildingDetailsDto
     {
         public Guid Id { get; set; }

@@ -1,4 +1,4 @@
-using Insurance.Application;
+﻿using Insurance.Application;
 using Insurance.Infrastructure;
 using Insurance.Infrastructure.Persistence;
 using Insurance.Infrastructure.Persistence.Seed;
@@ -53,6 +53,9 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
+
+//app.UseAuthentication();
+//app.UseAuthorization();
 
 app.MapControllers();
 

@@ -2,10 +2,12 @@
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Audit.Models
 {
+    [ExcludeFromCodeCoverage]
     public class MongoAuditLog
     {
         [BsonId]

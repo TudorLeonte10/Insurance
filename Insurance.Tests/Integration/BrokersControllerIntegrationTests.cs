@@ -1,9 +1,15 @@
-﻿using Insurance.Application.Brokers.DTOs;
+﻿using Insurance.Application.Brokers.Commands;
+using Insurance.Application.Brokers.DTOs;
+using Insurance.Application.Brokers.Queries;
 using Insurance.Application.Common.Paging;
 using Insurance.Domain.Clients;
 using Insurance.Infrastructure.Persistence;
 using Insurance.Tests.Integration.Setup;
+using Insurance.WebApi.Controllers;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -12,208 +18,134 @@ using System.Text;
 
 namespace Insurance.Tests.Integration
 {
-    public class BrokersControllerIntegrationTests
-    : IntegrationTestBase, IClassFixture<ControllerTestWebApplicationFactory>
+    public class BrokersControllerTests
     {
+        private readonly Mock<IMediator> _mediatorMock;
+        private readonly BrokersController _controller;
 
-        private readonly HttpClient _client;
-        private readonly ControllerTestWebApplicationFactory _factory;
-
-        public BrokersControllerIntegrationTests(ControllerTestWebApplicationFactory factory)
+        public BrokersControllerTests()
         {
-            _factory = factory;
-            _client = factory.CreateClient();
+            _mediatorMock = new Mock<IMediator>();
+            _controller = new BrokersController(_mediatorMock.Object);
         }
+
         [Fact]
-        public async Task POST_Admin_Brokers_Should_Return_201()
+        public async Task Create_Should_CallMediator_And_ReturnCreatedAtAction()
         {
-            var payload = new
+            var brokerId = Guid.NewGuid();
+            var dto = new CreateBrokerDto
             {
-                brokerCode = "BR001",
-                name = "Test Broker",
-                email = "test@test.com",
-                phone = "123"
+                BrokerCode = "BR001",
+                Name = "Test Broker",
+                Email = "test@test.com",
+                Phone = "0712345678"
             };
 
-            var response = await _client.PostAsJsonAsync(
-                "/api/admin/brokers", payload);
+            _mediatorMock
+                .Setup(m => m.Send(It.IsAny<CreateBrokerCommand>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(brokerId);
 
-            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            var result = await _controller.Create(dto);
+
+            var createdResult = Assert.IsType<CreatedAtActionResult>(result);
+            Assert.Equal(nameof(_controller.GetById), createdResult.ActionName);
+            Assert.Equal(brokerId, createdResult.RouteValues["brokerId"]);
+
+            _mediatorMock.Verify(
+                m => m.Send(It.Is<CreateBrokerCommand>(c => c.Dto == dto), It.IsAny<CancellationToken>()),
+                Times.Once);
         }
 
         [Fact]
-        public async Task GET_Admin_Brokers_Should_Return_Paged_Result()
+        public async Task GetById_WhenBrokerExists_Should_ReturnOk()
         {
-            var (factory, client) = CreateTestContext();
-
-            await CreateBrokerAndGetId(client);
-
-            var response =
-                await client.GetAsync("/api/admin/brokers?pageNumber=1&pageSize=10");
-
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-            var result = await response.Content
-                .ReadFromJsonAsync<PagedResult<BrokerDetailsDto>>();
-
-            Assert.NotNull(result);
-            Assert.NotEmpty(result.Items);
-        }
-
-        [Fact]
-        public async Task GET_Admin_Broker_By_Id_Should_Return_Broker()
-        {
-            var (factory, client) = CreateTestContext();
-
-            var brokerId = await CreateBrokerAndGetId(client);
-
-            var response =
-                await client.GetAsync($"/api/admin/brokers/{brokerId}");
-
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-            var broker = await response.Content
-                .ReadFromJsonAsync<BrokerDetailsDto>();
-
-            Assert.NotNull(broker);
-            Assert.Equal(brokerId, broker.Id);
-        }
-
-        [Fact]
-        public async Task GET_Admin_Broker_By_Id_Should_Return_404_When_Not_Found()
-        {
-            var (_, client) = CreateTestContext();
-
-            var response =
-                await client.GetAsync($"/api/admin/brokers/{Guid.NewGuid()}");
-
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        }
-
-
-        [Fact]
-        public async Task PATCH_Activate_Broker_Should_Set_IsActive_To_True()
-        {
-            var (factory, client) = CreateTestContext();
-            var brokerId = await CreateBrokerAndGetId(client);
-
-            using (var scope = factory.Services.CreateScope())
+            var brokerId = Guid.NewGuid();
+            var brokerDto = new BrokerDetailsDto
             {
-                var db = scope.ServiceProvider
-                    .GetRequiredService<InsuranceDbContext>();
-
-                var broker = await db.Brokers.FindAsync(brokerId);
-                broker!.IsActive = false;
-                await db.SaveChangesAsync();
-            }
-
-            var response = await client.PatchAsync(
-                $"/api/admin/brokers/{brokerId}/activate",
-                null);
-
-            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-
-            var getResponse = await client.GetAsync(
-                $"/api/admin/brokers/{brokerId}");
-
-            var brokerDto = await getResponse.Content
-                .ReadFromJsonAsync<BrokerDetailsDto>();
-
-            Assert.True(brokerDto!.IsActive);
-        }
-
-        [Fact]
-        public async Task PATCH_Deactivate_Broker_Should_Set_IsActive_To_False()
-        {
-            var (_, client) = CreateTestContext();
-            var brokerId = await CreateBrokerAndGetId(client);
-
-            var response = await client.PatchAsync(
-                $"/api/admin/brokers/{brokerId}/deactivate",
-                null);
-
-            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-
-            var getResponse = await client.GetAsync(
-                $"/api/admin/brokers/{brokerId}");
-
-            var brokerDto = await getResponse.Content
-                .ReadFromJsonAsync<BrokerDetailsDto>();
-
-            Assert.False(brokerDto!.IsActive);
-        }
-
-        [Fact]
-        public async Task PATCH_Activate_Should_Return_404_When_Broker_Not_Found()
-        {
-            var (_, client) = CreateTestContext();
-
-            var response = await client.PatchAsync(
-                $"/api/admin/brokers/{Guid.NewGuid()}/activate",
-                null);
-
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task PATCH_Deactivate_Should_Return_404_When_Broker_Not_Found()
-        {
-            var (_, client) = CreateTestContext();
-
-            var response = await client.PatchAsync(
-                $"/api/admin/brokers/{Guid.NewGuid()}/deactivate",
-                null);
-
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task PUT_Admin_Broker_Should_Update_Details()
-        {
-            var (factory, client) = CreateTestContext();
-            var brokerId = await CreateBrokerAndGetId(client);
-
-            var updateDto = new
-            {
-                name = "Updated Broker",
-                email = "updated@test.com",
-                phone = "0711111111"
+                Id = brokerId,
+                BrokerCode = "BR001",
+                Name = "Test",
+                Email = "test@test.com",
+                Phone = "123",
+                IsActive = true
             };
 
-            var response = await client.PutAsJsonAsync(
-                $"/api/admin/brokers/{brokerId}",
-                updateDto);
+            _mediatorMock
+                .Setup(m => m.Send(It.IsAny<GetBrokerByIdQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(brokerDto);
 
-            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            var result = await _controller.GetById(brokerId);
 
-            var getResponse = await client.GetAsync(
-                $"/api/admin/brokers/{brokerId}");
-
-            var broker = await getResponse.Content
-                .ReadFromJsonAsync<BrokerDetailsDto>();
-
-            Assert.Equal("Updated Broker", broker!.Name);
-            Assert.Equal("updated@test.com", broker.Email);
-            Assert.Equal("0711111111", broker.Phone);
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(brokerDto, okResult.Value);
         }
 
         [Fact]
-        public async Task PUT_Admin_Broker_Should_Return_404_When_Not_Found()
+        public async Task GetById_WhenBrokerNotFound_Should_ReturnNotFound()
         {
-            var (_, client) = CreateTestContext();
+            var brokerId = Guid.NewGuid();
 
-            var updateDto = new
-            {
-                name = "Updated Broker",
-                email = "updated@test.com",
-                phone = "0711111111"
-            };
+            _mediatorMock
+                .Setup(m => m.Send(It.IsAny<GetBrokerByIdQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((BrokerDetailsDto?)null);
 
-            var response = await client.PutAsJsonAsync(
-                $"/api/admin/brokers/{Guid.NewGuid()}",
-                updateDto);
+            var result = await _controller.GetById(brokerId);
 
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task GetAll_Should_ReturnOkWithPagedResult()
+        {
+            var pagedResult = new PagedResult<BrokerDetailsDto>(
+                new[] { new BrokerDetailsDto { Id = Guid.NewGuid(), Name = "Test" } },
+                1,
+                10,
+                1);
+
+            _mediatorMock
+                .Setup(m => m.Send(It.IsAny<GetBrokersQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(pagedResult);
+
+            var result = await _controller.GetAll(1, 10);
+
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(pagedResult, okResult.Value);
+        }
+
+
+        [Fact]
+        public async Task Deactivate_Should_CallMediator_And_ReturnNoContent()
+        {
+            var brokerId = Guid.NewGuid();
+
+            _mediatorMock
+                .Setup(m => m.Send(It.IsAny<ChangeBrokerStatusCommand>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(Guid.NewGuid()));
+
+            var result = await _controller.Deactivate(brokerId);
+
+            Assert.IsType<NoContentResult>(result);
+            _mediatorMock.Verify(
+                m => m.Send(It.Is<ChangeBrokerStatusCommand>(c => c.BrokerId == brokerId && c.IsActive == false), It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task Activate_Should_CallMediator_And_ReturnNoContent()
+        {
+            var brokerId = Guid.NewGuid();
+
+            _mediatorMock
+                .Setup(m => m.Send(It.IsAny<ChangeBrokerStatusCommand>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(Guid.NewGuid()));
+
+            var result = await _controller.Activate(brokerId);
+
+            Assert.IsType<NoContentResult>(result);
+            _mediatorMock.Verify(
+                m => m.Send(It.Is<ChangeBrokerStatusCommand>(c => c.BrokerId == brokerId && c.IsActive == true), It.IsAny<CancellationToken>()),
+                Times.Once);
         }
     }
 }

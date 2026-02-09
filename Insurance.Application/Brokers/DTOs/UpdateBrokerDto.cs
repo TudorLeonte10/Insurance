@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Application.Brokers.DTOs
 {
+    [ExcludeFromCodeCoverage]
     public class UpdateBrokerDto
     {
         public string Name { get; set; } = string.Empty;

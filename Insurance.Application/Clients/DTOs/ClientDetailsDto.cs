@@ -1,10 +1,12 @@
 ﻿using Insurance.Domain.Clients;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Application.Clients.DTOs
 {
+    [ExcludeFromCodeCoverage]
     public class ClientDetailsDto
     {
         public Guid Id { get; set; }

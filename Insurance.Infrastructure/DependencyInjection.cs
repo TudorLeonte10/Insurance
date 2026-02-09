@@ -2,6 +2,7 @@
 using Insurance.Application.Abstractions.Audit;
 using Insurance.Application.Abstractions.Loggers;
 using Insurance.Application.Abstractions.Repositories;
+using Insurance.Application.Authentication;
 using Insurance.Application.Policy.FeeStrategies;
 using Insurance.Application.Policy.RiskStrategies;
 using Insurance.Application.Policy.Services;
@@ -11,6 +12,7 @@ using Insurance.Domain.Clients;
 using Insurance.Domain.Metadata;
 using Insurance.Domain.Policies;
 using Insurance.Infrastructure.Audit;
+using Insurance.Infrastructure.Authentication;
 using Insurance.Infrastructure.Loggers;
 using Insurance.Infrastructure.Persistence;
 using Insurance.Infrastructure.Persistence.Repositories;
@@ -53,6 +55,9 @@ namespace Insurance.Infrastructure
             services.AddScoped<IPolicyRepository, PolicyRepository>();
             services.AddScoped<IPolicyReadRepository, PolicyReadRepository>();
             services.AddScoped<IPolicySearchRepository, PolicySearchRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+
+            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
             services.AddScoped<IApplicationLogger, ApplicationLogger>();
             services.AddScoped<IAuditLogger, AuditLogger>();
@@ -85,6 +90,7 @@ namespace Insurance.Infrastructure
             services.AddSingleton(TimeProvider.System);
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddJwtAuthentication(configuration);
 
             return services;
         }
