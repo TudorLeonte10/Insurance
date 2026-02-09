@@ -1,10 +1,12 @@
 ﻿using Insurance.Application.Abstractions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Persistence
 {
+    [ExcludeFromCodeCoverage]
     public class UnitOfWork : IUnitOfWork
     {
         private readonly InsuranceDbContext _dbContext;

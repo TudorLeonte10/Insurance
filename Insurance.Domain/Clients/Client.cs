@@ -1,18 +1,55 @@
 ﻿using Insurance.Domain.Buildings;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Insurance.Domain.Clients;
+using Insurance.Domain.Exceptions;
 
-namespace Insurance.Domain.Clients
+public class Client
 {
-    public class Client
-    {
-        public Guid Id { get; set; } = Guid.NewGuid();
-        public ClientType Type { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string IdentificationNumber { get; set; } = string.Empty;
-        public string ContactInfo { get; set; } = string.Empty;
-        public ICollection<Building> Buildings { get; set; } = new List<Building>();
+    public Guid Id { get; private set; }
+    public ClientType Type { get; private set; }
+    public string Name { get; private set; }
+    public string IdentificationNumber { get; private set; }
+    public string Email { get; private set; }
+    public string PhoneNumber { get; private set; }
+    public string Address { get; private set; }
 
+    private readonly List<Building> _buildings = new();
+    public IReadOnlyCollection<Building> Buildings => _buildings.AsReadOnly();
+
+    private Client() { }
+
+    public static Client Create(
+        ClientType type,
+        string name,
+        string identificationNumber,
+        string email,
+        string phoneNumber,
+        string address)
+    {
+
+        return new Client
+        {
+            Id = Guid.NewGuid(),
+            Type = type,
+            Name = name,
+            IdentificationNumber = identificationNumber,
+            Email = email,
+            PhoneNumber = phoneNumber,
+            Address = address ?? string.Empty
+        };
+    }
+
+    public void UpdateDetails(
+        string name,
+        string email,
+        string phoneNumber,
+        string address,
+        string identificationNumber)
+    {
+
+        Name = name;
+        Email = email;
+        PhoneNumber = phoneNumber;
+        Address = address ?? string.Empty;
+        IdentificationNumber = identificationNumber;
     }
 }

@@ -1,29 +1,23 @@
-﻿using Insurance.Domain.Geography;
+﻿using Insurance.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Text;
 
-namespace Insurance.Infrastructure.Persistence.Configurations.Geography
+namespace Insurance.Infrastructure.Persistence.Configurations;
+
+public class CountryEntityConfiguration
+    : IEntityTypeConfiguration<CountryEntity>
 {
-    public class CountryConfiguration : IEntityTypeConfiguration<Country>
+    public void Configure(EntityTypeBuilder<CountryEntity> builder)
     {
-        public void Configure(EntityTypeBuilder<Country> builder)
-        {
-            builder.ToTable("Countries");
+        builder.ToTable("Countries");
 
-            builder.HasKey(c => c.Id);
+        builder.HasKey(c => c.Id);
 
-            builder.Property(c => c.Name)
-                .IsRequired()
-                .HasMaxLength(100);
+        builder.Property(c => c.Name)
+            .IsRequired()
+            .HasMaxLength(200);
 
-            builder.HasMany(c => c.Counties)
-                .WithOne(cn => cn.Country)
-                .HasForeignKey(cn => cn.CountryId)
-                .OnDelete(DeleteBehavior.Restrict);
-        }
+        builder.HasIndex(c => c.Name)
+            .IsUnique();
     }
 }

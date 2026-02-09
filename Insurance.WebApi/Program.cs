@@ -3,6 +3,7 @@ using Insurance.Infrastructure;
 using Insurance.Infrastructure.Persistence;
 using Insurance.Infrastructure.Persistence.Seed;
 using Insurance.WebApi.Middleware;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,19 +12,32 @@ builder.Services.AddControllers();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
+if (!builder.Environment.IsEnvironment("Test"))
+{
+    builder.Services.AddSqlServerDbContext(builder.Configuration);
+}
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<InsuranceDbContext>();
     var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
+    var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
-    await DatabaseSeeder.SeedAsync(context, env);
+    var connectionString = config.GetConnectionString("DefaultConnection");
+
+    if (!env.IsEnvironment("Test") && !string.IsNullOrWhiteSpace(connectionString))
+    {
+        var context = scope.ServiceProvider.GetRequiredService<InsuranceDbContext>();
+
+        await context.Database.MigrateAsync();
+
+        var seeder = new DatabaseSeeder(context);
+        await seeder.SeedAsync();
+    }
 }
 
 if (app.Environment.IsDevelopment())
@@ -32,8 +46,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseHttpsRedirection();
 
 app.MapControllers();
 
 app.Run();
+

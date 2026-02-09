@@ -1,27 +1,33 @@
-﻿using Insurance.Domain.RiskIndicators;
+﻿using Insurance.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Insurance.Infrastructure.Persistence.Configurations
+namespace Insurance.Infrastructure.Persistence.Configurations;
+
+public class BuildingRiskIndicatorEntityConfiguration
+    : IEntityTypeConfiguration<BuildingRiskIndicatorEntity>
 {
-    public class BuildingRiskIndicatorConfiguration : IEntityTypeConfiguration<BuildingRiskIndicator>
+    public void Configure(EntityTypeBuilder<BuildingRiskIndicatorEntity> builder)
     {
-        public void Configure(EntityTypeBuilder<BuildingRiskIndicator> builder)
-        {
-            builder.ToTable("BuildingRiskIndicators");
+        builder.ToTable("BuildingRiskIndicators");
 
-            builder.HasKey(x => new { x.BuildingId, x.RiskIndicator });
+        builder.HasKey(ri => ri.Id);
 
-            builder.Property(x => x.RiskIndicator)
-                .IsRequired();
+        builder.Property(ri => ri.RiskIndicator)
+            .IsRequired()
+            .HasMaxLength(100);
 
-            builder.HasOne(x => x.Building)
-                .WithMany(b => b.RiskIndicators)
-                .HasForeignKey(x => x.BuildingId)
-                .OnDelete(DeleteBehavior.Cascade);
-        }
+        builder.HasOne(ri => ri.Building)
+            .WithMany() 
+            .HasForeignKey(ri => ri.BuildingId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(ri => ri.Building)
+            .WithMany(b => b.RiskIndicators)
+            .HasForeignKey(ri => ri.BuildingId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(ri => new { ri.BuildingId, ri.RiskIndicator })
+            .IsUnique();
     }
 }

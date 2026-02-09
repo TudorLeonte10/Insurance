@@ -1,34 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 
 namespace Insurance.Domain.Exceptions
 {
+    [ExcludeFromCodeCoverage]
     public abstract class BusinessException : Exception
     {
-        public BusinessException(string message) : base(message)
+        protected BusinessException(string message) : base(message)
         {
         }
     }
 
-    public class NotFoundException : BusinessException
+    public class BuildingConstructionYearNotAllowedException : BusinessException
     {
-        public NotFoundException(string message) : base(message) {}
-    }
+        public BuildingConstructionYearNotAllowedException(string message)
+            : base(message)
+        {
+        }
 
-    public class ConflictException : BusinessException
-    {
-        public ConflictException(string message) : base(message) { }
-    }
-
-    public class ValidationException : BusinessException
-    {
-        public ValidationException(string message) : base(message) { }
-    }
-
-    public class ForbiddenBusinessException : BusinessException
-    {
-        public ForbiddenBusinessException(string message) : base(message) { }
     }
 }
