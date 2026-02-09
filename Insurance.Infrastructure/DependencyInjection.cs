@@ -90,7 +90,11 @@ namespace Insurance.Infrastructure
             services.AddSingleton(TimeProvider.System);
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddJwtAuthentication(configuration);
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (environment != "Test")
+            {
+                services.AddJwtAuthentication(configuration);
+            }
 
             return services;
         }

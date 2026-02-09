@@ -15,8 +15,15 @@ namespace Insurance.Infrastructure.Authentication
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.Configure<JwtSettings>(
-                configuration.GetSection("Jwt"));
+            var jwtSection = configuration.GetSection("Jwt");
+            var jwtKey = jwtSection["Key"];
+
+            if (string.IsNullOrWhiteSpace(jwtKey))
+            {
+                return services;
+            }
+
+            services.Configure<JwtSettings>(jwtSection);
 
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
@@ -24,18 +31,16 @@ namespace Insurance.Infrastructure.Authentication
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    var jwt = configuration.GetSection("Jwt");
-
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = jwt["Issuer"],
-                        ValidAudience = jwt["Audience"],
+                        ValidIssuer = jwtSection["Issuer"],
+                        ValidAudience = jwtSection["Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(jwt["Key"]!))
+                            Encoding.UTF8.GetBytes(jwtKey))
                     };
                 });
 
