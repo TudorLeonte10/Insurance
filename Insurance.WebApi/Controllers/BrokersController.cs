@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Insurance.WebApi.Controllers
 {
     [ApiController]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [Route("api/admin/brokers")]
     public class BrokersController : ControllerBase
     {

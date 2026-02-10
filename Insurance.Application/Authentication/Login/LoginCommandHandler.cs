@@ -1,4 +1,5 @@
 ﻿using Insurance.Application.Abstractions.Repositories;
+using Insurance.Application.Exceptions;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -28,14 +29,14 @@ namespace Insurance.Application.Authentication.Login
                 .GetByUsernameAsync(request.Username, ct);
 
             if (user is null)
-                throw new UnauthorizedAccessException("Invalid credentials");
+                throw new UnauthorizedException("Invalid credentials");
 
             var passwordValid = BCrypt.Net.BCrypt.Verify(
                 request.Password,
                 user.PasswordHash);
 
             if (!passwordValid)
-                throw new UnauthorizedAccessException("Invalid credentials");
+                throw new UnauthorizedException("Invalid credentials");
 
             var authUser = new AuthUserContext(
                 user.UserId,
