@@ -6,6 +6,7 @@ using Insurance.Application.Authentication;
 using Insurance.Application.Policy.FeeStrategies;
 using Insurance.Application.Policy.RiskStrategies;
 using Insurance.Application.Policy.Services;
+using Insurance.Application.Policy.Services.Strategies;
 using Insurance.Domain.Brokers;
 using Insurance.Domain.Buildings;
 using Insurance.Domain.Clients;
@@ -72,6 +73,12 @@ namespace Insurance.Infrastructure
             services.AddScoped<IFeeStrategy, PercentageFeeStrategy>();
             services.AddScoped<IFeeStrategy, RiskIndicatorFeeStrategy>();
             services.AddScoped<IPolicyPremiumCalculator, PolicyPremiumCalculator>();
+
+            services.AddScoped<IReportGroupingStrategy, CountryGroupStrategy>();
+            services.AddScoped<IReportGroupingStrategy, CountyGroupStrategy>();
+            services.AddScoped<IReportGroupingStrategy, CityGroupStrategy>();
+            services.AddScoped<IReportGroupingStrategy, BrokerGroupStrategy>();
+            services.AddScoped<IGroupingStrategyFactory, GroupingStrategyFactory>();
 
             services.AddSingleton<IMongoClient>(sp =>
             {

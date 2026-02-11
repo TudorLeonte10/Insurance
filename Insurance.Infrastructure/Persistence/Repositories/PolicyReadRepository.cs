@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Insurance.Application.Abstractions.Repositories;
 using Insurance.Application.Policy.DTOs;
+using Insurance.Domain.Buildings;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,28 @@ namespace Insurance.Infrastructure.Persistence.Repositories
                 .Where(p => p.Id == policyId)
                 .ProjectTo<PolicyDetailsDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(ct);
+        }
+
+        public IQueryable<PolicyReportReadModel> GetQueryData()
+        {
+            return _db.Policies.
+                AsNoTracking()
+                .Select(p => new PolicyReportReadModel
+                {
+                    PolicyId = p.Id,
+                    PolicyStartDate = p.StartDate,
+                    Country = p.Building.City.County.Country.Name,
+                    County = p.Building.City.County.Name,
+                    City = p.Building.City.Name,
+                    CityId = p.Building.City.Id,
+                    BrokerCode = p.Broker.BrokerCode,
+                    BrokerName = p.Broker.Name,
+                    CurrencyCode = p.Currency.Code,
+                    FinalPremium = p.FinalPremium,
+                    ExchangeRate = p.Currency.ExchangeRateToBase,
+                    Status = p.Status,
+                    BuildingType = Enum.Parse<BuildingType>(p.Building.Type)
+                });
         }
     }
 
