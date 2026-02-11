@@ -13,9 +13,9 @@ namespace Insurance.Domain.Buildings
         public Guid ClientId { get; private set; }
         public Guid CityId { get; private set; }
         public BuildingType Type { get; private set; }
-        public string Street { get; private set; }
-        public string Number { get; private set; }
-        public int ConstructionYear { get; private set; }
+        public string Street { get; private set; } = string.Empty;
+        public string Number { get; private set; } = string.Empty;
+        public int ConstructionYear { get; private set; } 
         public int NumberOfFloors { get; private set; }
         public decimal SurfaceArea { get; private set; }
         public decimal InsuredValue { get; private set; }

@@ -1,9 +1,19 @@
 ﻿using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Audit;
+using Insurance.Application.Abstractions.Loggers;
 using Insurance.Application.Abstractions.Repositories;
+using Insurance.Application.Authentication;
+using Insurance.Application.Policy.FeeStrategies;
+using Insurance.Application.Policy.RiskStrategies;
+using Insurance.Application.Policy.Services;
+using Insurance.Domain.Brokers;
 using Insurance.Domain.Buildings;
 using Insurance.Domain.Clients;
+using Insurance.Domain.Metadata;
+using Insurance.Domain.Policies;
 using Insurance.Infrastructure.Audit;
+using Insurance.Infrastructure.Authentication;
+using Insurance.Infrastructure.Loggers;
 using Insurance.Infrastructure.Persistence;
 using Insurance.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +36,7 @@ namespace Insurance.Infrastructure
             IConfiguration configuration)
         {
 
-            services.AddAutoMapper(typeof(DependencyInjection).Assembly);
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddScoped<IClientRepository, ClientRepository>();
             services.AddScoped<IGeographyReadRepository, GeographyReadRepository>();
@@ -34,6 +44,34 @@ namespace Insurance.Infrastructure
             services.AddScoped<IBuildingReadRepository, BuildingReadRepository>();
             services.AddScoped<IClientReadRepository, ClientReadRepository>();
             services.AddScoped<IClientSearchRepository, ClientSearchRepository>();
+            services.AddScoped<IBrokerRepository, BrokerRepository>();
+            services.AddScoped<IBrokerReadRepository, BrokerReadRepository>();
+            services.AddScoped<IRiskFactorConfigurationRepository, RiskFactorConfigurationRepository>();
+            services.AddScoped<IRiskFactorReadRepository, RiskFactorReadRepository>();
+            services.AddScoped<IFeeConfigurationRepository, FeeConfigurationRepository>();
+            services.AddScoped<IFeeConfigurationReadRepository, FeeConfigurationReadRepository>();
+            services.AddScoped<ICurrencyRepository, CurrencyRepository>();
+            services.AddScoped<ICurrencyReadRepository, CurrencyReadRepository>();
+            services.AddScoped<IPolicyRepository, PolicyRepository>();
+            services.AddScoped<IPolicyReadRepository, PolicyReadRepository>();
+            services.AddScoped<IPolicySearchRepository, PolicySearchRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+
+            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+            services.AddScoped<IApplicationLogger, ApplicationLogger>();
+            services.AddScoped<IAuditLogger, AuditLogger>();
+
+            services.AddScoped<IFeeCalculator, FeeCalculator>();
+            services.AddScoped<IRiskFactorCalculator, RiskFactorCalculator>();
+
+            services.AddScoped<IRiskFactorStrategy, CityRiskFactorStrategy>();
+            services.AddScoped<IRiskFactorStrategy, CountyRiskFactorStrategy>();
+            services.AddScoped<IRiskFactorStrategy, CountryRiskFactorStrategy>();
+            services.AddScoped<IRiskFactorStrategy, BuildingTypeRiskStrategy>();
+            services.AddScoped<IFeeStrategy, PercentageFeeStrategy>();
+            services.AddScoped<IFeeStrategy, RiskIndicatorFeeStrategy>();
+            services.AddScoped<IPolicyPremiumCalculator, PolicyPremiumCalculator>();
 
             services.AddSingleton<IMongoClient>(sp =>
             {
@@ -49,9 +87,14 @@ namespace Insurance.Infrastructure
 
             services.AddScoped<IAuditLogService, MongoAuditLogService>();
 
-
+            services.AddSingleton(TimeProvider.System);
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (environment != "Test")
+            {
+                services.AddJwtAuthentication(configuration);
+            }
 
             return services;
         }

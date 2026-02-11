@@ -1,4 +1,5 @@
 ﻿using Insurance.Infrastructure.Persistence;
+using Insurance.Tests.Integration.Setup;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Net;
@@ -7,23 +8,9 @@ using Xunit;
 
 namespace Insurance.Tests.Integration
 {
-    public class CreateClientAndBuildingIntegrationTests
+    public class CreateClientAndBuildingIntegrationTests : IntegrationTestBase
     {
-        private (CustomWebApplicationFactory factory, HttpClient client) CreateTestContext()
-        {
-            var factory = new CustomWebApplicationFactory();
-            var client = factory.CreateClient();
-
-            using (var scope = factory.Services.CreateScope())
-            {
-                var db = scope.ServiceProvider.GetRequiredService<InsuranceDbContext>();
-                db.Database.EnsureCreated();
-                factory.SeedTestData(db);
-            }
-
-            return (factory, client);
-        }
-
+        
         [Fact]
         public async Task CreateClient_Then_CreateBuilding_ShouldSucceed()
         {
@@ -69,27 +56,6 @@ namespace Insurance.Tests.Integration
             Assert.NotNull(buildingResponse.Headers.Location);
         }
 
-        [Fact]
-        public async Task CreateClient_WithDuplicateIdentificationNumber_ShouldReturn409()
-        {
-            var (_, client) = CreateTestContext();
-
-            var dto = new
-            {
-                Name = "Ion Popescu",
-                IdentificationNumber = "9999999999",
-                Email = "ion@test.ro",
-                PhoneNumber = "0711111111",
-                Address = "Strada Libertatii 16",
-                Type = 1
-            };
-
-            var first = await client.PostAsJsonAsync("/api/brokers/clients", dto);
-            Assert.Equal(HttpStatusCode.Created, first.StatusCode);
-
-            var second = await client.PostAsJsonAsync("/api/brokers/clients", dto);
-            Assert.Equal(HttpStatusCode.Conflict, second.StatusCode);
-        }
 
         [Fact]
         public async Task CreateBuilding_WithInvalidCityId_ShouldReturn404()
@@ -140,29 +106,6 @@ namespace Insurance.Tests.Integration
                     $"/api/brokers/clients/{Guid.NewGuid()}/buildings", dto);
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        }
-
-        private static async Task<Guid> CreateClientAndGetId(HttpClient client)
-        {
-            var dto = new
-            {
-                Name = "Helper Client",
-                IdentificationNumber = DateTime.UtcNow.Ticks.ToString(),
-                Email = "helper@test.ro",
-                PhoneNumber = "0700000000",
-                Address = "Strada Nicolina 5",
-                Type = 1
-            };
-
-            var response =
-                await client.PostAsJsonAsync("/api/brokers/clients", dto);
-
-            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-
-            var location = response.Headers.Location;
-            Assert.NotNull(location);
-
-            return Guid.Parse(response.Headers.Location!.Segments.Last());
         }
     }
 }

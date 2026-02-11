@@ -2,11 +2,13 @@
 using Insurance.Application.Clients.DTOs;
 using Insurance.Application.Clients.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Insurance.WebApi.Controllers
 {
     [ApiController]
+    //[Authorize(Roles = "Broker")]
     [Route("api/brokers/[controller]")]
     public class ClientsController : ControllerBase
     {

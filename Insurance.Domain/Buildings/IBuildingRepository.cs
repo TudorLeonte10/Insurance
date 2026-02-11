@@ -7,7 +7,7 @@ namespace Insurance.Domain.Buildings
 {
     public interface IBuildingRepository
     {
-        Task<Building> GetByIdAsync(Guid id, CancellationToken ct);
+        Task<Building?> GetByIdAsync(Guid id, CancellationToken ct);
         Task AddAsync(
         Building building,
         IReadOnlyCollection<RiskIndicatorType> riskIndicators,

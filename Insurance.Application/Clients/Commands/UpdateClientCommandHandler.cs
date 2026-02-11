@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Audit;
+using Insurance.Application.Abstractions.Loggers;
 using Insurance.Application.Exceptions;
 using Insurance.Domain.Clients;
 using Insurance.Domain.Exceptions;
@@ -15,13 +16,15 @@ namespace Insurance.Application.Clients.Commands
     {
         private readonly IClientRepository _clientRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IAuditLogger _auditLogger;
         private readonly IAuditLogService _auditLogService;
 
-        public UpdateClientCommandHandler(IClientRepository clientRepository, IUnitOfWork unitOfWork, IAuditLogService auditLogService)
+        public UpdateClientCommandHandler(IClientRepository clientRepository, IUnitOfWork unitOfWork, IAuditLogService auditLogService, IAuditLogger auditLogger)
         {
             _clientRepository = clientRepository;
             _unitOfWork = unitOfWork;
             _auditLogService = auditLogService;
+            _auditLogger = auditLogger;
         }
 
         public async Task<Guid> Handle(UpdateClientCommand request, CancellationToken cancellationToken)
@@ -78,6 +81,7 @@ namespace Insurance.Application.Clients.Commands
             };
 
             await _auditLogService.LogAsync(auditEntry, cancellationToken);
+            _auditLogger.LogAudit("Update", "Client", client.Id);
         }
     }
 }
