@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Insurance.Application.Abstractions.Loggers;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -11,9 +12,9 @@ namespace Insurance.Application.Common.Behaviours
     [ExcludeFromCodeCoverage]
     public class LoggingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
-        private readonly ILogger<LoggingBehaviour<TRequest, TResponse>> _logger;
+        private readonly IApplicationLogger _logger;
 
-        public LoggingBehaviour(ILogger<LoggingBehaviour<TRequest, TResponse>> logger)
+        public LoggingBehaviour(IApplicationLogger logger)
         {
             _logger = logger;
         }
@@ -23,7 +24,7 @@ namespace Insurance.Application.Common.Behaviours
             var requestName = typeof(TRequest).Name;
             var stopwatch = Stopwatch.StartNew();
 
-            _logger.LogInformation("Handling {RequestName} {@Request}", requestName, request);
+            _logger.LogInformation($"Handling {requestName} {request}");
 
             try
             {
@@ -31,7 +32,7 @@ namespace Insurance.Application.Common.Behaviours
 
                 stopwatch.Stop();
 
-                _logger.LogInformation("Handled {RequestName} in {ElapsedMilliseconds} ms", requestName, stopwatch.ElapsedMilliseconds);
+                _logger.LogInformation($"Handled {requestName} in {stopwatch.ElapsedMilliseconds} ms");
 
                 return response;
             }
@@ -40,11 +41,7 @@ namespace Insurance.Application.Common.Behaviours
                 stopwatch.Stop();
 
                 _logger.LogError(ex,
-                    "Error handling {RequestName} after {ElapsedMilliseconds} ms. Exception type: {ExceptionType}",
-                    requestName,
-                    stopwatch.ElapsedMilliseconds,
-                    ex.GetType().Name);
-
+                    $"Error handling {requestName} after {stopwatch.ElapsedMilliseconds} ms. Exception type: {ex.GetType().Name}");
                 throw;
             }
         }

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Application.Exceptions
 {
+    [ExcludeFromCodeCoverage]
     public class NotFoundException : Exception
     {
         public NotFoundException(string message)
@@ -12,6 +14,7 @@ namespace Insurance.Application.Exceptions
         }
     }
 
+    [ExcludeFromCodeCoverage]
     public class ConflictException : Exception
     {
         public ConflictException(string message)
@@ -20,6 +23,7 @@ namespace Insurance.Application.Exceptions
         }
     }
 
+    [ExcludeFromCodeCoverage]
     public class ForbiddenException : Exception
     {
         public ForbiddenException(string message)
@@ -28,6 +32,7 @@ namespace Insurance.Application.Exceptions
         }
     }
 
+    [ExcludeFromCodeCoverage]
     public class UnauthorizedException : Exception
     {
         public UnauthorizedException(string message)

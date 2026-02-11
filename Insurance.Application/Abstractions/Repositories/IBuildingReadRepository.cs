@@ -14,5 +14,11 @@ namespace Insurance.Application.Abstractions.Repositories
         Task<IReadOnlyList<BuildingDetailsDto>> GetByClientIdAsync(
             Guid clientId,
             CancellationToken ct);
+
+        Task<BuildingGeoContextDto?> GetGeoContextAsync(
+            Guid buildingId,
+            CancellationToken cancellationToken);
+
+        Task<bool> IsOwnedByClientAsync(Guid buildingId, Guid clientId, CancellationToken cancellationToken);
     }
 }

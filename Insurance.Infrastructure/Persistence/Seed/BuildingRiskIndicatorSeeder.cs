@@ -22,26 +22,22 @@ namespace Insurance.Infrastructure.Persistence.Seed
             if (_context.BuildingRiskIndicators.Any())
                 return;
 
-            var building = _context.Buildings.First();
+            var buildings = _context.Buildings.Take(3).ToList();
 
             var indicators = new List<BuildingRiskIndicatorEntity>
         {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                BuildingId = building.Id,
-                RiskIndicator = RiskIndicatorType.TheftRisk.ToString()
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                BuildingId = building.Id,
-                RiskIndicator = RiskIndicatorType.EarthquakeRisk.ToString()
-            }
+            new() { Id = Guid.NewGuid(), BuildingId = buildings[0].Id, RiskIndicator = RiskIndicatorType.EarthquakeRisk.ToString() },
+            new() { Id = Guid.NewGuid(), BuildingId = buildings[0].Id, RiskIndicator = RiskIndicatorType.TheftRisk.ToString() },
+
+            new() { Id = Guid.NewGuid(), BuildingId = buildings[1].Id, RiskIndicator = RiskIndicatorType.FireRisk.ToString() },
+
+            new() { Id = Guid.NewGuid(), BuildingId = buildings[2].Id, RiskIndicator = RiskIndicatorType.FloodRisk.ToString() },
+            new() { Id = Guid.NewGuid(), BuildingId = buildings[2].Id, RiskIndicator = RiskIndicatorType.EarthquakeRisk.ToString() }
         };
 
             _context.BuildingRiskIndicators.AddRange(indicators);
             await _context.SaveChangesAsync();
         }
     }
+
 }

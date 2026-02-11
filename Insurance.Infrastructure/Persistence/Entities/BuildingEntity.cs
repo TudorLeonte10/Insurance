@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Persistence.Entities
 {
+    [ExcludeFromCodeCoverage]
     public class BuildingEntity
     {
         public Guid Id { get; set; }
@@ -22,6 +24,7 @@ namespace Insurance.Infrastructure.Persistence.Entities
         public decimal SurfaceArea { get; set; }
         public decimal InsuredValue { get; set; }
 
+        public ICollection<PolicyEntity> Policies { get; set; } = new List<PolicyEntity>();
         public ICollection<BuildingRiskIndicatorEntity> RiskIndicators { get; set; }
         = new List<BuildingRiskIndicatorEntity>();
     }

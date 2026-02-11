@@ -11,5 +11,6 @@ namespace Insurance.Application.Abstractions.Repositories
         Task<ClientDetailsDto?> GetByIdAsync(
             Guid clientId,
             CancellationToken ct);
+
     }
 }
