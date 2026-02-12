@@ -19,7 +19,7 @@ namespace Insurance.Infrastructure.Authentication
             var user = httpContext.HttpContext?.User
                 ?? throw new UnauthorizedException("Not authenticated");
 
-            UserId = Guid.Parse(user.FindFirst("sub")!.Value);
+            UserId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
             Role = user.FindFirst(ClaimTypes.Role)!.Value;
             

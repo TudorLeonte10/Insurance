@@ -1,5 +1,6 @@
 ﻿using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Repositories;
+using Insurance.Application.Authentication;
 using Insurance.Application.Buildings.DTOs;
 using Insurance.Application.Exceptions;
 using Insurance.Application.Policy.Services;
@@ -30,6 +31,7 @@ namespace Insurance.Application.Policy.Commands
         private readonly IPolicyPremiumCalculator _premiumCalculator;
         private readonly IPolicyRepository _policyRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentUserContext _currentUserContext;
         private readonly TimeProvider _timeProvider;
 
         public CreatePolicyCommandHandler(
@@ -42,6 +44,7 @@ namespace Insurance.Application.Policy.Commands
             IPolicyPremiumCalculator premiumCalculator,
             IPolicyRepository policyRepository,
             IUnitOfWork unitOfWork,
+            ICurrentUserContext currentUserContext,
             TimeProvider timeProvider)
         {
             _clientRepository = clientRepository;
@@ -53,12 +56,20 @@ namespace Insurance.Application.Policy.Commands
             _premiumCalculator = premiumCalculator;
             _policyRepository = policyRepository;
             _unitOfWork = unitOfWork;
+            _currentUserContext = currentUserContext;
             _timeProvider = timeProvider;
         }
 
         public async Task<Guid> Handle(CreatePolicyCommand request, CancellationToken cancellationToken)
         {
-            var broker = await LoadAndValidateBroker(request.PolicyDto.BrokerId, cancellationToken);
+            var brokerId = _currentUserContext.BrokerId!.Value;
+
+            var client = await _clientRepository.GetByIdAsync(request.PolicyDto.ClientId, cancellationToken);
+            if (client is null)
+                throw new NotFoundException("Client not found");
+            if (client.BrokerId != brokerId)
+                throw new ForbiddenException("Client does not belong to the current broker");
+
             var currency = await LoadAndValidateCurrency(request.PolicyDto.CurrencyId, cancellationToken);
 
             await ValidateClientExists(request.PolicyDto.ClientId, cancellationToken);
@@ -187,7 +198,7 @@ namespace Insurance.Application.Policy.Commands
             return Domain.Policies.Policy.CreateDraft(
                 clientId: request.PolicyDto.ClientId,
                 buildingId: request.PolicyDto.BuildingId,
-                brokerId: request.PolicyDto.BrokerId,
+                brokerId: Guid.NewGuid(),
                 currencyId: request.PolicyDto.CurrencyId,
                 basePremium: request.PolicyDto.BasePremium,
                 finalPremium: finalPremium,

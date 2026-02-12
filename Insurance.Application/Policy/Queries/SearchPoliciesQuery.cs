@@ -1,4 +1,5 @@
-﻿using Insurance.Application.Common.Paging;
+﻿using Insurance.Application.Common;
+using Insurance.Application.Common.Paging;
 using Insurance.Application.Policy.DTOs;
 using Insurance.Domain.Policies;
 using MediatR;
@@ -8,10 +9,9 @@ using System.Text;
 
 namespace Insurance.Application.Policy.Queries
 {
-   public class SearchPoliciesQuery : IRequest<PagedResult<PolicyDetailsDto>>
+   public class SearchPoliciesQuery : IRequest<PagedResult<PolicyDetailsDto>>, IRequireBrokerValidation
 {
     public Guid? ClientId { get; init; }
-    public Guid? BrokerId { get; init; }
     public PolicyStatus? Status { get; init; }
 
     public DateTime? StartDateFrom { get; init; }

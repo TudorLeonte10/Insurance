@@ -46,7 +46,7 @@ namespace Insurance.Application.Clients.Queries
                         $"Client with ID {request.ClientId} not found.");
 
                 if(client.BrokerId != brokerId)
-                    throw new UnauthorizedAccessException($"Client with ID {request.ClientId} does not belong to the current user's broker.");
+                    throw new UnauthorizedException($"Client with ID {request.ClientId} does not belong to the current user's broker.");
 
                 return new PagedResult<ClientDetailsDto>(
                     new[] { client },
