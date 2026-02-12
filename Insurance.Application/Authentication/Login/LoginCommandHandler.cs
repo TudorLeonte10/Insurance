@@ -34,7 +34,7 @@ namespace Insurance.Application.Authentication.Login
             var passwordValid = BCrypt.Net.BCrypt.Verify(
                 request.Password,
                 user.PasswordHash);
-
+            
             if (!passwordValid)
                 throw new UnauthorizedException("Invalid credentials");
 

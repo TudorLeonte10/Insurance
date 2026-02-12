@@ -10,6 +10,7 @@ namespace Insurance.Application.Clients.DTOs
     public class ClientDetailsDto
     {
         public Guid Id { get; set; }
+        public Guid BrokerId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string IdentificationNumber { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;

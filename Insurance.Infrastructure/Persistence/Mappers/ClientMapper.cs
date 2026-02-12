@@ -12,25 +12,22 @@ namespace Insurance.Infrastructure.Persistence.Mappers
     {
         public static Client ToDomain(ClientEntity entity)
         {
-            var client = Client.Create(
+            return Client.Rehydrate(
+                entity.Id,
+                entity.BrokerId,
                 Enum.Parse<ClientType>(entity.Type),
                 entity.Name,
                 entity.IdentificationNumber,
                 entity.Email,
                 entity.PhoneNumber,
                 entity.Address);
-
-            typeof(Client)
-                .GetProperty(nameof(Client.Id))!
-                .SetValue(client, entity.Id);
-
-            return client;
         }
 
         public static ClientEntity ToEntity(Client domain)
             => new()
             {
                 Id = domain.Id,
+                BrokerId = domain.BrokerId,
                 Type = domain.Type.ToString(),
                 Name = domain.Name,
                 IdentificationNumber = domain.IdentificationNumber,
@@ -38,5 +35,7 @@ namespace Insurance.Infrastructure.Persistence.Mappers
                 PhoneNumber = domain.PhoneNumber,
                 Address = domain.Address
             };
+
+
     }
 }

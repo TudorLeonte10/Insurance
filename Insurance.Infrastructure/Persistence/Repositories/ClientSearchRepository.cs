@@ -26,13 +26,14 @@ namespace Insurance.Infrastructure.Persistence.Repositories
         }
 
         public async Task<PagedResult<ClientDetailsDto>> SearchAsync(
+            Guid brokerId,
             string? name,
             string? identifier,
             int pageNumber,
             int pageSize,
             CancellationToken ct)
         {
-            var query = _dbContext.Clients.AsNoTracking();
+            var query = _dbContext.Clients.AsNoTracking().Where(c => c.BrokerId == brokerId);
 
             if (!string.IsNullOrWhiteSpace(name))
                 query = query.Where(c => c.Name.Contains(name));

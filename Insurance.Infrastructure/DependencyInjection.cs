@@ -94,6 +94,10 @@ namespace Insurance.Infrastructure
 
             services.AddScoped<IAuditLogService, MongoAuditLogService>();
 
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUserContext, CurrentUserContext>();
+
+
             services.AddSingleton(TimeProvider.System);
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();

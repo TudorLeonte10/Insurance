@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Insurance.Application.Abstractions.Repositories;
+using Insurance.Application.Authentication;
 using Insurance.Application.Clients.DTOs;
 using Insurance.Application.Common.Paging;
 using Insurance.Application.Exceptions;
@@ -17,19 +18,24 @@ namespace Insurance.Application.Clients.Queries
     {
         private readonly IClientSearchRepository _searchRepository;
         private readonly IClientReadRepository _readRepository;
+        private readonly ICurrentUserContext _currentUser;
 
         public GetClientsQueryHandler(
             IClientSearchRepository searchRepository,
-            IClientReadRepository readRepository)
+            IClientReadRepository readRepository,
+            ICurrentUserContext currentUser)
         {
             _searchRepository = searchRepository;
             _readRepository = readRepository;
+            _currentUser = currentUser;
         }
 
         public async Task<PagedResult<ClientDetailsDto>> Handle(
             GetClientsQuery request,
             CancellationToken ct)
         {
+            var brokerId = _currentUser.BrokerId;
+               
             if (request.ClientId.HasValue)
             {
                 var client = await _readRepository
@@ -39,6 +45,9 @@ namespace Insurance.Application.Clients.Queries
                     throw new NotFoundException(
                         $"Client with ID {request.ClientId} not found.");
 
+                if(client.BrokerId != brokerId)
+                    throw new UnauthorizedAccessException($"Client with ID {request.ClientId} does not belong to the current user's broker.");
+
                 return new PagedResult<ClientDetailsDto>(
                     new[] { client },
                     request.PageNumber,
@@ -47,6 +56,7 @@ namespace Insurance.Application.Clients.Queries
             }
 
             return await _searchRepository.SearchAsync(
+                brokerId!.Value,
                 request.Name,
                 request.IdentificationNumber,
                 request.PageNumber,
