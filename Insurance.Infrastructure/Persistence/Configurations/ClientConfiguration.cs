@@ -31,6 +31,7 @@ public class ClientEntityConfiguration : IEntityTypeConfiguration<ClientEntity>
             .IsUnique();
 
         builder.Property(c => c.Type)
+            .HasConversion<string>()
             .IsRequired();
 
         builder.HasMany(c => c.Policies)

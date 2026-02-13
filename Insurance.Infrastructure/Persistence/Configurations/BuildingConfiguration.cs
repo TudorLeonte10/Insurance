@@ -22,6 +22,7 @@ public class BuildingEntityConfiguration
             .HasMaxLength(20);
 
         builder.Property(b => b.Type)
+            .HasConversion<string>()
             .IsRequired()
             .HasMaxLength(50);
 

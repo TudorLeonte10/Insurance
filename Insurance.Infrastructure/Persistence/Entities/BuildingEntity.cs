@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Insurance.Domain.Buildings;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
@@ -18,7 +19,7 @@ namespace Insurance.Infrastructure.Persistence.Entities
 
         public string? Street { get; set; } 
         public string? Number { get; set; }
-        public string? Type { get; set; } 
+        public BuildingType Type { get; set; } 
         public int ConstructionYear { get; set; }
         public int NumberOfFloors { get; set; }
         public decimal SurfaceArea { get; set; }

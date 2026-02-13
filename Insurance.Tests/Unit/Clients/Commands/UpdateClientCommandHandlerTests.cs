@@ -2,6 +2,7 @@
 using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Audit;
 using Insurance.Application.Abstractions.Loggers;
+using Insurance.Application.Authentication;
 using Insurance.Application.Clients.Commands;
 using Insurance.Application.Clients.Commands.CreateClient;
 using Insurance.Application.Clients.DTOs;
@@ -21,6 +22,7 @@ namespace Insurance.Tests.Unit.Clients.Commands
         private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
         private readonly Mock<IAuditLogService> _auditLogServiceMock = new();
         private readonly Mock<IAuditLogger> _auditLoggerMock = new();
+        private readonly Mock<ICurrentUserContext> _currentUserContextMock = new();
 
         private readonly UpdateClientCommandHandler _handler;
 
@@ -30,7 +32,8 @@ namespace Insurance.Tests.Unit.Clients.Commands
                 _clientRepositoryMock.Object,
                 _unitOfWorkMock.Object,
                 _auditLogServiceMock.Object,
-                _auditLoggerMock.Object);
+                _auditLoggerMock.Object,
+                _currentUserContextMock.Object);
         }
 
         [Fact]
@@ -57,8 +60,10 @@ namespace Insurance.Tests.Unit.Clients.Commands
         [Fact]
         public async Task Given_ExistingClient_Should_UpdateAndSave()
         {
+            var brokerId = Guid.NewGuid();
             var client = Client.Create(
                 ClientType.Individual,
+                brokerId,
                 "Old Name",
                 "1234567890123",
                 "old@test.ro",
@@ -67,6 +72,10 @@ namespace Insurance.Tests.Unit.Clients.Commands
             );
 
             var clientId = client.Id;
+
+            _currentUserContextMock
+               .SetupGet(x => x.BrokerId)
+               .Returns(brokerId);
 
             _clientRepositoryMock
                 .Setup(r => r.GetByIdAsync(clientId, It.IsAny<CancellationToken>()))
@@ -80,7 +89,7 @@ namespace Insurance.Tests.Unit.Clients.Commands
                     Email = "new@test.ro",
                     PhoneNumber = "0799999999",
                     Address = "Str. Noua 2",
-                    IdentificationNumber = "1234567890123" 
+                    IdentificationNumber = "1234567890123"
                 });
 
             var result = await _handler.Handle(command, CancellationToken.None);
@@ -99,8 +108,11 @@ namespace Insurance.Tests.Unit.Clients.Commands
         [Fact]
         public async Task Given_SameIdentificationNumber_Should_UpdateSuccessfully()
         {
+            var brokerId = Guid.NewGuid();
+
             var client = Client.Create(
                 ClientType.Individual,
+                brokerId,
                 "Initial Name",
                 "1234567890123",
                 "init@test.ro",
@@ -109,6 +121,10 @@ namespace Insurance.Tests.Unit.Clients.Commands
             );
 
             var clientId = client.Id;
+
+            _currentUserContextMock
+               .SetupGet(x => x.BrokerId)
+               .Returns(brokerId);
 
             _clientRepositoryMock
                 .Setup(r => r.GetByIdAsync(clientId, It.IsAny<CancellationToken>()))
@@ -122,7 +138,7 @@ namespace Insurance.Tests.Unit.Clients.Commands
                     Email = "updated@test.ro",
                     PhoneNumber = "0722222222",
                     Address = "Str. Noua 5",
-                    IdentificationNumber = "1234567890123" 
+                    IdentificationNumber = "1234567890123"
                 });
 
             var result = await _handler.Handle(command, CancellationToken.None);
@@ -139,8 +155,11 @@ namespace Insurance.Tests.Unit.Clients.Commands
         [Fact]
         public async Task Given_IdentificationNumberChanged_Should_LogAudit()
         {
+            var brokerId = Guid.NewGuid();
+
             var client = Client.Create(
                 ClientType.Individual,
+                brokerId,
                 "Initial Name",
                 "1234567890123",
                 "init@test.ro",
@@ -149,6 +168,10 @@ namespace Insurance.Tests.Unit.Clients.Commands
             );
 
             var clientId = client.Id;
+
+            _currentUserContextMock
+               .SetupGet(x => x.BrokerId)
+               .Returns(brokerId);
 
             _clientRepositoryMock
                 .Setup(r => r.GetByIdAsync(clientId, It.IsAny<CancellationToken>()))
@@ -173,7 +196,7 @@ namespace Insurance.Tests.Unit.Clients.Commands
                     Email = "updated@test.ro",
                     PhoneNumber = "0799999999",
                     Address = "Updated Address",
-                    IdentificationNumber = "9999999999999" 
+                    IdentificationNumber = "9999999999999"
                 });
 
             var result = await _handler.Handle(command, CancellationToken.None);

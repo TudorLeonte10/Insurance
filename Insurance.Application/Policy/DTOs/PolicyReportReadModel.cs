@@ -25,6 +25,7 @@ namespace Insurance.Application.Policy.DTOs
 
         public PolicyStatus Status { get; set; }
         public BuildingType BuildingType { get; set; }
+        public string BuildingTypeString => BuildingType.ToString();
     }
 
 }

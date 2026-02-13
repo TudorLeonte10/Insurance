@@ -63,7 +63,7 @@ namespace Insurance.Infrastructure.Persistence.Repositories
             if (entity is null)
                 throw new InvalidOperationException("Building not found");
 
-            entity.Type = building.Type.ToString();
+            entity.Type = building.Type;
             entity.Street = building.Street;
             entity.Number = building.Number;
             entity.ConstructionYear = building.ConstructionYear;

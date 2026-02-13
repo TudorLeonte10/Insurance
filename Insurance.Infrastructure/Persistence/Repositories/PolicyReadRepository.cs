@@ -50,7 +50,7 @@ namespace Insurance.Infrastructure.Persistence.Repositories
                     FinalPremium = p.FinalPremium,
                     ExchangeRate = p.Currency.ExchangeRateToBase,
                     Status = p.Status,
-                    BuildingType = Enum.Parse<BuildingType>(p.Building.Type)
+                    BuildingType = p.Building.Type
                 });
         }
     }

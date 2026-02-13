@@ -27,8 +27,6 @@ namespace Insurance.Infrastructure.Persistence.Seed
 
             var buildings = new List<BuildingEntity>();
 
-            int index = 0;
-
             void AddBuilding(
                 ClientEntity client,
                 CityEntity city,
@@ -47,7 +45,7 @@ namespace Insurance.Infrastructure.Persistence.Seed
                     CityId = city.Id,
                     Street = street,
                     Number = number,
-                    Type = type.ToString(),
+                    Type = type,
                     ConstructionYear = year,
                     NumberOfFloors = floors,
                     SurfaceArea = surface,

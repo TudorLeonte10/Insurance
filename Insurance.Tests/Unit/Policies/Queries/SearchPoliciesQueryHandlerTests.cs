@@ -1,4 +1,5 @@
 ﻿using Insurance.Application.Abstractions.Repositories;
+using Insurance.Application.Authentication;
 using Insurance.Application.Common.Paging;
 using Insurance.Application.Policy.DTOs;
 using Insurance.Application.Policy.Queries;
@@ -13,12 +14,15 @@ namespace Insurance.Tests.Unit.Policies.Queries
     public class SearchPoliciesQueryHandlerTests
     {
         private readonly Mock<IPolicySearchRepository> _searchRepositoryMock;
+        private readonly Mock<ICurrentUserContext> _currentUserContextMock;
         private readonly SearchPoliciesQueryHandler _handler;
+        
 
         public SearchPoliciesQueryHandlerTests()
         {
             _searchRepositoryMock = new Mock<IPolicySearchRepository>();
-            _handler = new SearchPoliciesQueryHandler(_searchRepositoryMock.Object);
+            _currentUserContextMock = new Mock<ICurrentUserContext>();
+            _handler = new SearchPoliciesQueryHandler(_searchRepositoryMock.Object, _currentUserContextMock.Object);
         }
 
         [Fact]
@@ -32,6 +36,10 @@ namespace Insurance.Tests.Unit.Policies.Queries
                 1,
                 10,
                 1);
+
+            _currentUserContextMock
+                .SetupGet(x => x.BrokerId)
+                .Returns(Guid.NewGuid());
 
             _searchRepositoryMock
                 .Setup(r => r.SearchAsync(
@@ -63,7 +71,6 @@ namespace Insurance.Tests.Unit.Policies.Queries
             var query = new SearchPoliciesQuery
             {
                 ClientId = Guid.NewGuid(),
-                BrokerId = Guid.NewGuid(),
                 Status = PolicyStatus.Active,
                 StartDateFrom = DateTime.UtcNow.AddDays(-10),
                 StartDateTo = DateTime.UtcNow,
@@ -71,10 +78,15 @@ namespace Insurance.Tests.Unit.Policies.Queries
                 PageSize = 5
             };
 
+            var brokerId = Guid.NewGuid();
+            _currentUserContextMock
+                .SetupGet(x => x.BrokerId)
+                .Returns(brokerId);
+
             _searchRepositoryMock
                 .Setup(r => r.SearchAsync(
                     query.ClientId,
-                    query.BrokerId,
+                    brokerId,
                     query.Status,
                     query.StartDateFrom,
                     query.StartDateTo,
@@ -91,7 +103,7 @@ namespace Insurance.Tests.Unit.Policies.Queries
 
             _searchRepositoryMock.Verify(r => r.SearchAsync(
                 query.ClientId,
-                query.BrokerId,
+                brokerId,
                 query.Status,
                 query.StartDateFrom,
                 query.StartDateTo,

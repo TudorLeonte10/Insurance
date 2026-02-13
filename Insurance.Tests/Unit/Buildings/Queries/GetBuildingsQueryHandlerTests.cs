@@ -1,4 +1,5 @@
 ﻿using Insurance.Application.Abstractions.Repositories;
+using Insurance.Application.Authentication;
 using Insurance.Application.Buildings.DTOs;
 using Insurance.Application.Buildings.Queries;
 using Insurance.Application.Exceptions;
@@ -15,28 +16,49 @@ namespace Insurance.Tests.Unit.Buildings.Queries
     public class GetBuildingsQueryHandlerTests
     {
         private readonly Mock<IBuildingReadRepository> _repositoryMock = new();
+        private readonly Mock<IClientReadRepository> _clientReadMock = new();
+        private readonly Mock<ICurrentUserContext> _currentUserContextMock = new();
         private readonly GetBuildingsQueryHandler _handler;
 
         public GetBuildingsQueryHandlerTests()
         {
             _handler = new GetBuildingsQueryHandler(
-                _repositoryMock.Object);
+                _repositoryMock.Object,
+                _clientReadMock.Object,
+                _currentUserContextMock.Object);
         }
 
         [Fact]
         public async Task Given_BuildingId_When_BuildingExists_Should_ReturnSingleItem()
         {
             var buildingId = Guid.NewGuid();
+            var clientId = Guid.NewGuid();
+            var brokerId = Guid.NewGuid();
 
             var dto = new BuildingDetailsDto
             {
                 Id = buildingId,
-                Type = "Residential"
+                Type = "Residential",
+                ClientId = clientId 
             };
+
+            _currentUserContextMock
+                .SetupGet(x => x.BrokerId)
+                .Returns(brokerId);
+
 
             _repositoryMock
                 .Setup(r => r.GetByIdAsync(buildingId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dto);
+
+            _clientReadMock
+                .Setup(c => c.GetByIdAsync(clientId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new Insurance.Application.Clients.DTOs.ClientDetailsDto
+                {
+                    Id = clientId,
+                    BrokerId = brokerId,
+                    Name = "Owner Client"
+                });
 
             var query = new GetBuildingsQuery
             {
@@ -59,6 +81,11 @@ namespace Insurance.Tests.Unit.Buildings.Queries
         public async Task Given_BuildingId_When_BuildingDoesNotExist_Should_ThrowNotFoundException()
         {
             var buildingId = Guid.NewGuid();
+            var brokerId = Guid.NewGuid();
+
+            _currentUserContextMock
+                .SetupGet(x => x.BrokerId)
+                .Returns(brokerId);
 
             _repositoryMock
                 .Setup(r => r.GetByIdAsync(buildingId, It.IsAny<CancellationToken>()))
@@ -77,12 +104,26 @@ namespace Insurance.Tests.Unit.Buildings.Queries
         public async Task Given_ClientId_Should_ReturnBuildingsForClient()
         {
             var clientId = Guid.NewGuid();
+            var brokerId = Guid.NewGuid();
 
             var buildings = new List<BuildingDetailsDto>
             {
-                new BuildingDetailsDto { Id = Guid.NewGuid(), Type = "Residential" },
-                new BuildingDetailsDto { Id = Guid.NewGuid(), Type = "Office" }
+                new BuildingDetailsDto { Id = Guid.NewGuid(), Type = "Residential", ClientId = clientId },
+                new BuildingDetailsDto { Id = Guid.NewGuid(), Type = "Office", ClientId = clientId }
             };
+
+            _currentUserContextMock
+                .SetupGet(x => x.BrokerId)
+                .Returns(brokerId);
+
+            _clientReadMock
+                .Setup(c => c.GetByIdAsync(clientId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new Insurance.Application.Clients.DTOs.ClientDetailsDto
+                {
+                    Id = clientId,
+                    BrokerId = brokerId,
+                    Name = "Owner Client"
+                });
 
             _repositoryMock
                 .Setup(r => r.GetByClientIdAsync(clientId, It.IsAny<CancellationToken>()))

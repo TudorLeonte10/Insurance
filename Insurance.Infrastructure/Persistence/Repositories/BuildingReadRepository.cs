@@ -62,7 +62,7 @@ namespace Insurance.Infrastructure.Persistence.Repositories
                     CityId = b.CityId,
                     CountyId = b.City.CountyId,
                     CountryId = b.City.County.CountryId,
-                    BuildingType = Enum.Parse<BuildingType>(b.Type!),
+                    BuildingType = b.Type,
                     RiskIndicators = b.RiskIndicators!
                         .Select(ri => Enum.Parse<RiskIndicatorType>(ri.RiskIndicator))
                         .ToList()
