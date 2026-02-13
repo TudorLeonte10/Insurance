@@ -20,207 +20,35 @@ namespace Insurance.Application.Policy.Commands
 {
     public class CreatePolicyCommandHandler : IRequestHandler<CreatePolicyCommand, Guid>
     {
-        private readonly IClientRepository _clientRepository;
-        private readonly IBuildingReadRepository _buildingReadRepository;
-        private readonly IBrokerRepository _brokerRepository;
-        private readonly ICurrencyRepository _currencyRepository;
 
-        private readonly IFeeConfigurationReadRepository _feeReadRepository;
-        private readonly IRiskFactorReadRepository _riskReadRepository;
-
-        private readonly IPolicyPremiumCalculator _premiumCalculator;
+        private readonly IPolicyCreationService _policyCreationService;
         private readonly IPolicyRepository _policyRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICurrentUserContext _currentUserContext;
-        private readonly TimeProvider _timeProvider;
 
         public CreatePolicyCommandHandler(
-            IClientRepository clientRepository,
-            IBuildingReadRepository buildingReadRepository,
-            IBrokerRepository brokerRepository,
-            ICurrencyRepository currencyRepository,
-            IFeeConfigurationReadRepository feeReadRepository,
-            IRiskFactorReadRepository riskReadRepository,
-            IPolicyPremiumCalculator premiumCalculator,
+            IPolicyCreationService policyCreationService,
             IPolicyRepository policyRepository,
             IUnitOfWork unitOfWork,
-            ICurrentUserContext currentUserContext,
-            TimeProvider timeProvider)
+            ICurrentUserContext currentUserContext)
         {
-            _clientRepository = clientRepository;
-            _buildingReadRepository = buildingReadRepository;
-            _brokerRepository = brokerRepository;
-            _currencyRepository = currencyRepository;
-            _feeReadRepository = feeReadRepository;
-            _riskReadRepository = riskReadRepository;
-            _premiumCalculator = premiumCalculator;
+            _policyCreationService = policyCreationService;
             _policyRepository = policyRepository;
             _unitOfWork = unitOfWork;
             _currentUserContext = currentUserContext;
-            _timeProvider = timeProvider;
         }
 
         public async Task<Guid> Handle(CreatePolicyCommand request, CancellationToken cancellationToken)
         {
             var brokerId = _currentUserContext.BrokerId!.Value;
 
-            var client = await _clientRepository.GetByIdAsync(request.PolicyDto.ClientId, cancellationToken);
-            if (client is null)
-                throw new NotFoundException("Client not found");
-            if (client.BrokerId != brokerId)
-                throw new ForbiddenException("Client does not belong to the current broker");
+            var policy = await _policyCreationService.CreatePolicyAsync(request.PolicyDto, brokerId, cancellationToken);
 
-            var currency = await LoadAndValidateCurrency(request.PolicyDto.CurrencyId, cancellationToken);
-
-            await ValidateClientExists(request.PolicyDto.ClientId, cancellationToken);
-            await ValidateBuildingOwnership(request.PolicyDto.BuildingId, request.PolicyDto.ClientId, cancellationToken);
-
-            var geoContext = await LoadBuildingGeoContext(request.PolicyDto.BuildingId, cancellationToken);
-
-            var calculationContext = BuildCalculationContext(geoContext);
-
-            var fees = await LoadActiveFees(cancellationToken);
-            var riskFactors = await LoadActiveRiskFactors(cancellationToken);
-
-            var finalPremiumBase = CalculateFinalPremium(
-                request.PolicyDto.BasePremium,
-                calculationContext,
-                fees,
-                riskFactors);
-
-            var finalPremium = ConvertToPolicyCurrency(
-                finalPremiumBase,
-                currency);
-
-            var policy = CreateDraftPolicy(request, finalPremium);
-
-            await PersistPolicy(policy, cancellationToken);
-
+            await _policyRepository.AddAsync(policy, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
             return policy.Id;
         }
 
-        private async Task<Broker> LoadAndValidateBroker(
-            Guid brokerId,
-            CancellationToken ct)
-        {
-            var broker = await _brokerRepository.GetByIdAsync(brokerId, ct)
-                ?? throw new NotFoundException("Broker not found");
 
-            if (!broker.IsActive)
-                throw new InactiveBrokerException("Broker is inactive");
-
-            return broker;
-        }
-
-        private async Task ValidateClientExists(Guid clientId, CancellationToken ct)
-        {
-            var client = await _clientRepository.GetByIdAsync(clientId, ct);
-
-            if (client == null)
-                throw new NotFoundException("Client not found");
-        }
-
-        private async Task<Currency> LoadAndValidateCurrency(Guid currencyId, CancellationToken ct)
-        {
-            var currency = await _currencyRepository.GetByIdAsync(currencyId, ct)
-                ?? throw new NotFoundException("Currency not found");
-
-            if (!currency.IsActive)
-                throw new InactiveCurrencyException("Currency is inactive");
-
-            return currency;
-        }
-
-        private async Task<BuildingGeoContextDto> LoadBuildingGeoContext(Guid buildingId, CancellationToken ct)
-        {
-            return await _buildingReadRepository
-                .GetGeoContextAsync(buildingId, ct)
-                ?? throw new NotFoundException("Building not found");
-        }
-
-        private static PolicyCalculationContext BuildCalculationContext(
-            BuildingGeoContextDto geo)
-        {
-            return new PolicyCalculationContext
-            {
-                CityId = geo.CityId,
-                CountyId = geo.CountyId,
-                CountryId = geo.CountryId,
-                BuildingType = geo.BuildingType,
-                RiskIndicators = geo.RiskIndicators ?? new List<RiskIndicatorType>()
-            };
-        }
-
-        private async Task ValidateBuildingOwnership(Guid buildingId, Guid clientId, CancellationToken ct)
-        {
-            var owns = await _buildingReadRepository
-                .IsOwnedByClientAsync(buildingId, clientId, ct);
-
-            if (!owns)
-                throw new BuildingNotOwnedByClientException(
-                    "Building does not belong to the selected client.");
-        }
-
-        private async Task<IReadOnlyList<FeeConfiguration>> LoadActiveFees(
-            CancellationToken ct)
-        {
-            return await _feeReadRepository.GetActiveAsync(ct);
-        }
-
-        private async Task<IReadOnlyList<RiskFactorConfiguration>> LoadActiveRiskFactors(
-            CancellationToken ct)
-        {
-            return await _riskReadRepository.GetActiveAsync(ct);
-        }
-
-        private decimal CalculateFinalPremium(
-            decimal basePremium,
-            PolicyCalculationContext context,
-            IEnumerable<FeeConfiguration> fees,
-            IEnumerable<RiskFactorConfiguration> riskFactors)
-        {
-            return _premiumCalculator.Calculate(
-                basePremium,
-                context,
-                fees,
-                riskFactors);
-        }
-
-        private static decimal ConvertToPolicyCurrency(decimal premiumBase, Currency currency)
-        {
-            return CurrencyConverter.ConvertFromBase(premiumBase, currency);
-        }
-
-        private Domain.Policies.Policy CreateDraftPolicy(
-            CreatePolicyCommand request,
-            decimal finalPremium)
-        {
-            return Domain.Policies.Policy.CreateDraft(
-                clientId: request.PolicyDto.ClientId,
-                buildingId: request.PolicyDto.BuildingId,
-                brokerId: Guid.NewGuid(),
-                currencyId: request.PolicyDto.CurrencyId,
-                basePremium: request.PolicyDto.BasePremium,
-                finalPremium: finalPremium,
-                startDate: request.PolicyDto.StartDate,
-                endDate: request.PolicyDto.EndDate,
-                policyNumber: GeneratePolicyNumber(),
-                now: _timeProvider.GetUtcNow().UtcDateTime
-            );
-        }
-
-        private async Task PersistPolicy(
-            Domain.Policies.Policy policy,
-            CancellationToken ct)
-        {
-            await _policyRepository.AddAsync(policy, ct);
-            await _unitOfWork.SaveChangesAsync(ct);
-        }
-
-        private static string GeneratePolicyNumber()
-        {
-            return $"POL-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid()}";
-        }
     }
-
 }

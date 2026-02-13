@@ -3,11 +3,13 @@ using Insurance.Application.Policy.Queries;
 using Insurance.Domain.Buildings;
 using Insurance.Domain.Policies;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Insurance.WebApi
 {
     [ApiController]
+    [Authorize(Roles = "Admin")]
     [Route("api/admin/reports")]
     public class PolicyReportsController : ControllerBase
     {

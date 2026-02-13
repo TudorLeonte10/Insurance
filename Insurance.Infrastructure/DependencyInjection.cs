@@ -58,6 +58,8 @@ namespace Insurance.Infrastructure
             services.AddScoped<IPolicySearchRepository, PolicySearchRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
 
+            services.AddScoped<IPolicyCreationService, PolicyCreationService>();
+
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
             services.AddScoped<IApplicationLogger, ApplicationLogger>();
