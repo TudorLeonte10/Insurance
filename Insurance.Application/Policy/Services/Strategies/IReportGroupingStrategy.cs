@@ -9,6 +9,6 @@ namespace Insurance.Application.Policy.Services.Strategies
     public interface IReportGroupingStrategy
     {
         ReportGroupingType GroupingType { get; }
-        IEnumerable<PolicyReportDto> Group(IEnumerable<PolicyReportReadModel> data);
+        IQueryable<PolicyReportDto> Group(IQueryable<PolicyReportReadModel> data);
     }
 }

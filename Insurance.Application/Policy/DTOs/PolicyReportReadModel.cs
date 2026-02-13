@@ -21,6 +21,7 @@ namespace Insurance.Application.Policy.DTOs
         public string CurrencyCode { get; set; } = string.Empty;
 
         public decimal FinalPremium { get; set; }
+        public decimal FinalPremiumBase { get; set; }
         public decimal ExchangeRate { get; set; }
 
         public PolicyStatus Status { get; set; }

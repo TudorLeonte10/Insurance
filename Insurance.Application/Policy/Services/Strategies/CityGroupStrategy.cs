@@ -9,16 +9,17 @@ namespace Insurance.Application.Policy.Services.Strategies
     public class CityGroupStrategy : IReportGroupingStrategy
     {
         public ReportGroupingType GroupingType => ReportGroupingType.City;
-        public IEnumerable<PolicyReportDto> Group(IEnumerable<PolicyReportReadModel> data)
+        public IQueryable<PolicyReportDto> Group(IQueryable<PolicyReportReadModel> data)
         {
             return data.GroupBy(x => new { x.CityId, x.City, x.CurrencyCode })
-                .Select(g => new PolicyReportDto(
-                    g.Key.City,
-                    g.Key.CurrencyCode,
-                    g.Count(),
-                    g.Sum(x => x.FinalPremium),
-                    g.Sum(x => x.FinalPremium * x.ExchangeRate)
-                ))
+                .Select(g => new PolicyReportDto
+                {
+                    GroupName = g.Key.City,
+                    Currency = g.Key.CurrencyCode,
+                    PoliciesCount = g.Count(),
+                    TotalPremium = g.Sum(x => x.FinalPremium),
+                    TotalPremiumnBase = g.Sum(x => x.FinalPremiumBase)
+                })
                 .OrderBy(x => x.GroupName)
                 .ThenBy(x => x.Currency);
         }

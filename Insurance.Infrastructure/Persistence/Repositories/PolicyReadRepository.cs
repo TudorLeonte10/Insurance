@@ -48,7 +48,7 @@ namespace Insurance.Infrastructure.Persistence.Repositories
                     BrokerName = p.Broker.Name,
                     CurrencyCode = p.Currency.Code,
                     FinalPremium = p.FinalPremium,
-                    ExchangeRate = p.Currency.ExchangeRateToBase,
+                    FinalPremiumBase = p.FinalPremium * p.Currency.ExchangeRateToBase,
                     Status = p.Status,
                     BuildingType = p.Building.Type
                 });

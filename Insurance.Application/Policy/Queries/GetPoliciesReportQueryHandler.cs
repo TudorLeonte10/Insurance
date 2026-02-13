@@ -21,9 +21,9 @@ namespace Insurance.Application.Policy.Queries
         }
         public async Task<IEnumerable<PolicyReportDto>> Handle(GetPoliciesReportQuery request, CancellationToken cancellationToken)
         {
-            var filteredReport = await _repo.GetQueryData().ApplyFilters(request).ToListAsync(cancellationToken);
+            var baseQuery = _repo.GetQueryData().ApplyFilters(request);
             var strategy = _factory.Create(request.GroupingType);
-            return strategy.Group(filteredReport);
+            return await strategy.Group(baseQuery).ToListAsync(cancellationToken);
         }
     }
 }

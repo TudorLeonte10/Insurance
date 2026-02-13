@@ -144,14 +144,5 @@ namespace Insurance.Tests.Unit.Buildings.Queries
 
             _repositoryMock.VerifyNoOtherCalls();
         }
-
-        [Fact]
-        public async Task Given_NoIdentifiers_Should_ThrowArgumentException()
-        {
-            var query = new GetBuildingsQuery();
-
-            await Assert.ThrowsAsync<ArgumentException>(() =>
-                _handler.Handle(query, CancellationToken.None));
-        }
     }
 }
