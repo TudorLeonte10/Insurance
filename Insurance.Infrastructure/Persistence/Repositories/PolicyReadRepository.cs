@@ -32,27 +32,6 @@ namespace Insurance.Infrastructure.Persistence.Repositories
                 .FirstOrDefaultAsync(ct);
         }
 
-        public IQueryable<PolicyReportReadModel> GetQueryData()
-        {
-            return _db.Policies.
-                AsNoTracking()
-                .Select(p => new PolicyReportReadModel
-                {
-                    PolicyId = p.Id,
-                    PolicyStartDate = p.StartDate,
-                    Country = p.Building.City.County.Country.Name,
-                    County = p.Building.City.County.Name,
-                    City = p.Building.City.Name,
-                    CityId = p.Building.City.Id,
-                    BrokerCode = p.Broker.BrokerCode,
-                    BrokerName = p.Broker.Name,
-                    CurrencyCode = p.Currency.Code,
-                    FinalPremium = p.FinalPremium,
-                    FinalPremiumBase = p.FinalPremium * p.Currency.ExchangeRateToBase,
-                    Status = p.Status,
-                    BuildingType = p.Building.Type
-                });
-        }
     }
 
 }

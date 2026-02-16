@@ -10,7 +10,7 @@ namespace Insurance.Application.Policy.DTOs
         public string Currency { get; set; } = string.Empty;
         public int PoliciesCount { get; set; } 
         public decimal TotalPremium { get; set; }
-        public decimal TotalPremiumnBase { get; set; }
+        public decimal TotalPremiumInBase { get; set; }
     }
 }
 

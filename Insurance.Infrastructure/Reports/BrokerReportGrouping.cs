@@ -1,24 +1,26 @@
 ﻿using Insurance.Application.Policy.DTOs;
 using Insurance.Application.Policy.Enums;
+using Insurance.Infrastructure.Persistence.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Insurance.Application.Policy.Services.Strategies
+namespace Insurance.Infrastructure.Reports
 {
-    public class BrokerGroupStrategy : IReportGroupingStrategy
+    public class BrokerReportGrouping : IPolicyReportGrouping
     {
         public ReportGroupingType GroupingType => ReportGroupingType.Broker;
-        public IQueryable<PolicyReportDto> Group(IQueryable<PolicyReportReadModel> data)
+
+        public IQueryable<PolicyReportDto> Group(IQueryable<PolicyEntity> data)
         {
-            return data.GroupBy(x => new { x.BrokerCode, x.BrokerName, x.CurrencyCode })
+            return data.GroupBy(x => new {x.Broker.Id, x.Broker.Name, x.Currency.Code, x.Currency.ExchangeRateToBase })
                 .Select(g => new PolicyReportDto
                 {
-                    GroupName = g.Key.BrokerName,
-                    Currency = g.Key.CurrencyCode,
+                    GroupName = g.Key.Name,
+                    Currency = g.Key.Code,
                     PoliciesCount = g.Count(),
                     TotalPremium = g.Sum(x => x.FinalPremium),
-                    TotalPremiumnBase = g.Sum(x => x.FinalPremiumBase)
+                    TotalPremiumInBase = g.Sum(x => x.FinalPremium) * g.Key.ExchangeRateToBase
                 })
                 .OrderBy(x => x.GroupName)
                 .ThenBy(x => x.Currency);

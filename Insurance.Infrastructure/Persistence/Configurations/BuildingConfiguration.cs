@@ -48,5 +48,8 @@ public class BuildingEntityConfiguration
             .WithMany(c => c.Buildings)
             .HasForeignKey(b => b.CityId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(b => new { b.CityId, b.Type })
+            .HasDatabaseName("IX_Buildings_City_Type");
     }
 }

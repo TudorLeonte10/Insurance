@@ -6,7 +6,6 @@ using Insurance.Application.Authentication;
 using Insurance.Application.Policy.FeeStrategies;
 using Insurance.Application.Policy.RiskStrategies;
 using Insurance.Application.Policy.Services;
-using Insurance.Application.Policy.Services.Strategies;
 using Insurance.Domain.Brokers;
 using Insurance.Domain.Buildings;
 using Insurance.Domain.Clients;
@@ -17,6 +16,7 @@ using Insurance.Infrastructure.Authentication;
 using Insurance.Infrastructure.Loggers;
 using Insurance.Infrastructure.Persistence;
 using Insurance.Infrastructure.Persistence.Repositories;
+using Insurance.Infrastructure.Reports;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,6 +57,7 @@ namespace Insurance.Infrastructure
             services.AddScoped<IPolicyRepository, PolicyRepository>();
             services.AddScoped<IPolicyReadRepository, PolicyReadRepository>();
             services.AddScoped<IPolicySearchRepository, PolicySearchRepository>();
+            services.AddScoped<IPolicyReportRepository, PolicyReportRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
 
             services.AddScoped<IPolicyCreationService, PolicyCreationService>();
@@ -77,11 +78,11 @@ namespace Insurance.Infrastructure
             services.AddScoped<IFeeStrategy, RiskIndicatorFeeStrategy>();
             services.AddScoped<IPolicyPremiumCalculator, PolicyPremiumCalculator>();
 
-            services.AddScoped<IReportGroupingStrategy, CountryGroupStrategy>();
-            services.AddScoped<IReportGroupingStrategy, CountyGroupStrategy>();
-            services.AddScoped<IReportGroupingStrategy, CityGroupStrategy>();
-            services.AddScoped<IReportGroupingStrategy, BrokerGroupStrategy>();
-            services.AddScoped<IGroupingStrategyFactory, GroupingStrategyFactory>();
+            services.AddScoped<IPolicyReportGrouping, CountryReportGrouping>();
+            services.AddScoped<IPolicyReportGrouping, CountyReportGrouping>();
+            services.AddScoped<IPolicyReportGrouping, CityReportGrouping>();
+            services.AddScoped<IPolicyReportGrouping, BrokerReportGrouping>();
+
 
             services.AddSingleton<IMongoClient>(sp =>
             {

@@ -9,14 +9,6 @@ using System.Text;
 
 namespace Insurance.Application.Policy.Queries
 {
-    public record GetPoliciesReportQuery(
-    ReportGroupingType GroupingType,
-    DateTime? From,
-    DateTime? To,
-    PolicyStatus? Status,
-    string? Currency,
-    BuildingType? BuildingType
-    ) : IRequest<IEnumerable<PolicyReportDto>>;
-
+    public record GetPoliciesReportQuery(GetPoliciesReportRequestDto Dto, ReportGroupingType GroupingType) : IRequest<IEnumerable<PolicyReportDto>>;
 
 }

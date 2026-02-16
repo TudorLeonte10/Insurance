@@ -9,7 +9,6 @@ namespace Insurance.Application.Abstractions.Repositories
     {
         Task<PolicyDetailsDto?> GetByIdAsync(Guid policyId, CancellationToken ct);
 
-        IQueryable<PolicyReportReadModel> GetQueryData();
     }
 
 }

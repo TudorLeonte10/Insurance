@@ -74,6 +74,10 @@ namespace Insurance.Infrastructure.Persistence.Configurations
                 .WithMany(c => c.Policies)
                 .HasForeignKey(p => p.CurrencyId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(p => new { p.Status, p.CurrencyId, p.StartDate, p.EndDate })
+                .HasDatabaseName("IX_Policies_Report")
+                .IncludeProperties(p => new { p.FinalPremium, p.BuildingId, p.BrokerId });
         }
     }
 
