@@ -1,6 +1,7 @@
 ﻿using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Audit;
 using Insurance.Application.Abstractions.Loggers;
+using Insurance.Application.Abstractions.Messaging;
 using Insurance.Application.Abstractions.Repositories;
 using Insurance.Application.Authentication;
 using Insurance.Application.Policy.FeeStrategies;
@@ -15,6 +16,7 @@ using Insurance.Infrastructure.Audit;
 using Insurance.Infrastructure.Authentication;
 using Insurance.Infrastructure.Loggers;
 using Insurance.Infrastructure.Persistence;
+using Insurance.Infrastructure.Persistence.Outbox;
 using Insurance.Infrastructure.Persistence.Repositories;
 using Insurance.Infrastructure.Reports;
 using Microsoft.EntityFrameworkCore;
@@ -83,6 +85,7 @@ namespace Insurance.Infrastructure
             services.AddScoped<IPolicyReportGrouping, CityReportGrouping>();
             services.AddScoped<IPolicyReportGrouping, BrokerReportGrouping>();
 
+            services.AddScoped<IIntegrationEventPublisher, IntegrationEventPublisher>();
 
             services.AddSingleton<IMongoClient>(sp =>
             {

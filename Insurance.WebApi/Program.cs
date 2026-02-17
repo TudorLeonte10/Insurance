@@ -1,7 +1,10 @@
 ﻿using Insurance.Application;
 using Insurance.Infrastructure;
+using Insurance.Infrastructure.Messaging.Rabbit;
 using Insurance.Infrastructure.Persistence;
+using Insurance.Infrastructure.Persistence.Outbox;
 using Insurance.Infrastructure.Persistence.Seed;
+using Insurance.Reporting.Infrastructure.Persistence;
 using Insurance.WebApi.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +22,11 @@ builder.Services.AddControllers()
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddReportingDbContext(builder.Configuration);
+
+builder.Services.AddSingleton<RabbitMqPublisher>();
+builder.Services.AddHostedService<OutboxPublisherBackgroundService>();
 
 if (!builder.Environment.IsEnvironment("Test"))
 {

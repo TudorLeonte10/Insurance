@@ -52,9 +52,6 @@ namespace Insurance.Infrastructure.Persistence.Repositories
         {
             return await _dbContext.Buildings
                 .AsNoTracking()
-                .Include(b => b.City)
-                    .ThenInclude(c => c.County)
-                        .ThenInclude(co => co.Country)
                 .Where(b => b.Id == buildingId)
                 .Select(b => new BuildingGeoContextDto
                 {
@@ -62,6 +59,10 @@ namespace Insurance.Infrastructure.Persistence.Repositories
                     CityId = b.CityId,
                     CountyId = b.City.CountyId,
                     CountryId = b.City.County.CountryId,
+                    CityName = b.City.Name,
+                    CountyName = b.City.County.Name,
+                    CountryName = b.City.County.Country.Name,
+                    BrokerCode = b.Client.Broker.BrokerCode,
                     BuildingType = b.Type,
                     RiskIndicators = b.RiskIndicators!
                         .Select(ri => Enum.Parse<RiskIndicatorType>(ri.RiskIndicator))

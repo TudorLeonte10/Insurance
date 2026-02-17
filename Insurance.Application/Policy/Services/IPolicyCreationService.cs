@@ -8,6 +8,6 @@ namespace Insurance.Application.Policy.Services
 {
     public interface IPolicyCreationService
     {
-        Task<Domain.Policies.Policy> CreatePolicyAsync(CreatePolicyDto dto, Guid brokerId, CancellationToken cancellationToken);
+        Task<PolicyCreationResult> CreatePolicyAsync(CreatePolicyDto dto, Guid brokerId, CancellationToken cancellationToken);
     }
 }

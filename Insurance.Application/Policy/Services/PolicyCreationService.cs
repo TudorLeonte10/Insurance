@@ -36,26 +36,63 @@ namespace Insurance.Application.Policy.Services
             _premiumCalculator = premiumCalculator;
             _timeProvider = timeProvider;
         }
-        public async Task<Domain.Policies.Policy> CreatePolicyAsync(CreatePolicyDto dto, Guid brokerId, CancellationToken cancellationToken)
+        public async Task<PolicyCreationResult> CreatePolicyAsync(
+    CreatePolicyDto dto,
+    Guid brokerId,
+    CancellationToken cancellationToken)
         {
             await ValidateClientOwnershipAsync(dto.ClientId, brokerId, cancellationToken);
             await ValidateBuildingOwnershipAsync(dto.BuildingId, dto.ClientId, cancellationToken);
 
             var currency = await GetAndValidateCurrencyAsync(dto.CurrencyId, cancellationToken);
-            var finalPremium = await CalculateFinalPremium(currency, dto, cancellationToken);
 
-            return Domain.Policies.Policy.CreateDraft(
+            var geoContext = await _buildingReadRepository
+                .GetGeoContextAsync(dto.BuildingId, cancellationToken);
+
+            var fees = await _feeReadRepository.GetActiveAsync(cancellationToken);
+            var riskFactors = await _riskReadRepository.GetActiveAsync(cancellationToken);
+
+            var calculationContext = new PolicyCalculationContext
+            {
+                CityId = geoContext!.CityId,
+                CountyId = geoContext.CountyId,
+                CountryId = geoContext.CountryId,
+                BuildingType = geoContext.BuildingType,
+                RiskIndicators = geoContext.RiskIndicators
+            };
+
+            var premiumResult = await CalculateFinalPremium(currency, dto, cancellationToken);
+
+            var now = _timeProvider.GetUtcNow().UtcDateTime;
+
+            var policy = Domain.Policies.Policy.CreateDraft(
                 clientId: dto.ClientId,
                 buildingId: dto.BuildingId,
                 brokerId: brokerId,
                 currencyId: dto.CurrencyId,
                 basePremium: dto.BasePremium,
-                finalPremium: finalPremium,
+                finalPremium: premiumResult.PremiumInCurrency,
                 startDate: dto.StartDate,
                 endDate: dto.EndDate,
                 policyNumber: GeneratePolicyNumber(),
-                now: _timeProvider.GetUtcNow().UtcDateTime);
+                now: now);
+
+            return new PolicyCreationResult
+            {
+                Policy = policy,
+                Country = geoContext.CountryName,
+                County = geoContext.CountyName,
+                City = geoContext.CityName,
+                BrokerCode = geoContext.BrokerCode,
+                Currency = currency.Name,
+                Status = policy.Status.ToString(),
+                BuildingType = geoContext.BuildingType.ToString(),
+                FinalPremium = premiumResult.PremiumInCurrency,
+                FinalPremiumInBase = premiumResult.PremiumInBase,
+                CreatedAt = now
+            };
         }
+
 
         private async Task ValidateClientOwnershipAsync(Guid clientId, Guid brokerId, CancellationToken cancellationToken)
         {
@@ -94,12 +131,17 @@ namespace Insurance.Application.Policy.Services
             return currency;
         }
 
-        private async Task<decimal> CalculateFinalPremium(Currency currency, CreatePolicyDto dto, CancellationToken cancellationToken)
+        private async Task<PremiumCalculationResult> CalculateFinalPremium(
+    Currency currency,
+    CreatePolicyDto dto,
+    CancellationToken cancellationToken)
         {
             var fees = await _feeReadRepository.GetActiveAsync(cancellationToken);
             var riskFactors = await _riskReadRepository.GetActiveAsync(cancellationToken);
 
-            var geoContext = await _buildingReadRepository.GetGeoContextAsync(dto.BuildingId,cancellationToken);
+            var geoContext = await _buildingReadRepository
+                .GetGeoContextAsync(dto.BuildingId, cancellationToken);
+
             var calculationContext = new PolicyCalculationContext
             {
                 CityId = geoContext!.CityId,
@@ -109,13 +151,27 @@ namespace Insurance.Application.Policy.Services
                 RiskIndicators = geoContext.RiskIndicators
             };
 
-            var premiumBase = _premiumCalculator.Calculate(dto.BasePremium, calculationContext, fees, riskFactors);
+            var premiumBase = _premiumCalculator
+                .Calculate(dto.BasePremium, calculationContext, fees, riskFactors);
 
-            return CurrencyConverter.ConvertFromBase(premiumBase, currency);
+            var finalPremium = CurrencyConverter
+                .ConvertFromBase(premiumBase, currency);
+
+            return new PremiumCalculationResult
+            {
+                PremiumInBase = premiumBase,
+                PremiumInCurrency = finalPremium
+            };
         }
+
 
         private static string GeneratePolicyNumber()
             => $"POL-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid():N}";
+    }
 
+    public class PremiumCalculationResult
+    {
+        public decimal PremiumInBase { get; init; }
+        public decimal PremiumInCurrency { get; init; }
     }
 }

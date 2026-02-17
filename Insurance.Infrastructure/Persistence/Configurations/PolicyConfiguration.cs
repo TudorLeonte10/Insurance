@@ -25,7 +25,7 @@ namespace Insurance.Infrastructure.Persistence.Configurations
                 .IsUnique();
 
             builder.Property(p => p.Status)
-                .HasConversion<string>()
+                .HasConversion<int>()
                 .IsRequired();
 
             builder.Property(p => p.BasePremium)
