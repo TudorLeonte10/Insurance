@@ -1,4 +1,5 @@
 ﻿using Insurance.Application.Abstractions;
+using Insurance.Application.Abstractions.Messaging;
 using Insurance.Application.Abstractions.Repositories;
 using Insurance.Application.Authentication;
 using Insurance.Application.Brokers;
@@ -28,6 +29,7 @@ namespace Insurance.Tests.Unit.Polic.Commands
         private readonly Mock<IPolicyRepository> _policyRepo = new();
         private readonly Mock<IUnitOfWork> _unitOfWork = new();
         private readonly Mock<ICurrentUserContext> _currentUserContext = new();
+        private readonly Mock<IIntegrationEventPublisher> _eventPublisher = new();
 
         private readonly CreatePolicyCommandHandler _handler;
 
@@ -37,7 +39,8 @@ namespace Insurance.Tests.Unit.Polic.Commands
                 _creationService.Object,
                 _policyRepo.Object,
                 _unitOfWork.Object,
-                _currentUserContext.Object);
+                _currentUserContext.Object,
+                _eventPublisher.Object);
         }
 
         [Fact]
@@ -72,9 +75,24 @@ namespace Insurance.Tests.Unit.Polic.Commands
                 policyNumber: $"POL-{Guid.NewGuid():N}",
                 now: now);
 
+            var creationResult = new PolicyCreationResult
+            {
+                Policy = policy,
+                Country = "Romania",
+                County = "SomeCounty",
+                City = "SomeCity",
+                BrokerCode = "BRK001",
+                Currency = "RON",
+                Status = policy.Status.ToString(),
+                FinalPremium = policy.FinalPremium,
+                FinalPremiumInBase = policy.FinalPremium, // adjust if needed
+                CreatedAt = now
+            };
+
             _creationService
                 .Setup(s => s.CreatePolicyAsync(dto, brokerId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(policy);
+                .ReturnsAsync(creationResult);
+
 
             _policyRepo
                 .Setup(r => r.AddAsync(policy, It.IsAny<CancellationToken>()))
@@ -97,7 +115,6 @@ namespace Insurance.Tests.Unit.Polic.Commands
         [Fact]
         public async Task Handle_Should_Propagate_Exception_From_Service()
         {
-            // arrange
             var brokerId = Guid.NewGuid();
             _currentUserContext.SetupGet(x => x.BrokerId).Returns(brokerId);
 
@@ -117,7 +134,6 @@ namespace Insurance.Tests.Unit.Polic.Commands
                 .Setup(s => s.CreatePolicyAsync(dto, brokerId, It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new NotFoundException("Client not found"));
 
-            // act / assert
             await Assert.ThrowsAsync<NotFoundException>(() => _handler.Handle(command, CancellationToken.None));
 
             _policyRepo.Verify(r => r.AddAsync(It.IsAny<Domain.Policies.Policy>(), It.IsAny<CancellationToken>()), Times.Never);

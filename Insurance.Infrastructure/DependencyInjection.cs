@@ -19,6 +19,7 @@ using Insurance.Infrastructure.Persistence;
 using Insurance.Infrastructure.Persistence.Outbox;
 using Insurance.Infrastructure.Persistence.Repositories;
 using Insurance.Infrastructure.Reports;
+using Insurance.Reporting.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,8 +60,13 @@ namespace Insurance.Infrastructure
             services.AddScoped<IPolicyRepository, PolicyRepository>();
             services.AddScoped<IPolicyReadRepository, PolicyReadRepository>();
             services.AddScoped<IPolicySearchRepository, PolicySearchRepository>();
-            services.AddScoped<IPolicyReportRepository, PolicyReportRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+
+            services.AddScoped<IPolicyReportRepository, PolicyReportRepository>();
+            services.AddScoped<IPolicyReportGrouping, CountryReportGrouping>();
+            services.AddScoped<IPolicyReportGrouping, CountyReportGrouping>();
+            services.AddScoped<IPolicyReportGrouping, CityReportGrouping>();
+            services.AddScoped<IPolicyReportGrouping, BrokerReportGrouping>();
 
             services.AddScoped<IPolicyCreationService, PolicyCreationService>();
 
@@ -79,11 +85,6 @@ namespace Insurance.Infrastructure
             services.AddScoped<IFeeStrategy, PercentageFeeStrategy>();
             services.AddScoped<IFeeStrategy, RiskIndicatorFeeStrategy>();
             services.AddScoped<IPolicyPremiumCalculator, PolicyPremiumCalculator>();
-
-            services.AddScoped<IPolicyReportGrouping, CountryReportGrouping>();
-            services.AddScoped<IPolicyReportGrouping, CountyReportGrouping>();
-            services.AddScoped<IPolicyReportGrouping, CityReportGrouping>();
-            services.AddScoped<IPolicyReportGrouping, BrokerReportGrouping>();
 
             services.AddScoped<IIntegrationEventPublisher, IntegrationEventPublisher>();
 

@@ -10,6 +10,7 @@ namespace Insurance.WebApi.Controllers.Metadata
 {
     [ApiController]
     [Authorize(Roles = "Admin")]
+    [ApiExplorerSettings(GroupName = "admin")]  
     [Route("api/admin/fees")]
     public class FeeConfigurationController : ControllerBase
     {

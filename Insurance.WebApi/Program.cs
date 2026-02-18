@@ -6,9 +6,12 @@ using Insurance.Infrastructure.Persistence.Outbox;
 using Insurance.Infrastructure.Persistence.Seed;
 using Insurance.Reporting.Infrastructure.Persistence;
 using Insurance.WebApi.Middleware;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection.Metadata;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -25,21 +28,38 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddReportingDbContext(builder.Configuration);
 
-builder.Services.AddSingleton<RabbitMqPublisher>();
-builder.Services.AddHostedService<OutboxPublisherBackgroundService>();
 
 if (!builder.Environment.IsEnvironment("Test"))
 {
     builder.Services.AddSqlServerDbContext(builder.Configuration);
+    builder.Services.AddSingleton<RabbitMqPublisher>();
+    builder.Services.AddHostedService<OutboxPublisherBackgroundService>();
+
 }
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo 
+    c.SwaggerDoc("admin", new OpenApiInfo 
     { 
-        Title = "Insurance API", 
+        Title = "Admin API", 
         Version = "v1" 
+    });
+
+    c.SwaggerDoc("broker", new OpenApiInfo
+    {
+        Title = "Broker API",
+        Version = "v1"
+    });
+
+    c.DocInclusionPredicate((docName, apiDesc) =>
+    {
+        var groupName = apiDesc.GroupName;
+
+        if (string.IsNullOrEmpty(groupName))
+            return docName == "admin" || docName == "broker";
+
+        return groupName == docName;
     });
 
     c.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
@@ -79,7 +99,11 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/admin/swagger.json", "Admin API");
+        c.SwaggerEndpoint("/swagger/broker/swagger.json", "Broker API");
+    });
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();

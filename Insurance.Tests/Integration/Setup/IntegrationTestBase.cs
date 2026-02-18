@@ -20,14 +20,13 @@ public abstract class IntegrationTestBase
             factory.SeedTestData(db);
         }
 
-        // Ensure broker id header is set when the factory seeded one
         if (factory.SeededBrokerId != Guid.Empty)
         {
             client.DefaultRequestHeaders.Remove("X-Test-BrokerId");
             client.DefaultRequestHeaders.Add("X-Test-BrokerId", factory.SeededBrokerId.ToString());
         }
 
-        // Default role for endpoints; tests can override by passing roles parameter or using SetRoles helper.
+     
         client.DefaultRequestHeaders.Remove("X-Test-Roles");
         if (!string.IsNullOrWhiteSpace(roles))
             client.DefaultRequestHeaders.Add("X-Test-Roles", roles);
@@ -35,7 +34,6 @@ public abstract class IntegrationTestBase
         return (factory, client);
     }
 
-    // Helper to change roles in a test after context creation
     protected void SetRoles(HttpClient client, string roles)
     {
         client.DefaultRequestHeaders.Remove("X-Test-Roles");

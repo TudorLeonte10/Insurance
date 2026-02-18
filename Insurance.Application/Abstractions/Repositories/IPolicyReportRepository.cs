@@ -8,6 +8,6 @@ namespace Insurance.Application.Abstractions.Repositories
 {
     public interface IPolicyReportRepository
     {
-        Task<IReadOnlyList<PolicyReportDto>> GetPolicyReportAsync(GetPoliciesReportQuery request, CancellationToken ct);
+        Task<IEnumerable<PolicyReportDto>> GetPolicyReportAsync(GetPoliciesReportQuery request, CancellationToken ct);
     }
 }

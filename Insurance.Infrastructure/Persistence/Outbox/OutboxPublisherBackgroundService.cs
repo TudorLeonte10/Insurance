@@ -36,14 +36,15 @@ namespace Insurance.Infrastructure.Persistence.Outbox
                     .Take(20)
                     .ToListAsync(cancellationToken);
 
-                foreach (var @event in events)
+                foreach (var ev in events)
                 {
                     await publisher.PublishAsync(
                         _configuration["Rabbit:Queue"]!,
-                        @event.Payload,
+                        ev.Payload,
+                        ev.EventType,
                         cancellationToken);
 
-                    @event.Processed = true;
+                    ev.Processed = true;
                 }
 
                 await db.SaveChangesAsync(cancellationToken);

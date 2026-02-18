@@ -24,6 +24,7 @@ namespace Insurance.Infrastructure.Messaging.Rabbit
         public async Task PublishAsync(
             string queueName,
             string message,
+            string eventType,
             CancellationToken cancellationToken = default)
         {
             var connection = await _connectionTask;
@@ -42,7 +43,8 @@ namespace Insurance.Infrastructure.Messaging.Rabbit
 
             var properties = new BasicProperties
             {
-                Persistent = true
+                Persistent = true,
+                Type = eventType
             };
 
             await channel.BasicPublishAsync(

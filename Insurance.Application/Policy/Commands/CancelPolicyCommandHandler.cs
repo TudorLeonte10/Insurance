@@ -1,5 +1,7 @@
 ﻿using Insurance.Application.Abstractions;
+using Insurance.Application.Abstractions.Messaging;
 using Insurance.Application.Authentication;
+using Insurance.Application.Events;
 using Insurance.Application.Exceptions;
 using Insurance.Domain.Policies;
 using MediatR;
@@ -14,11 +16,13 @@ namespace Insurance.Application.Policy.Commands
         private readonly IPolicyRepository _policyRepo;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICurrentUserContext _currentUserContext;
-        public CancelPolicyCommandHandler(IPolicyRepository policyRepo, IUnitOfWork unitOfWork, ICurrentUserContext currentUserContext)
+        private readonly IIntegrationEventPublisher _eventPublisher;
+        public CancelPolicyCommandHandler(IPolicyRepository policyRepo, IUnitOfWork unitOfWork, ICurrentUserContext currentUserContext, IIntegrationEventPublisher eventPublisher)
         {
             _policyRepo = policyRepo;
             _unitOfWork = unitOfWork;
             _currentUserContext = currentUserContext;
+            _eventPublisher = eventPublisher;
         }
         public async Task<Guid> Handle(CancelPolicyCommand request, CancellationToken cancellationToken)
         {
@@ -38,6 +42,14 @@ namespace Insurance.Application.Policy.Commands
 
             policy.Cancel(request.cancellationReason);
             await _policyRepo.UpdateAsync(policy, cancellationToken);
+
+            var integrationEvent = new PolicyStatusChangedIntegrationEvent(
+                policy.Id,
+                policy.Status.ToString(),
+                DateTime.UtcNow);
+
+            await _eventPublisher.Publish(integrationEvent, cancellationToken);
+
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return policy.Id;
         }

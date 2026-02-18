@@ -1,4 +1,5 @@
 ﻿using Insurance.Application.Abstractions;
+using Insurance.Application.Abstractions.Messaging;
 using Insurance.Application.Authentication;
 using Insurance.Application.Exceptions;
 using Insurance.Application.Policy.Commands;
@@ -31,7 +32,8 @@ namespace Insurance.Tests.Unit.Policy.Commands
             var handler = new CancelPolicyCommandHandler(
                 repo.Object,
                 uow.Object,
-                currentUser.Object);
+                currentUser.Object,
+                Mock.Of<IIntegrationEventPublisher>());
 
             await handler.Handle(
                 new CancelPolicyCommand(policy.Id, cancellationReason),
@@ -63,7 +65,8 @@ namespace Insurance.Tests.Unit.Policy.Commands
             var handler = new CancelPolicyCommandHandler(
                 repo.Object,
                 uow.Object,
-                currentUser.Object);
+                currentUser.Object,
+                Mock.Of<IIntegrationEventPublisher>());
 
             await handler.Handle(
                 new CancelPolicyCommand(policy.Id, null),
@@ -89,7 +92,8 @@ namespace Insurance.Tests.Unit.Policy.Commands
             var handler = new CancelPolicyCommandHandler(
                 repo.Object,
                 Mock.Of<IUnitOfWork>(),
-                currentUser.Object);
+                currentUser.Object,
+                Mock.Of<IIntegrationEventPublisher>());
 
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 handler.Handle(
@@ -115,7 +119,8 @@ namespace Insurance.Tests.Unit.Policy.Commands
             var handler = new CancelPolicyCommandHandler(
                 repo.Object,
                 uow.Object,
-                currentUser.Object);
+                currentUser.Object,
+                Mock.Of<IIntegrationEventPublisher>());
 
             await handler.Handle(
                 new CancelPolicyCommand(policy.Id, cancellationReason),

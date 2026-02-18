@@ -11,6 +11,7 @@ namespace Insurance.WebApi
 {
     [ApiController]
     [Authorize(Roles = "Admin")]
+    [ApiExplorerSettings(GroupName = "admin")]
     [Route("api/admin/reports")]
     public class PolicyReportsController : ControllerBase
     {

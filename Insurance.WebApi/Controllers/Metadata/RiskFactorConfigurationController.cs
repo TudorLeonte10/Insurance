@@ -9,6 +9,7 @@ namespace Insurance.WebApi.Controllers.Metadata
 {
     [ApiController]
     [Authorize(Roles = "Admin")]
+    [ApiExplorerSettings(GroupName = "admin")]
     [Route("api/admin/risk-factors")]
     public class RiskFactorConfigurationController : ControllerBase
     {

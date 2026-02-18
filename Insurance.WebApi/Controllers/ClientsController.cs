@@ -9,6 +9,7 @@ namespace Insurance.WebApi.Controllers
 {
     [ApiController]
     [Authorize(Roles = "Broker")]
+    [ApiExplorerSettings(GroupName = "broker")]
     [Route("api/brokers/[controller]")]
     public class ClientsController : ControllerBase
     {
