@@ -7,6 +7,7 @@ using Insurance.Reporting.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Reporting.Infrastructure.Persistence.Repositories

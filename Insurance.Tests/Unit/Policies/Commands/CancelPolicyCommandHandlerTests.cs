@@ -33,7 +33,8 @@ namespace Insurance.Tests.Unit.Policy.Commands
                 repo.Object,
                 uow.Object,
                 currentUser.Object,
-                Mock.Of<IIntegrationEventPublisher>());
+                Mock.Of<IIntegrationEventPublisher>(),
+                Mock.Of<TimeProvider>());
 
             await handler.Handle(
                 new CancelPolicyCommand(policy.Id, cancellationReason),
@@ -66,7 +67,8 @@ namespace Insurance.Tests.Unit.Policy.Commands
                 repo.Object,
                 uow.Object,
                 currentUser.Object,
-                Mock.Of<IIntegrationEventPublisher>());
+                Mock.Of<IIntegrationEventPublisher>(),
+                Mock.Of<TimeProvider>());
 
             await handler.Handle(
                 new CancelPolicyCommand(policy.Id, null),
@@ -93,7 +95,8 @@ namespace Insurance.Tests.Unit.Policy.Commands
                 repo.Object,
                 Mock.Of<IUnitOfWork>(),
                 currentUser.Object,
-                Mock.Of<IIntegrationEventPublisher>());
+                Mock.Of<IIntegrationEventPublisher>(),
+                Mock.Of<TimeProvider>());
 
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 handler.Handle(
@@ -120,7 +123,8 @@ namespace Insurance.Tests.Unit.Policy.Commands
                 repo.Object,
                 uow.Object,
                 currentUser.Object,
-                Mock.Of<IIntegrationEventPublisher>());
+                Mock.Of<IIntegrationEventPublisher>(),
+                Mock.Of<TimeProvider>());
 
             await handler.Handle(
                 new CancelPolicyCommand(policy.Id, cancellationReason),

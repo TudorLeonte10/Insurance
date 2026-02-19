@@ -1,6 +1,7 @@
 ﻿
 using Insurance.Infrastructure.Persistence;
 using Insurance.Infrastructure.Persistence.Entities;
+using Insurance.Reporting.Infrastructure.Persistence;
 using Insurance.Tests.Integration.Setup;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     private SqliteConnection _connection = null!;
+    private SqliteConnection _reportingConnection = null!;
     public Guid SeededCityId { get; private set; }
     public Guid SeededCurrencyId { get; private set; }
     public Guid SeededBrokerId { get; private set; }
@@ -31,12 +33,19 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
                     TestAuthHandler.SchemeName, options => { });
 
-            var descriptors = services
+            var insuranceDescriptors = services
                 .Where(d => d.ServiceType == typeof(DbContextOptions<InsuranceDbContext>))
                 .ToList();
 
-            foreach (var descriptor in descriptors)
+            foreach (var descriptor in insuranceDescriptors)
                 services.Remove(descriptor);
+
+            var reportingDescriptors = services
+                .Where(d => d.ServiceType == typeof(DbContextOptions<ReportingDbContext>))
+                .ToList();
+
+            foreach (var reportingDescriptor in reportingDescriptors)
+                services.Remove(reportingDescriptor);
 
             _connection = new SqliteConnection("DataSource=:memory:");
             _connection.Open();
@@ -44,6 +53,14 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             services.AddDbContext<InsuranceDbContext>(options =>
             {
                 options.UseSqlite(_connection);
+            });
+
+            _reportingConnection = new SqliteConnection("DataSource=:memory:");
+            _reportingConnection.Open();
+
+            services.AddDbContext <ReportingDbContext>(options =>
+            {
+                options.UseSqlite(_reportingConnection);
             });
         });
     }

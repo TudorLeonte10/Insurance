@@ -7,6 +7,7 @@ using Insurance.Infrastructure.Persistence.Seed;
 using Insurance.Reporting.Infrastructure.Persistence;
 using Insurance.WebApi.Middleware;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -15,6 +16,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection.Metadata;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,12 +28,11 @@ builder.Services.AddControllers()
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddReportingDbContext(builder.Configuration);
-
 
 if (!builder.Environment.IsEnvironment("Test"))
 {
     builder.Services.AddSqlServerDbContext(builder.Configuration);
+    builder.Services.AddReportingDbContext(builder.Configuration);
     builder.Services.AddSingleton<RabbitMqPublisher>();
     builder.Services.AddHostedService<OutboxPublisherBackgroundService>();
 
@@ -76,6 +77,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -112,6 +114,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 

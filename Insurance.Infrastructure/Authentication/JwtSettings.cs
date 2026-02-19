@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Authentication
 {
+    [ExcludeFromCodeCoverage]
     public class JwtSettings
     {
         public string Key { get; set; } = string.Empty;

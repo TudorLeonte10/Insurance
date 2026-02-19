@@ -44,7 +44,7 @@ namespace Insurance.Tests.Unit.Policy.Domain
         {
             var policy = CreateActivePolicy();
 
-            policy.Cancel("client request");
+            policy.Cancel("client request", DateTime.UtcNow);
 
             Assert.Equal(PolicyStatus.Cancelled, policy.Status);
             Assert.Equal("client request", policy.CancellationReason);
@@ -56,7 +56,7 @@ namespace Insurance.Tests.Unit.Policy.Domain
             var policy = CreateDraftPolicy();
 
             Assert.Throws<InvalidPolicyTransitionException>(() =>
-                policy.Cancel("reason"));
+                policy.Cancel("reason", DateTime.UtcNow));
         }
 
         public static Insurance.Domain.Policies.Policy CreateDraftPolicy() =>

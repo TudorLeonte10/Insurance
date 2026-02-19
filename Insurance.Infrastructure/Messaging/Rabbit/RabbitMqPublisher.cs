@@ -1,12 +1,15 @@
 ﻿
 using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Messaging.Rabbit
 {
+    [ExcludeFromCodeCoverage]
     public class RabbitMqPublisher
     {
         private readonly Task<IConnection> _connectionTask;
@@ -47,13 +50,20 @@ namespace Insurance.Infrastructure.Messaging.Rabbit
                 Type = eventType
             };
 
-            await channel.BasicPublishAsync(
-                exchange: "",
-                routingKey: queueName,
-                mandatory: false,
-                basicProperties: properties,
-                body: body,
-                cancellationToken: cancellationToken);
+            try
+            {
+                await channel.BasicPublishAsync(
+                    exchange: "",
+                    routingKey: queueName,
+                    mandatory: false,
+                    basicProperties: properties,
+                    body: body,
+                    cancellationToken: cancellationToken);
+            }
+            catch (PublishException ex)
+            {
+                throw new PublishRQException($"Failed to publish message to queue '{queueName}'", ex);
+            }
         }
     }
 }

@@ -17,12 +17,14 @@ namespace Insurance.Application.Policy.Commands
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICurrentUserContext _currentUserContext;
         private readonly IIntegrationEventPublisher _eventPublisher;
-        public CancelPolicyCommandHandler(IPolicyRepository policyRepo, IUnitOfWork unitOfWork, ICurrentUserContext currentUserContext, IIntegrationEventPublisher eventPublisher)
+        private readonly TimeProvider _timeProvider;
+        public CancelPolicyCommandHandler(IPolicyRepository policyRepo, IUnitOfWork unitOfWork, ICurrentUserContext currentUserContext, IIntegrationEventPublisher eventPublisher, TimeProvider timeProvider)
         {
             _policyRepo = policyRepo;
             _unitOfWork = unitOfWork;
             _currentUserContext = currentUserContext;
             _eventPublisher = eventPublisher;
+            _timeProvider = timeProvider;
         }
         public async Task<Guid> Handle(CancelPolicyCommand request, CancellationToken cancellationToken)
         {
@@ -40,13 +42,13 @@ namespace Insurance.Application.Policy.Commands
                 throw new ForbiddenException("Policy does not belong to the current broker");
             }
 
-            policy.Cancel(request.cancellationReason);
+            policy.Cancel(request.cancellationReason, _timeProvider.GetUtcNow().UtcDateTime);
             await _policyRepo.UpdateAsync(policy, cancellationToken);
 
             var integrationEvent = new PolicyStatusChangedIntegrationEvent(
                 policy.Id,
                 policy.Status.ToString(),
-                DateTime.UtcNow);
+                _timeProvider.GetUtcNow().UtcDateTime);
 
             await _eventPublisher.Publish(integrationEvent, cancellationToken);
 

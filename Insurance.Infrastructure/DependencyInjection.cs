@@ -122,9 +122,7 @@ namespace Insurance.Infrastructure
         {
             services.AddDbContext<InsuranceDbContext>(options =>
                 options.UseSqlServer(
-                    configuration.GetConnectionString("DefaultConnection"))
-                    .EnableSensitiveDataLogging()
-                    .LogTo(Console.WriteLine, LogLevel.Information));
+                    configuration.GetConnectionString("DefaultConnection")));
             return services;
         }
     }

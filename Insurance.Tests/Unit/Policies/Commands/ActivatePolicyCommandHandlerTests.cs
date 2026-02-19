@@ -33,7 +33,8 @@ namespace Insurance.Tests.Unit.Policy.Commands
                 repo.Object,
                 uow.Object,
                 currentUser.Object,
-                eventus.Object);
+                eventus.Object,
+                Mock.Of<TimeProvider>());
 
             await handler.Handle(
                 new ActivatePolicyCommand(policy.Id),
@@ -60,7 +61,8 @@ namespace Insurance.Tests.Unit.Policy.Commands
                 repo.Object,
                 Mock.Of<IUnitOfWork>(),
                 currentUser.Object,
-                Mock.Of<IIntegrationEventPublisher>());
+                Mock.Of<IIntegrationEventPublisher>(),
+                Mock.Of<TimeProvider>());
 
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 handler.Handle(
@@ -84,7 +86,8 @@ namespace Insurance.Tests.Unit.Policy.Commands
                 repo.Object,
                 Mock.Of<IUnitOfWork>(),
                 currentUser.Object,
-                Mock.Of<IIntegrationEventPublisher>());
+                Mock.Of<IIntegrationEventPublisher>(),
+                Mock.Of<TimeProvider>());
 
             await Assert.ThrowsAsync<InvalidPolicyTransitionException>(() =>
                 handler.Handle(

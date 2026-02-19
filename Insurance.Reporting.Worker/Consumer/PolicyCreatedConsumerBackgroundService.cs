@@ -6,11 +6,13 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 
 namespace Insurance.Reporting.Worker.Consumer
 {
+    [ExcludeFromCodeCoverage]
     public class PolicyCreatedConsumerBackgroundService : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
