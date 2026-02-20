@@ -35,7 +35,6 @@ if (!builder.Environment.IsEnvironment("Test"))
     builder.Services.AddReportingDbContext(builder.Configuration);
     builder.Services.AddSingleton<RabbitMqPublisher>();
     builder.Services.AddHostedService<OutboxPublisherBackgroundService>();
-
 }
 
 builder.Services.AddEndpointsApiExplorer();
@@ -109,6 +108,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<TraceMiddleware>();
 
 app.UseHttpsRedirection();
 

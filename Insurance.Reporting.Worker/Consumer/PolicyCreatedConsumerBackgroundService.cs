@@ -1,4 +1,6 @@
 ﻿using Insurance.Application.Events;
+using Insurance.Infrastructure.Messaging.Rabbit;
+using Insurance.Infrastructure.Persistence;
 using Insurance.Reporting.Infrastructure.Entities;
 using Insurance.Reporting.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +22,7 @@ namespace Insurance.Reporting.Worker.Consumer
         private IConnection? _connection;
         private IChannel? _channel;
 
-        public PolicyCreatedConsumerBackgroundService(IServiceScopeFactory scopeFactory, IConfiguration configuration)
+        public PolicyCreatedConsumerBackgroundService(IServiceScopeFactory scopeFactory, IConfiguration configuration, RabbitMqPublisher publisher)
         {
             _scopeFactory = scopeFactory;
             _configuration = configuration;
@@ -53,54 +55,78 @@ namespace Insurance.Reporting.Worker.Consumer
 
             consumer.ReceivedAsync += async (model, ea) =>
             {
-                var body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-                var eventType = ea.BasicProperties.Type;
+                var correlationId = ea.BasicProperties.CorrelationId;
 
-                using var scope = _scopeFactory.CreateScope();
-                var db = scope.ServiceProvider.GetRequiredService<ReportingDbContext>();
+
+                    var body = ea.Body.ToArray();
+                    var message = Encoding.UTF8.GetString(body);
+                    var eventType = ea.BasicProperties.Type;
+
+                    using var scope = _scopeFactory.CreateScope();
+                    var db = scope.ServiceProvider.GetRequiredService<ReportingDbContext>();
+
+                    var processedSuccessfully = false;
+                    
+                Console.WriteLine("Event Type: " + eventType);
 
                 switch (eventType)
+                    {
+                        case nameof(PolicyCreatedIntegrationEvent):
+                            var createdEvent = JsonSerializer.Deserialize<PolicyCreatedIntegrationEvent>(message);
+
+                            var aggregate = new PolicyReportAggregate
+                            {
+                                PolicyId = createdEvent!.PolicyId,
+                                Country = createdEvent.Country,
+                                County = createdEvent.County,
+                                City = createdEvent.City,
+                                BrokerCode = createdEvent.BrokerCode,
+                                Currency = createdEvent.Currency,
+                                Status = createdEvent.Status,
+                                BuildingType = createdEvent.BuildingType,
+                                FinalPremium = createdEvent.FinalPremium,
+                                FinalPremiumInBase = createdEvent.FinalPremiumInBase,
+                                CreatedAt = DateTime.UtcNow
+                            };
+
+                            if (!await db.PolicyReportAggregates
+                                .AnyAsync(x => x.PolicyId == createdEvent!.PolicyId, stoppingToken))
+                            {
+                                db.PolicyReportAggregates.Add(aggregate);
+                                await db.SaveChangesAsync(stoppingToken);
+                            }
+
+                            processedSuccessfully = true;
+                        break;
+
+                        case nameof(PolicyStatusChangedIntegrationEvent):
+                            var statusChangedEvent = JsonSerializer.Deserialize<PolicyStatusChangedIntegrationEvent>(message);
+
+                            var aggregateToUpdate = await db.PolicyReportAggregates
+                                    .FirstOrDefaultAsync(x => x.PolicyId == statusChangedEvent!.PolicyId, stoppingToken);
+
+                            if (aggregateToUpdate != null)
+                            {
+                                aggregateToUpdate.Status = statusChangedEvent!.NewStatus;
+                                await db.SaveChangesAsync(stoppingToken);
+                            }
+
+                            processedSuccessfully = true;
+                        break;
+                    }
+
+                if (processedSuccessfully && !string.IsNullOrEmpty(correlationId) && Guid.TryParse(correlationId, out var outboxId))
                 {
-                    case nameof(PolicyCreatedIntegrationEvent):
-                        var createdEvent = JsonSerializer.Deserialize<PolicyCreatedIntegrationEvent>(message);
-
-                        var aggregate = new PolicyReportAggregate
+                    var primaryDb = scope.ServiceProvider.GetService<InsuranceDbContext>();
+                    if (primaryDb != null)
+                    {
+                        var outbox = await primaryDb.OutboxEvents.FirstOrDefaultAsync(o => o.Id == outboxId, stoppingToken);
+                        if (outbox != null && outbox.Enqueued && !outbox.Processed)
                         {
-                            PolicyId = createdEvent!.PolicyId,
-                            Country = createdEvent.Country,
-                            County = createdEvent.County,
-                            City = createdEvent.City,
-                            BrokerCode = createdEvent.BrokerCode,
-                            Currency = createdEvent.Currency,
-                            Status = createdEvent.Status,
-                            BuildingType = createdEvent.BuildingType,
-                            FinalPremium = createdEvent.FinalPremium,
-                            FinalPremiumInBase = createdEvent.FinalPremiumInBase,
-                            CreatedAt = DateTime.UtcNow
-                        };
-
-                        if (!await db.PolicyReportAggregates
-                            .AnyAsync(x => x.PolicyId == createdEvent!.PolicyId, stoppingToken))
-                        {
-                            db.PolicyReportAggregates.Add(aggregate);
-                            await db.SaveChangesAsync(stoppingToken);
+                            outbox.Processed = true;
+                            await primaryDb.SaveChangesAsync(stoppingToken);
                         }
-                        break;
-
-                    case nameof(PolicyStatusChangedIntegrationEvent):
-                        var statusChangedEvent = JsonSerializer.Deserialize<PolicyStatusChangedIntegrationEvent>(message);
-
-                        var aggregateToUpdate = await db.PolicyReportAggregates
-                                .FirstOrDefaultAsync(x => x.PolicyId == statusChangedEvent!.PolicyId, stoppingToken);
-
-                        if (aggregateToUpdate != null)
-                        {
-                            aggregateToUpdate.Status = statusChangedEvent!.NewStatus;
-                            await db.SaveChangesAsync(stoppingToken);
-                        }
-
-                        break;
+                    }
                 }
 
                 await _channel!.BasicAckAsync(ea.DeliveryTag, false, stoppingToken);

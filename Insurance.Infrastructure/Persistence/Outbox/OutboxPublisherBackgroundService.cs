@@ -37,7 +37,7 @@ namespace Insurance.Infrastructure.Persistence.Outbox
                 var logger = scope.ServiceProvider.GetRequiredService<IApplicationLogger>();
 
                 var events = await db.OutboxEvents
-                    .Where(x => !x.Processed)
+                    .Where(x => !x.Processed && !x.Enqueued)
                     .OrderBy(x => x.OccurredOn)
                     .Take(20)
                     .ToListAsync(cancellationToken);
@@ -50,16 +50,16 @@ namespace Insurance.Infrastructure.Persistence.Outbox
                             _configuration["Rabbit:Queue"]!,
                             ev.Payload,
                             ev.EventType,
+                            correlationId: ev.Id.ToString(),
                             cancellationToken);
 
-                        ev.Processed = true;
+                        ev.Enqueued = true;
+                        await db.SaveChangesAsync(cancellationToken);
                     }
                     catch (PublishRQException ex)
                     {
                         logger.LogError(ex, "Failed to publish outbox event {EventId} of type {EventType}", ev.Id, ev.EventType);
                     }
-
-                    await db.SaveChangesAsync(cancellationToken);
 
                     await Task.Delay(5000, cancellationToken);
                 }

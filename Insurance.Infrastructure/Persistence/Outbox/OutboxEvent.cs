@@ -14,6 +14,8 @@ namespace Insurance.Infrastructure.Persistence.Outbox
 
         public DateTime OccurredOn { get; set; }
 
+        public bool Enqueued { get; set; }
+
         public bool Processed { get; set; }
     }
 }

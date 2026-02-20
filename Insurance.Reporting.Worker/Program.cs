@@ -1,4 +1,6 @@
 using Insurance.Application.Abstractions.Repositories;
+using Insurance.Infrastructure;
+using Insurance.Infrastructure.Messaging.Rabbit;
 using Insurance.Infrastructure.Reports;
 using Insurance.Reporting.Infrastructure.Persistence;
 using Insurance.Reporting.Infrastructure.Persistence.Repositories;
@@ -13,9 +15,11 @@ builder.Services.AddDbContext<ReportingDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("ReportingConnection")));
 
+builder.Services.AddSqlServerDbContext(builder.Configuration);
 
 
 builder.Services.AddHostedService<PolicyCreatedConsumerBackgroundService>();
+builder.Services.AddSingleton<RabbitMqPublisher>();
 
 builder.Services.AddScoped<IPolicyReportRepository, PolicyReportRepository>();
 builder.Services.AddScoped<IPolicyReportGrouping, CountryReportGrouping>();

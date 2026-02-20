@@ -1,9 +1,11 @@
 ﻿
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
@@ -28,6 +30,7 @@ namespace Insurance.Infrastructure.Messaging.Rabbit
             string queueName,
             string message,
             string eventType,
+            string? correlationId = null,
             CancellationToken cancellationToken = default)
         {
             var connection = await _connectionTask;
@@ -42,13 +45,15 @@ namespace Insurance.Infrastructure.Messaging.Rabbit
                 arguments: null,
                 cancellationToken: cancellationToken);
 
-            var body = Encoding.UTF8.GetBytes(message);
-
+            var body = Encoding.UTF8.GetBytes(message ?? string.Empty);
             var properties = new BasicProperties
             {
                 Persistent = true,
                 Type = eventType
             };
+
+            if (!string.IsNullOrEmpty(correlationId))
+                properties.CorrelationId = correlationId;
 
             try
             {

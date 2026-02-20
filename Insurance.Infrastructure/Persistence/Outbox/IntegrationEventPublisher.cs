@@ -21,6 +21,7 @@ namespace Insurance.Infrastructure.Persistence.Outbox
                 EventType = typeof(T).Name,
                 Payload = JsonSerializer.Serialize(integrationEvent),
                 OccurredOn = DateTime.UtcNow,
+                Enqueued = false,
                 Processed = false
             };
            
