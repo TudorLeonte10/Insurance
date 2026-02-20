@@ -54,11 +54,11 @@ namespace Insurance.Tests.Unit.Reporting
             var now = DateTime.UtcNow;
             var older = now.AddDays(-10);
             var items = new List<PolicyReportAggregate>
-            {
-                new() { PolicyId = Guid.NewGuid(), City = "A", Currency = "RON", FinalPremium = 100m, FinalPremiumInBase = 100m, CreatedAt = older, Status = "Active", BuildingType = "Residential" },
-                new() { PolicyId = Guid.NewGuid(), City = "B", Currency = "RON", FinalPremium = 200m, FinalPremiumInBase = 200m, CreatedAt = now, Status = "Cancelled", BuildingType = "Residential" },
-                new() { PolicyId = Guid.NewGuid(), City = "C", Currency = "RON", FinalPremium = 300m, FinalPremiumInBase = 300m, CreatedAt = now, Status = "Active", BuildingType = "Commercial" },
-            }.AsQueryable();
+    {
+        new() { PolicyId = Guid.NewGuid(), City = "A", Currency = "RON", FinalPremium = 100m, FinalPremiumInBase = 100m, CreatedAt = older, StartDate = older, EndDate = older, Status = "Active", BuildingType = "Residential" },
+        new() { PolicyId = Guid.NewGuid(), City = "B", Currency = "RON", FinalPremium = 200m, FinalPremiumInBase = 200m, CreatedAt = now, StartDate = now, EndDate = now, Status = "Cancelled", BuildingType = "Residential" },
+        new() { PolicyId = Guid.NewGuid(), City = "C", Currency = "RON", FinalPremium = 300m, FinalPremiumInBase = 300m, CreatedAt = now, StartDate = now, EndDate = now, Status = "Active", BuildingType = "Commercial" },
+    }.AsQueryable();
 
             var from = now.AddDays(-5);
             var to = now.AddDays(1);
@@ -137,9 +137,9 @@ namespace Insurance.Tests.Unit.Reporting
             var now = DateTime.UtcNow;
             var items = new List<PolicyReportAggregate>
             {
-                new() { PolicyId = Guid.NewGuid(), City = "A", Currency = "RON", FinalPremium = 100m, FinalPremiumInBase = 100m, CreatedAt = now, Status = "Active", BuildingType = "Residential" },
-                new() { PolicyId = Guid.NewGuid(), City = "B", Currency = "EUR", FinalPremium = 200m, FinalPremiumInBase = 440m, CreatedAt = now, Status = "Active", BuildingType = "Industrial" },
-                new() { PolicyId = Guid.NewGuid(), City = "C", Currency = "RON", FinalPremium = 300m, FinalPremiumInBase = 300m, CreatedAt = now, Status = "Active", BuildingType = "Industrial" },
+                new() { PolicyId = Guid.NewGuid(), City = "A", Currency = "RON", FinalPremium = 100m, FinalPremiumInBase = 100m, CreatedAt = now, StartDate = now, EndDate = now, Status = "Active", BuildingType = "Residential" },
+                new() { PolicyId = Guid.NewGuid(), City = "B", Currency = "EUR", FinalPremium = 200m, FinalPremiumInBase = 440m, CreatedAt = now, StartDate = now, EndDate = now, Status = "Active", BuildingType = "Industrial" },
+                new() { PolicyId = Guid.NewGuid(), City = "C", Currency = "RON", FinalPremium = 300m, FinalPremiumInBase = 300m, CreatedAt = now, StartDate = now, EndDate = now, Status = "Active", BuildingType = "Industrial" },
             }.AsQueryable();
 
             var from = now.AddMinutes(-5);

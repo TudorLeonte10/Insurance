@@ -19,15 +19,13 @@ namespace Insurance.Reporting.Infrastructure.Extensions
                 .FilterByCurrency(request.Dto.Currency)
                 .FilterByBuildingType(request.Dto.BuildingType);
         }
-        
+
 
         public static IQueryable<PolicyReportAggregate> FilterByDateRange(this IQueryable<PolicyReportAggregate> query, DateTime from, DateTime to)
         {
-            query = query.Where(p =>
-            p.CreatedAt <= to &&
-            p.CreatedAt >= from);
-
-            return query;
+            return query.Where(p =>
+                p.StartDate <= to &&
+                p.EndDate >= from);
         }
 
         public static IQueryable<PolicyReportAggregate> FilterByStatus(this IQueryable<PolicyReportAggregate> query, PolicyStatus? status)

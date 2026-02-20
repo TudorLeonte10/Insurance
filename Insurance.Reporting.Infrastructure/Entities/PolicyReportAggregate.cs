@@ -21,6 +21,8 @@ namespace Insurance.Reporting.Infrastructure.Entities
 
         public decimal FinalPremium { get; set; }
         public decimal FinalPremiumInBase { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
 
         public DateTime CreatedAt { get; set; }
     }

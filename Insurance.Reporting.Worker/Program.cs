@@ -15,11 +15,10 @@ builder.Services.AddDbContext<ReportingDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("ReportingConnection")));
 
-builder.Services.AddSqlServerDbContext(builder.Configuration);
-
+builder.Services.AddSingleton<RabbitMqPublisher>();
 
 builder.Services.AddHostedService<PolicyCreatedConsumerBackgroundService>();
-builder.Services.AddSingleton<RabbitMqPublisher>();
+builder.Services.AddScoped<IPolicyIntegrationEventHandler, PolicyIntegrationEventHandler>();
 
 builder.Services.AddScoped<IPolicyReportRepository, PolicyReportRepository>();
 builder.Services.AddScoped<IPolicyReportGrouping, CountryReportGrouping>();

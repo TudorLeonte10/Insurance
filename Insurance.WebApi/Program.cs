@@ -35,6 +35,8 @@ if (!builder.Environment.IsEnvironment("Test"))
     builder.Services.AddReportingDbContext(builder.Configuration);
     builder.Services.AddSingleton<RabbitMqPublisher>();
     builder.Services.AddHostedService<OutboxPublisherBackgroundService>();
+    builder.Services.AddHostedService<OutboxAckListenerBackgroundService>();
+
 }
 
 builder.Services.AddEndpointsApiExplorer();

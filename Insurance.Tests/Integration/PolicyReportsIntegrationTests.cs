@@ -35,6 +35,8 @@ namespace Insurance.Tests.Integration
                         BuildingType = "Residential",
                         FinalPremium = 100m,
                         FinalPremiumInBase = 100m,
+                        StartDate = DateTime.UtcNow.AddDays(-10),
+                        EndDate = DateTime.UtcNow.AddDays(10),
                         CreatedAt = DateTime.UtcNow
                     },
                     new PolicyReportAggregate
@@ -49,6 +51,8 @@ namespace Insurance.Tests.Integration
                         BuildingType = "Residential",
                         FinalPremium = 200m,
                         FinalPremiumInBase = 200m,
+                        StartDate = DateTime.UtcNow.AddDays(-5),
+                        EndDate = DateTime.UtcNow.AddDays(5),
                         CreatedAt = DateTime.UtcNow
                     },
                     new PolicyReportAggregate
@@ -63,6 +67,8 @@ namespace Insurance.Tests.Integration
                         BuildingType = "Commercial",
                         FinalPremium = 150m,
                         FinalPremiumInBase = 330m,
+                        StartDate = DateTime.UtcNow.AddDays(-5),
+                        EndDate = DateTime.UtcNow.AddDays(5),
                         CreatedAt = DateTime.UtcNow
                     }
                 );
@@ -117,6 +123,8 @@ namespace Insurance.Tests.Integration
                         BuildingType = "Residential",
                         FinalPremium = 100m,
                         FinalPremiumInBase = 100m,
+                        StartDate = now.AddDays(-5),
+                        EndDate = now.AddDays(5),
                         CreatedAt = now.AddDays(-2)
                     },
                     new PolicyReportAggregate
@@ -131,6 +139,8 @@ namespace Insurance.Tests.Integration
                         BuildingType = "Residential",
                         FinalPremium = 200m,
                         FinalPremiumInBase = 440m,
+                        StartDate = now.AddDays(-5),
+                        EndDate = now.AddDays(5),
                         CreatedAt = now.AddDays(-1)
                     },
                     new PolicyReportAggregate
@@ -145,6 +155,8 @@ namespace Insurance.Tests.Integration
                         BuildingType = "Commercial",
                         FinalPremium = 300m,
                         FinalPremiumInBase = 300m,
+                        StartDate = now.AddDays(-5),
+                        EndDate = now.AddDays(5),
                         CreatedAt = now
                     }
                 );

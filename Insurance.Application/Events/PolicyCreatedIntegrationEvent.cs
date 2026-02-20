@@ -15,5 +15,7 @@ namespace Insurance.Application.Events
         string BuildingType,
         decimal FinalPremium,
         decimal FinalPremiumInBase,
+        DateTime StartDate,
+        DateTime EndDate,
         DateTime CreatedAt);
 }

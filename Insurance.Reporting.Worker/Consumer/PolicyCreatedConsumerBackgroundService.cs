@@ -6,6 +6,7 @@ using Insurance.Reporting.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQ.Client.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -19,11 +20,13 @@ namespace Insurance.Reporting.Worker.Consumer
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IConfiguration _configuration;
+        private readonly RabbitMqPublisher _publisher;
         private IConnection? _connection;
         private IChannel? _channel;
 
         public PolicyCreatedConsumerBackgroundService(IServiceScopeFactory scopeFactory, IConfiguration configuration, RabbitMqPublisher publisher)
         {
+            _publisher = publisher;
             _scopeFactory = scopeFactory;
             _configuration = configuration;
         }
@@ -55,84 +58,36 @@ namespace Insurance.Reporting.Worker.Consumer
 
             consumer.ReceivedAsync += async (model, ea) =>
             {
-                var correlationId = ea.BasicProperties.CorrelationId;
-
-
-                    var body = ea.Body.ToArray();
-                    var message = Encoding.UTF8.GetString(body);
+                try
+                {
+                    var correlationId = ea.BasicProperties.CorrelationId;
+                    var body = Encoding.UTF8.GetString(ea.Body.ToArray());
                     var eventType = ea.BasicProperties.Type;
 
                     using var scope = _scopeFactory.CreateScope();
-                    var db = scope.ServiceProvider.GetRequiredService<ReportingDbContext>();
+                    var handler = scope.ServiceProvider.GetRequiredService<IPolicyIntegrationEventHandler>();
 
-                    var processedSuccessfully = false;
-                    
-                Console.WriteLine("Event Type: " + eventType);
+                    var processed = await handler.Handle(eventType, body, stoppingToken);
 
-                switch (eventType)
+                    if(processed && !string.IsNullOrEmpty(correlationId))
                     {
-                        case nameof(PolicyCreatedIntegrationEvent):
-                            var createdEvent = JsonSerializer.Deserialize<PolicyCreatedIntegrationEvent>(message);
-
-                            var aggregate = new PolicyReportAggregate
-                            {
-                                PolicyId = createdEvent!.PolicyId,
-                                Country = createdEvent.Country,
-                                County = createdEvent.County,
-                                City = createdEvent.City,
-                                BrokerCode = createdEvent.BrokerCode,
-                                Currency = createdEvent.Currency,
-                                Status = createdEvent.Status,
-                                BuildingType = createdEvent.BuildingType,
-                                FinalPremium = createdEvent.FinalPremium,
-                                FinalPremiumInBase = createdEvent.FinalPremiumInBase,
-                                CreatedAt = DateTime.UtcNow
-                            };
-
-                            if (!await db.PolicyReportAggregates
-                                .AnyAsync(x => x.PolicyId == createdEvent!.PolicyId, stoppingToken))
-                            {
-                                db.PolicyReportAggregates.Add(aggregate);
-                                await db.SaveChangesAsync(stoppingToken);
-                            }
-
-                            processedSuccessfully = true;
-                        break;
-
-                        case nameof(PolicyStatusChangedIntegrationEvent):
-                            var statusChangedEvent = JsonSerializer.Deserialize<PolicyStatusChangedIntegrationEvent>(message);
-
-                            var aggregateToUpdate = await db.PolicyReportAggregates
-                                    .FirstOrDefaultAsync(x => x.PolicyId == statusChangedEvent!.PolicyId, stoppingToken);
-
-                            if (aggregateToUpdate != null)
-                            {
-                                aggregateToUpdate.Status = statusChangedEvent!.NewStatus;
-                                await db.SaveChangesAsync(stoppingToken);
-                            }
-
-                            processedSuccessfully = true;
-                        break;
+                        var ackQueue = _configuration["Rabbit:OutboxAckQueue"] ?? "ack_queue";
+                        await _publisher.PublishAsync(ackQueue, string.Empty, "OutboxAck", correlationId, stoppingToken);
                     }
 
-                if (processedSuccessfully && !string.IsNullOrEmpty(correlationId) && Guid.TryParse(correlationId, out var outboxId))
-                {
-                    var primaryDb = scope.ServiceProvider.GetService<InsuranceDbContext>();
-                    if (primaryDb != null)
-                    {
-                        var outbox = await primaryDb.OutboxEvents.FirstOrDefaultAsync(o => o.Id == outboxId, stoppingToken);
-                        if (outbox != null && outbox.Enqueued && !outbox.Processed)
-                        {
-                            outbox.Processed = true;
-                            await primaryDb.SaveChangesAsync(stoppingToken);
-                        }
-                    }
+                    await _channel!.BasicAckAsync(ea.DeliveryTag, false, stoppingToken);
                 }
-
-                await _channel!.BasicAckAsync(ea.DeliveryTag, false, stoppingToken);
+                catch (RabbitMQClientException)
+                {
+                    await _channel!.BasicNackAsync(ea.DeliveryTag, false, true, stoppingToken);
+                }
             };
 
-            await _channel!.BasicConsumeAsync(queue: _configuration["Rabbit:Queue"]!, autoAck: false, consumer: consumer, cancellationToken: stoppingToken);
+            await _channel!.BasicConsumeAsync(
+                queue: _configuration["Rabbit:Queue"]!,
+                autoAck: false,
+                consumer: consumer,
+                cancellationToken: stoppingToken);
             await Task.Delay(Timeout.Infinite, stoppingToken);
         }
 

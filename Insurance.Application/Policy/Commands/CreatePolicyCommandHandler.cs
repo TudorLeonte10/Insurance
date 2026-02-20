@@ -63,6 +63,8 @@ namespace Insurance.Application.Policy.Commands
                 policy.BuildingType,
                 policy.FinalPremium,
                 policy.FinalPremiumInBase,
+                policy.Policy.StartDate,
+                policy.Policy.EndDate,
                 policy.Policy.CreatedAt
    );
 
