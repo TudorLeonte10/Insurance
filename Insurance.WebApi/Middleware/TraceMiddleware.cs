@@ -28,14 +28,14 @@ namespace Insurance.WebApi.Middleware
             else
             {
                 var correlationId = Activity.Current?.TraceId.ToString() ?? Guid.NewGuid().ToString();
-                context.Items["CorrelationId"] = correlationId;
+                context.Items["xCorrelationId"] = correlationId;
             }
 
             context.Response.OnStarting(() =>
             {
-                if (!context.Response.Headers.ContainsKey("CorrelationId"))
+                if (!context.Response.Headers.ContainsKey("xCorrelationId"))
                 {
-                    context.Response.Headers.Add("CorrelationId", context.Items["CorrelationId"].ToString());
+                    context.Response.Headers.Add("xCorrelationId", context.Items["xCorrelationId"].ToString());
                 }
                 return Task.CompletedTask;
             });
@@ -51,7 +51,7 @@ namespace Insurance.WebApi.Middleware
 
             using (_logger.BeginScope(new Dictionary<string, object>
             {
-                ["CorrelationId"] = context.Items["CorrelationId"].ToString(),
+                ["xCorrelationId"] = context.Items["xCorrelationId"].ToString(),
                 ["UserId"] = userId,
                 ["BrokerId"] = brokerId != Guid.Empty ? brokerId.ToString() : "N/A"
             }))

@@ -8,7 +8,6 @@ namespace Insurance.Application.Abstractions.Repositories
     public interface IPolicyReadRepository
     {
         Task<PolicyDetailsDto?> GetByIdAsync(Guid policyId, CancellationToken ct);
-
     }
 
 }

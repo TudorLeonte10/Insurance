@@ -49,8 +49,7 @@ namespace Insurance.Tests.Unit.Policies.Queries
                     It.IsAny<DateTime?>(),
                     It.IsAny<DateTime?>(),
                     It.IsAny<int>(),
-                    It.IsAny<int>(),
-                    It.IsAny<CancellationToken>()))
+                    It.IsAny<int>()))
                 .ReturnsAsync(expectedResult);
 
             var query = new SearchPoliciesQuery
@@ -91,8 +90,7 @@ namespace Insurance.Tests.Unit.Policies.Queries
                     query.StartDateFrom,
                     query.StartDateTo,
                     query.PageNumber,
-                    query.PageSize,
-                    It.IsAny<CancellationToken>()))
+                    query.PageSize))
                 .ReturnsAsync(new PagedResult<PolicyDetailsDto>(
                     Array.Empty<PolicyDetailsDto>(),
                     query.PageNumber,
@@ -108,9 +106,7 @@ namespace Insurance.Tests.Unit.Policies.Queries
                 query.StartDateFrom,
                 query.StartDateTo,
                 query.PageNumber,
-                query.PageSize,
-                It.IsAny<CancellationToken>()),
-                Times.Once);
+                query.PageSize));
         }
     }
 

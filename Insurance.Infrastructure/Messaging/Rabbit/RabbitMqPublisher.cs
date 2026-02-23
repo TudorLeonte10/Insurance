@@ -12,20 +12,27 @@ using System.Text;
 namespace Insurance.Infrastructure.Messaging.Rabbit
 {
     [ExcludeFromCodeCoverage]
-    public class RabbitMqPublisher
+    public class RabbitMqPublisher : IAsyncDisposable
     {
-        private readonly Task<IConnection> _connectionTask;
+        private readonly IConnection _connection;
+        private readonly IChannel _channel;
 
-        public RabbitMqPublisher(IConfiguration configuration)
+        public RabbitMqPublisher(IConnection connection, IChannel channel)
+        {
+            _connection = connection;
+            _channel = channel;
+        }
+
+        public static async Task<RabbitMqPublisher> CreateAsync(IConfiguration configuration, CancellationToken cancellationToken)
         {
             var factory = new ConnectionFactory
             {
                 HostName = configuration["Rabbit:Host"] ?? "localhost"
             };
-
-            _connectionTask = factory.CreateConnectionAsync();
+            var connection = await factory.CreateConnectionAsync(cancellationToken);
+            var channel = await connection.CreateChannelAsync(null, cancellationToken);
+            return new RabbitMqPublisher(connection, channel);
         }
-
         public async Task PublishAsync(
             string queueName,
             string message,
@@ -33,42 +40,44 @@ namespace Insurance.Infrastructure.Messaging.Rabbit
             string? correlationId = null,
             CancellationToken cancellationToken = default)
         {
-            var connection = await _connectionTask;
 
-            await using var channel = await connection.CreateChannelAsync(null, cancellationToken);
-
-            await channel.QueueDeclareAsync(
-                queue: queueName,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null,
-                cancellationToken: cancellationToken);
-
-            var body = Encoding.UTF8.GetBytes(message ?? string.Empty);
-            var properties = new BasicProperties
-            {
-                Persistent = true,
-                Type = eventType
-            };
-
-            if (!string.IsNullOrEmpty(correlationId))
-                properties.CorrelationId = correlationId;
-
-            try
-            {
-                await channel.BasicPublishAsync(
-                    exchange: "",
-                    routingKey: queueName,
-                    mandatory: false,
-                    basicProperties: properties,
-                    body: body,
+                await _channel.QueueDeclareAsync(
+                    queue: queueName,
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null,
                     cancellationToken: cancellationToken);
-            }
-            catch (PublishException ex)
-            {
-                throw new PublishRQException($"Failed to publish message to queue '{queueName}'", ex);
-            }
+
+                var body = Encoding.UTF8.GetBytes(message ?? string.Empty);
+                var properties = new BasicProperties
+                {
+                    Persistent = true,
+                    Type = eventType
+                };
+
+                if (!string.IsNullOrEmpty(correlationId))
+                    properties.CorrelationId = correlationId;
+
+                try
+                {
+                    await _channel.BasicPublishAsync(
+                        exchange: "",
+                        routingKey: queueName,
+                        mandatory: false,
+                        basicProperties: properties,
+                        body: body,
+                        cancellationToken: cancellationToken);
+                }
+                catch (PublishException ex)
+                {
+                    throw new PublishRQException($"Failed to publish message to queue '{queueName}'", ex);
+                }      
+        }
+        public async ValueTask DisposeAsync()
+        {
+            await _channel.DisposeAsync();
+            await _connection.DisposeAsync();
         }
     }
 }

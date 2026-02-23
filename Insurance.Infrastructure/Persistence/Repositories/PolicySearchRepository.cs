@@ -31,8 +31,7 @@ namespace Insurance.Infrastructure.Persistence.Repositories
             DateTime? startDateFrom,
             DateTime? startDateTo,
             int pageNumber,
-            int pageSize,
-            CancellationToken ct)
+            int pageSize)
         {
             var query = _db.Policies.AsNoTracking();
 
@@ -51,14 +50,14 @@ namespace Insurance.Infrastructure.Persistence.Repositories
             if (startDateTo.HasValue)
                 query = query.Where(p => p.StartDate <= startDateTo);
 
-            var totalCount = await query.CountAsync(ct);
+            var totalCount = await query.CountAsync();
 
             var items = await query
                 .OrderByDescending(p => p.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ProjectTo<PolicyDetailsDto>(_mapper.ConfigurationProvider)
-                .ToListAsync(ct);
+                .ToListAsync();
 
             return new PagedResult<PolicyDetailsDto>(
                 items,

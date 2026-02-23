@@ -23,8 +23,7 @@ namespace Insurance.Application.Policy.Queries
         }
 
         public async Task<PagedResult<PolicyDetailsDto>> Handle(
-            SearchPoliciesQuery request,
-            CancellationToken ct)
+            SearchPoliciesQuery request, CancellationToken cancellationToken)
         {
             var brokerId = _currentUserContext.BrokerId;
 
@@ -35,8 +34,7 @@ namespace Insurance.Application.Policy.Queries
                 request.StartDateFrom,
                 request.StartDateTo,
                 request.PageNumber,
-                request.PageSize,
-                ct);
+                request.PageSize);
         }
     }
 

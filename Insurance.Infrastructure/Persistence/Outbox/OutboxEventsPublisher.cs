@@ -13,12 +13,12 @@ using System.Diagnostics.CodeAnalysis;
 namespace Insurance.Infrastructure.Persistence.Outbox
 {
     [ExcludeFromCodeCoverage]
-    public class OutboxPublisherBackgroundService : BackgroundService
+    public class OutboxEventsPublisher : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IConfiguration _configuration;
 
-        public OutboxPublisherBackgroundService(
+        public OutboxEventsPublisher(
             IServiceScopeFactory scopeFactory,
             IConfiguration configuration)
         {
@@ -59,6 +59,10 @@ namespace Insurance.Infrastructure.Persistence.Outbox
                     catch (PublishRQException ex)
                     {
                         logger.LogError(ex, "Failed to publish outbox event {EventId} of type {EventType}", ev.Id, ev.EventType);
+                    }
+                    catch(BrokerUnreachableException ex)
+                    {
+                        logger.LogError(ex, "RabbitMQ broker is unreachable while publishing outbox event {EventId} of type {EventType}", ev.Id, ev.EventType);
                     }
 
                     await Task.Delay(5000, cancellationToken);

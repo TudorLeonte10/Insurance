@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQ.Client.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -11,7 +12,6 @@ using System.Text;
 
 namespace Insurance.Infrastructure.Persistence.Outbox
 {
-    [ExcludeFromCodeCoverage]
     public class OutboxAckListenerBackgroundService : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
@@ -32,18 +32,29 @@ namespace Insurance.Infrastructure.Persistence.Outbox
                 HostName = _configuration["Rabbit:Host"] ?? "localhost"
             };
 
-            _connection = await factory.CreateConnectionAsync(cancellationToken);
-            _channel = await _connection.CreateChannelAsync(null, cancellationToken);
+                try {
 
-            var ackQueue = _configuration["Rabbit:OutboxAckQueue"] ?? "outbox-acks";
+                    _connection = await factory.CreateConnectionAsync(cancellationToken);
+                    _channel = await _connection.CreateChannelAsync(null, cancellationToken);
 
-            await _channel.QueueDeclareAsync(
-                queue: ackQueue,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null,
-                cancellationToken: cancellationToken);
+                    var ackQueue = _configuration["Rabbit:OutboxAckQueue"] ?? "outbox-acks";
+
+                    await _channel.QueueDeclareAsync(
+                        queue: ackQueue,
+                        durable: true,
+                        exclusive: false,
+                        autoDelete: false,
+                        arguments: new Dictionary<string, object?>
+                        {
+                            {"x-delivery-limit", 5 }
+                        },
+                        cancellationToken: cancellationToken);
+
+                }
+                catch(BrokerUnreachableException ex)
+                {
+                    Console.WriteLine("RabbitMQ not available: " + ex.ToString());
+                }
 
             await base.StartAsync(cancellationToken);
         }
@@ -68,11 +79,12 @@ namespace Insurance.Infrastructure.Persistence.Outbox
                         await db.SaveChangesAsync(stoppingToken);
                     }
                 }
-
-                await _channel!.BasicAckAsync(ea.DeliveryTag, false, stoppingToken);
+                if(_channel is not null)
+                    await _channel.BasicAckAsync(ea.DeliveryTag, false, stoppingToken);
             };
 
-            await _channel!.BasicConsumeAsync(queue: ackQueue, autoAck: false, consumer: consumer, cancellationToken: stoppingToken);
+            if(_channel is not null)
+                await _channel.BasicConsumeAsync(queue: ackQueue, autoAck: false, consumer: consumer, cancellationToken: stoppingToken);
             await Task.Delay(Timeout.Infinite, stoppingToken);
         }
 

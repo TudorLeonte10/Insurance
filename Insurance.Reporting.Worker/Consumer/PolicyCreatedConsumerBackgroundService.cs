@@ -10,12 +10,12 @@ using RabbitMQ.Client.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 
 namespace Insurance.Reporting.Worker.Consumer
 {
-    [ExcludeFromCodeCoverage]
     public class PolicyCreatedConsumerBackgroundService : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
@@ -38,16 +38,27 @@ namespace Insurance.Reporting.Worker.Consumer
                 HostName = _configuration["Rabbit:Host"] ?? "localhost"
             };
 
-            _connection = await factory.CreateConnectionAsync(cancellationToken);
-            _channel = await _connection.CreateChannelAsync(null, cancellationToken);
+            try
+            {
+                _connection = await factory.CreateConnectionAsync(cancellationToken);
+                _channel = await _connection.CreateChannelAsync(null, cancellationToken);
 
-            await _channel.QueueDeclareAsync(
-                queue: _configuration["Rabbit:Queue"]!,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null,
-                cancellationToken: cancellationToken);
+                await _channel.QueueDeclareAsync(
+                    queue: _configuration["Rabbit:Queue"]!,
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: new Dictionary<string, object?>
+                    {
+                        {"x-delivery-limit", 5 }
+                    },
+                    cancellationToken: cancellationToken);
+
+            }
+            catch (BrokerUnreachableException ex)
+            {
+                Console.WriteLine("Exception at RabbitMQ: " + ex.ToString());
+            }
 
             await base.StartAsync(cancellationToken);
         }
