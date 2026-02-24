@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Repositories;
+using Insurance.Application.Authentication;
 using Insurance.Application.Buildings.Commands;
 using Insurance.Application.Buildings.DTOs;
 using Insurance.Application.Exceptions;
@@ -9,6 +10,7 @@ using Insurance.Domain.Buildings;
 using Insurance.Domain.Clients;
 using Insurance.Domain.Exceptions;
 using Insurance.Domain.RiskIndicators;
+using Insurance.Infrastructure.Persistence.Repositories;
 using Moq;
 using System;
 using System.Threading;
@@ -23,6 +25,7 @@ namespace Insurance.Tests.Unit.Buildings.Commands
         private readonly Mock<IClientRepository> _clientRepositoryMock = new();
         private readonly Mock<IGeographyReadRepository> _geographyRepositoryMock = new();
         private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
+        private readonly Mock<ICurrentUserContext> _currentUserContextMock = new();
 
         private readonly CreateBuildingCommandHandler _handler;
 
@@ -32,9 +35,9 @@ namespace Insurance.Tests.Unit.Buildings.Commands
                 _buildingRepositoryMock.Object,
                 _clientRepositoryMock.Object,
                 _geographyRepositoryMock.Object,
-                _unitOfWorkMock.Object);
+                _unitOfWorkMock.Object,
+                _currentUserContextMock.Object);
         }
-
 
         private static CreateBuildingCommand CreateValidCommand(Guid clientId, Guid cityId)
         {
@@ -52,8 +55,8 @@ namespace Insurance.Tests.Unit.Buildings.Commands
                     InsuredValue = 100000,
                     RiskIndicators = new[]
                     {
-                RiskIndicatorType.FireRisk,
-                RiskIndicatorType.FloodRisk
+                        RiskIndicatorType.FireRisk,
+                        RiskIndicatorType.FloodRisk
                     }
                 });
         }
@@ -62,6 +65,12 @@ namespace Insurance.Tests.Unit.Buildings.Commands
         public async Task Given_NonExistingClient_Should_ThrowNotFoundException()
         {
             var clientId = Guid.NewGuid();
+            var brokerId = Guid.NewGuid();
+
+            // ensure current user has a broker id so handler proceeds to client check
+            _currentUserContextMock
+                .SetupGet(x => x.BrokerId)
+                .Returns(brokerId);
 
             _clientRepositoryMock
                 .Setup(x => x.GetByIdAsync(clientId, It.IsAny<CancellationToken>()))
@@ -79,9 +88,15 @@ namespace Insurance.Tests.Unit.Buildings.Commands
         {
             var clientId = Guid.NewGuid();
             var cityId = Guid.NewGuid();
+            var brokerId = Guid.NewGuid();
+
+            _currentUserContextMock
+                .SetupGet(x => x.BrokerId)
+                .Returns(brokerId);
 
             var client = Client.Create(
                 ClientType.Individual,
+                brokerId,
                 "John Doe",
                 "123456789",
                 "john@test.com",
@@ -109,9 +124,15 @@ namespace Insurance.Tests.Unit.Buildings.Commands
         {
             var clientId = Guid.NewGuid();
             var cityId = Guid.NewGuid();
+            var brokerId = Guid.NewGuid();
+
+            _currentUserContextMock
+                .SetupGet(x => x.BrokerId)
+                .Returns(brokerId);
 
             var client = Client.Create(
                 ClientType.Individual,
+                brokerId,
                 "John Doe",
                 "123456789",
                 "john@test.com",
@@ -123,8 +144,8 @@ namespace Insurance.Tests.Unit.Buildings.Commands
                 .ReturnsAsync(client);
 
             _geographyRepositoryMock
-            .Setup(x => x.GetCityByIdAsync(cityId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new CityDto(cityId, "test city"));
+                .Setup(x => x.GetCityByIdAsync(cityId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new CityDto(cityId, "test city"));
 
             _buildingRepositoryMock
                 .Setup(x => x.AddAsync(
@@ -156,9 +177,15 @@ namespace Insurance.Tests.Unit.Buildings.Commands
         {
             var clientId = Guid.NewGuid();
             var cityId = Guid.NewGuid();
+            var brokerId = Guid.NewGuid();
+
+            _currentUserContextMock
+                .SetupGet(x => x.BrokerId)
+                .Returns(brokerId);
 
             var client = Client.Create(
                 ClientType.Individual,
+                brokerId,
                 "John Doe",
                 "123456789",
                 "john@test.com",
@@ -170,8 +197,8 @@ namespace Insurance.Tests.Unit.Buildings.Commands
                 .ReturnsAsync(client);
 
             _geographyRepositoryMock
-            .Setup(x => x.GetCityByIdAsync(cityId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new CityDto(cityId, "test city"));
+                .Setup(x => x.GetCityByIdAsync(cityId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new CityDto(cityId, "test city"));
 
             IReadOnlyCollection<RiskIndicatorType>? passedIndicators = null;
 
@@ -198,9 +225,9 @@ namespace Insurance.Tests.Unit.Buildings.Commands
                     InsuredValue = 100000,
                     RiskIndicators = new[]
                     {
-                RiskIndicatorType.FireRisk,
-                RiskIndicatorType.FireRisk,
-                RiskIndicatorType.FloodRisk
+                        RiskIndicatorType.FireRisk,
+                        RiskIndicatorType.FireRisk,
+                        RiskIndicatorType.FloodRisk
                     }
                 });
 

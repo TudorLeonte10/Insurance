@@ -20,9 +20,13 @@ namespace Insurance.Application.Policy.RiskStrategies
             PolicyCalculationContext context,
             IEnumerable<RiskFactorConfiguration> riskFactors)
         {
-            foreach (var risk in riskFactors)
+            var sortedRiskFactors = riskFactors.OrderBy(r => r.Level).ThenBy(r => r.Id);
+
+            foreach (var risk in sortedRiskFactors)
             {
-                foreach (var strategy in _strategies.Where(s => s.CanHandle(risk.Level)))
+                var strategy = _strategies.FirstOrDefault(s => s.CanHandle(risk.Level));
+
+                if (strategy != null)
                 {
                     premium = strategy.Apply(premium, context, risk);
                 }

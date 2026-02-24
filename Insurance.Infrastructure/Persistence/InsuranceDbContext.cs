@@ -2,6 +2,7 @@
 using Insurance.Domain.Clients;
 using Insurance.Domain.RiskIndicators;
 using Insurance.Infrastructure.Persistence.Entities;
+using Insurance.Infrastructure.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,7 @@ namespace Insurance.Infrastructure.Persistence
         public DbSet<FeeConfigurationEntity> FeeConfigurations => Set<FeeConfigurationEntity>();
         public DbSet<RiskFactorConfigurationEntity> RiskFactorConfigurations => Set<RiskFactorConfigurationEntity>();
         public DbSet<UserEntity> Users => Set<UserEntity>();
+        public DbSet<OutboxEvent> OutboxEvents => Set<OutboxEvent>();
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(InsuranceDbContext).Assembly);

@@ -9,6 +9,7 @@ namespace Insurance.Application.Abstractions.Repositories
     public interface IClientSearchRepository
     {
         Task<PagedResult<ClientDetailsDto>> SearchAsync(
+            Guid brokerId,
             string? name,
             string? identifier,
             int pageNumber,

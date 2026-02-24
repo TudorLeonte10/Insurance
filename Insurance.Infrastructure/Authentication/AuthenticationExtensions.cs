@@ -1,5 +1,6 @@
 ﻿using Insurance.Application.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -41,6 +42,35 @@ namespace Insurance.Infrastructure.Authentication
                         ValidAudience = jwtSection["Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(
                             Encoding.UTF8.GetBytes(jwtKey))
+                    };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnChallenge = async context =>
+                        {
+                            context.HandleResponse();
+
+                            context.Response.StatusCode = 401;
+                            context.Response.ContentType = "application/json";
+
+                            await context.Response.WriteAsJsonAsync(new
+                            {
+                                error = "Authentication is required",
+                                status = 401
+                            });
+                        },
+
+                        OnForbidden = async context =>
+                        {
+                            context.Response.StatusCode = 403;
+                            context.Response.ContentType = "application/json";
+
+                            await context.Response.WriteAsJsonAsync(new
+                            {
+                                error = "You do not have permission to access this resource",
+                                status = 403
+                            });
+                        }
                     };
                 });
 

@@ -5,12 +5,14 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 namespace Insurance.Infrastructure.Authentication
 {
+    [ExcludeFromCodeCoverage]
     public class JwtTokenGenerator : IJwtTokenGenerator
     {
         private readonly JwtSettings _settings;

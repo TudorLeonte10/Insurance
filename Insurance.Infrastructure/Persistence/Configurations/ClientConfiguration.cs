@@ -18,6 +18,11 @@ public class ClientEntityConfiguration : IEntityTypeConfiguration<ClientEntity>
             .IsRequired()
             .HasMaxLength(200);
 
+        builder.HasOne(c => c.Broker)
+            .WithMany()
+            .HasForeignKey(c => c.BrokerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.Property(c => c.IdentificationNumber)
             .IsRequired()
             .HasMaxLength(20);
@@ -26,6 +31,7 @@ public class ClientEntityConfiguration : IEntityTypeConfiguration<ClientEntity>
             .IsUnique();
 
         builder.Property(c => c.Type)
+            .HasConversion<string>()
             .IsRequired();
 
         builder.HasMany(c => c.Policies)

@@ -1,5 +1,7 @@
 ﻿using Insurance.Application.Abstractions;
+using Insurance.Application.Abstractions.Messaging;
 using Insurance.Application.Abstractions.Repositories;
+using Insurance.Application.Authentication;
 using Insurance.Application.Brokers;
 using Insurance.Application.Buildings;
 using Insurance.Application.Buildings.DTOs;
@@ -19,151 +21,123 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Insurance.Tests.Unit.Policy.Commands
+namespace Insurance.Tests.Unit.Polic.Commands
 {
     public class CreatePolicyCommandHandlerTests
     {
-        private readonly Mock<IClientRepository> _clientRepo = new();
-        private readonly Mock<IBrokerRepository> _brokerRepo = new();
-        private readonly Mock<ICurrencyRepository> _currencyRepo = new();
-        private readonly Mock<IBuildingReadRepository> _buildingReadRepo = new();
-        private readonly Mock<IFeeConfigurationReadRepository> _feeRepo = new();
-        private readonly Mock<IRiskFactorReadRepository> _riskRepo = new();
-        private readonly Mock<IPolicyPremiumCalculator> _calculator = new();
+        private readonly Mock<IPolicyCreationService> _creationService = new();
         private readonly Mock<IPolicyRepository> _policyRepo = new();
         private readonly Mock<IUnitOfWork> _unitOfWork = new();
-        private readonly Mock<TimeProvider> _timeProvider = new();
+        private readonly Mock<ICurrentUserContext> _currentUserContext = new();
+        private readonly Mock<IIntegrationEventPublisher> _eventPublisher = new();
 
         private readonly CreatePolicyCommandHandler _handler;
 
         public CreatePolicyCommandHandlerTests()
         {
-            _timeProvider.Setup(x => x.GetUtcNow()).Returns(DateTime.UtcNow);
-
             _handler = new CreatePolicyCommandHandler(
-                _clientRepo.Object,
-                _buildingReadRepo.Object,
-                _brokerRepo.Object,
-                _currencyRepo.Object,
-                _feeRepo.Object,
-                _riskRepo.Object,
-                _calculator.Object,
+                _creationService.Object,
                 _policyRepo.Object,
                 _unitOfWork.Object,
-                _timeProvider.Object
-            );
+                _currentUserContext.Object,
+                _eventPublisher.Object);
         }
 
         [Fact]
-        public async Task Handle_Should_Throw_NotFound_When_Client_Does_Not_Exist()
+        public async Task Handle_Should_Call_Service_And_Persist_Policy()
         {
-            var command = CreateValidCommand();
+            var brokerId = Guid.NewGuid();
+            _currentUserContext.SetupGet(x => x.BrokerId).Returns(brokerId);
 
-            _clientRepo
-                .Setup(x => x.GetByIdAsync(
-                    command.PolicyDto.ClientId,
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Insurance.Domain.Clients.Client?)null);
-
-            await Assert.ThrowsAsync<NotFoundException>(() =>
-                _handler.Handle(command, CancellationToken.None));
-        }
-
-        [Fact]
-        public async Task Handle_Should_Throw_NotFound_When_Broker_Does_Not_Exist()
-        {
-            var command = CreateValidCommand();
-
-            _clientRepo
-                .Setup(x => x.GetByIdAsync(
-                    command.PolicyDto.ClientId,
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Insurance.Domain.Clients.Client?)null);
-
-            _brokerRepo
-                .Setup(x => x.GetByIdAsync(
-                    command.PolicyDto.BrokerId,
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Insurance.Domain.Brokers.Broker?)null);
-
-            await Assert.ThrowsAsync<NotFoundException>(() =>
-                _handler.Handle(command, CancellationToken.None));
-        }
-
-        [Fact]
-        public async Task Handle_Should_Throw_NotFound_When_Currency_Does_Not_Exist()
-        {
-            var command = CreateValidCommand();
-
-            _clientRepo
-                .Setup(x => x.GetByIdAsync(
-                    command.PolicyDto.ClientId,
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Client)null!);
-
-            _brokerRepo
-                .Setup(x => x.GetByIdAsync(
-                    command.PolicyDto.BrokerId,
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Broker)null!);
-
-            _currencyRepo
-                .Setup(x => x.GetByIdAsync(
-                    command.PolicyDto.CurrencyId,
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Insurance.Domain.Metadata.Currency?)null);
-
-            await Assert.ThrowsAsync<NotFoundException>(() =>
-                _handler.Handle(command, CancellationToken.None));
-        }
-
-        [Fact]
-        public async Task Handle_Should_Throw_NotFound_When_Building_Not_Found()
-        {
-            var command = CreateValidCommand();
-
-            _clientRepo
-                .Setup(x => x.GetByIdAsync(
-                    command.PolicyDto.ClientId,
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Client)null!);
-
-            _brokerRepo
-                .Setup(x => x.GetByIdAsync(
-                    command.PolicyDto.BrokerId,
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Broker)null!);
-
-            _currencyRepo
-                .Setup(x => x.GetByIdAsync(
-                    command.PolicyDto.CurrencyId,
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Insurance.Domain.Metadata.Currency)null!);
-
-            _buildingReadRepo
-                .Setup(x => x.GetGeoContextAsync(
-                    command.PolicyDto.BuildingId,
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync((BuildingGeoContextDto?)null);
-
-            await Assert.ThrowsAsync<NotFoundException>(() =>
-                _handler.Handle(command, CancellationToken.None));
-        }
-
-        private static CreatePolicyCommand CreateValidCommand()
-        {
             var dto = new CreatePolicyDto
             {
                 ClientId = Guid.NewGuid(),
                 BuildingId = Guid.NewGuid(),
-                BrokerId = Guid.NewGuid(),
                 CurrencyId = Guid.NewGuid(),
-                BasePremium = 10000,
-                StartDate = DateTime.UtcNow.AddDays(1),
-                EndDate = DateTime.UtcNow.AddDays(365)
+                BasePremium = 1000m,
+                StartDate = DateTime.UtcNow.Date.AddDays(1),
+                EndDate = DateTime.UtcNow.Date.AddMonths(12)
             };
 
-            return new CreatePolicyCommand(dto);
+            var command = new CreatePolicyCommand(dto);
+
+          
+            var now = DateTime.UtcNow;
+            var policy = Domain.Policies.Policy.CreateDraft(
+                clientId: dto.ClientId,
+                buildingId: dto.BuildingId,
+                brokerId: brokerId,
+                currencyId: dto.CurrencyId,
+                basePremium: dto.BasePremium,
+                finalPremium: 1500m,
+                startDate: dto.StartDate,
+                endDate: dto.EndDate,
+                policyNumber: $"POL-{Guid.NewGuid():N}",
+                now: now);
+
+            var creationResult = new PolicyCreationResult
+            {
+                Policy = policy,
+                Country = "Romania",
+                County = "SomeCounty",
+                City = "SomeCity",
+                BrokerCode = "BRK001",
+                Currency = "RON",
+                Status = policy.Status.ToString(),
+                FinalPremium = policy.FinalPremium,
+                FinalPremiumInBase = policy.FinalPremium, // adjust if needed
+                CreatedAt = now
+            };
+
+            _creationService
+                .Setup(s => s.CreatePolicyAsync(dto, brokerId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(creationResult);
+
+
+            _policyRepo
+                .Setup(r => r.AddAsync(policy, It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            _unitOfWork
+                .Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(1);
+
+           
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            Assert.Equal(policy.Id, result);
+
+            _creationService.Verify(s => s.CreatePolicyAsync(dto, brokerId, It.IsAny<CancellationToken>()), Times.Once);
+            _policyRepo.Verify(r => r.AddAsync(policy, It.IsAny<CancellationToken>()), Times.Once);
+            _unitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Handle_Should_Propagate_Exception_From_Service()
+        {
+            var brokerId = Guid.NewGuid();
+            _currentUserContext.SetupGet(x => x.BrokerId).Returns(brokerId);
+
+            var dto = new CreatePolicyDto
+            {
+                ClientId = Guid.NewGuid(),
+                BuildingId = Guid.NewGuid(),
+                CurrencyId = Guid.NewGuid(),
+                BasePremium = 1000m,
+                StartDate = DateTime.UtcNow.Date.AddDays(1),
+                EndDate = DateTime.UtcNow.Date.AddMonths(12)
+            };
+
+            var command = new CreatePolicyCommand(dto);
+
+            _creationService
+                .Setup(s => s.CreatePolicyAsync(dto, brokerId, It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new NotFoundException("Client not found"));
+
+            await Assert.ThrowsAsync<NotFoundException>(() => _handler.Handle(command, CancellationToken.None));
+
+            _policyRepo.Verify(r => r.AddAsync(It.IsAny<Domain.Policies.Policy>(), It.IsAny<CancellationToken>()), Times.Never);
+            _unitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
     }
 }

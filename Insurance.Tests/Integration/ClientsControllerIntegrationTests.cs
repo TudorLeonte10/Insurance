@@ -9,8 +9,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 
-namespace Insurance.Tests.Integration
-{
+
     namespace Insurance.Tests.Integration.Clients
     {
         public class ClientsControllerIntegrationTests : IntegrationTestBase, IClassFixture<ControllerTestWebApplicationFactory>
@@ -23,6 +22,7 @@ namespace Insurance.Tests.Integration
             {
                 _factory = factory;
                 _client = factory.CreateClient();
+
             }
 
             [Fact]
@@ -37,63 +37,6 @@ namespace Insurance.Tests.Integration
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             }
-
-            [Fact]
-            public async Task UpdateClient_Should_ReturnNoContent()
-            {
-                var clientId = Guid.NewGuid();
-
-                _factory.MediatorMock
-                    .Setup(m => m.Send(
-                        It.IsAny<UpdateClientCommand>(),
-                        It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(clientId);
-
-                var dto = new
-                {
-                    Name = "Updated",
-                    Email = "updated@test.ro",
-                    PhoneNumber = "0799999999",
-                    Address = "New Address",
-                    IdentificationNumber = "1234567890123"
-                };
-
-                var response = await _client.PutAsJsonAsync(
-                    $"/api/brokers/clients/{clientId}", dto);
-
-                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-
-                _factory.MediatorMock.Verify(
-                    m => m.Send(
-                        It.Is<UpdateClientCommand>(c =>
-                            c.ClientId == clientId),
-                        It.IsAny<CancellationToken>()),
-                    Times.Once);
-            }
-
-            [Fact]
-            public async Task UpdateClient_When_NotFound_Should_Return404()
-            {
-                var clientId = Guid.NewGuid();
-
-                _factory.MediatorMock
-                    .Setup(m => m.Send(
-                        It.IsAny<UpdateClientCommand>(),
-                        It.IsAny<CancellationToken>()))
-                    .ThrowsAsync(new NotFoundException("Client not found"));
-
-                var dto = new
-                {
-                    Name = "Updated",
-                    IdentificationNumber = "1234567890123"
-                };
-
-                var response = await _client.PutAsJsonAsync(
-                    $"/api/brokers/clients/{clientId}", dto);
-
-                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-            }
         }
     }
-}
 

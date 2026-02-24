@@ -1,6 +1,7 @@
 ﻿using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Audit;
 using Insurance.Application.Abstractions.Loggers;
+using Insurance.Application.Abstractions.Messaging;
 using Insurance.Application.Abstractions.Repositories;
 using Insurance.Application.Authentication;
 using Insurance.Application.Policy.FeeStrategies;
@@ -15,10 +16,14 @@ using Insurance.Infrastructure.Audit;
 using Insurance.Infrastructure.Authentication;
 using Insurance.Infrastructure.Loggers;
 using Insurance.Infrastructure.Persistence;
+using Insurance.Infrastructure.Persistence.Outbox;
 using Insurance.Infrastructure.Persistence.Repositories;
+using Insurance.Infrastructure.Reports;
+using Insurance.Reporting.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
@@ -57,6 +62,14 @@ namespace Insurance.Infrastructure
             services.AddScoped<IPolicySearchRepository, PolicySearchRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
 
+            services.AddScoped<IPolicyReportRepository, PolicyReportRepository>();
+            services.AddScoped<IPolicyReportGrouping, CountryReportGrouping>();
+            services.AddScoped<IPolicyReportGrouping, CountyReportGrouping>();
+            services.AddScoped<IPolicyReportGrouping, CityReportGrouping>();
+            services.AddScoped<IPolicyReportGrouping, BrokerReportGrouping>();
+
+            services.AddScoped<IPolicyCreationService, PolicyCreationService>();
+
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
             services.AddScoped<IApplicationLogger, ApplicationLogger>();
@@ -73,6 +86,8 @@ namespace Insurance.Infrastructure
             services.AddScoped<IFeeStrategy, RiskIndicatorFeeStrategy>();
             services.AddScoped<IPolicyPremiumCalculator, PolicyPremiumCalculator>();
 
+            services.AddScoped<IIntegrationEventPublisher, IntegrationEventPublisher>();
+
             services.AddSingleton<IMongoClient>(sp =>
             {
                 var connectionString = configuration.GetConnectionString("MongoDb");
@@ -86,6 +101,10 @@ namespace Insurance.Infrastructure
             });
 
             services.AddScoped<IAuditLogService, MongoAuditLogService>();
+
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUserContext, CurrentUserContext>();
+
 
             services.AddSingleton(TimeProvider.System);
 

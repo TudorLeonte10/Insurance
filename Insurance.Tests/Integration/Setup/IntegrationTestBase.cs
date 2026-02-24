@@ -7,7 +7,8 @@ namespace Insurance.Tests.Integration.Setup;
 
 public abstract class IntegrationTestBase
 {
-    protected (CustomWebApplicationFactory factory, HttpClient client) CreateTestContext()
+  
+    protected (CustomWebApplicationFactory factory, HttpClient client) CreateTestContext(string roles = "Broker,Admin")
     {
         var factory = new CustomWebApplicationFactory();
         var client = factory.CreateClient();
@@ -19,7 +20,25 @@ public abstract class IntegrationTestBase
             factory.SeedTestData(db);
         }
 
+        if (factory.SeededBrokerId != Guid.Empty)
+        {
+            client.DefaultRequestHeaders.Remove("X-Test-BrokerId");
+            client.DefaultRequestHeaders.Add("X-Test-BrokerId", factory.SeededBrokerId.ToString());
+        }
+
+     
+        client.DefaultRequestHeaders.Remove("X-Test-Roles");
+        if (!string.IsNullOrWhiteSpace(roles))
+            client.DefaultRequestHeaders.Add("X-Test-Roles", roles);
+
         return (factory, client);
+    }
+
+    protected void SetRoles(HttpClient client, string roles)
+    {
+        client.DefaultRequestHeaders.Remove("X-Test-Roles");
+        if (!string.IsNullOrWhiteSpace(roles))
+            client.DefaultRequestHeaders.Add("X-Test-Roles", roles);
     }
 
     protected async Task<Guid> CreateClientAndGetId(HttpClient client)
@@ -115,6 +134,4 @@ public abstract class IntegrationTestBase
         return Guid.Parse(
             response.Headers.Location!.Segments.Last());
     }
-
-
 }

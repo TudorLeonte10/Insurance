@@ -2,12 +2,14 @@
 using Insurance.Application.Metadata.RiskFactors.DTOs;
 using Insurance.Application.Metadata.RiskFactors.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Insurance.WebApi.Controllers.Metadata
 {
     [ApiController]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
+    [ApiExplorerSettings(GroupName = "admin")]
     [Route("api/admin/risk-factors")]
     public class RiskFactorConfigurationController : ControllerBase
     {

@@ -133,12 +133,11 @@ namespace Insurance.Tests.Unit.Policies.Exceptions
         {
           
             var policy = PolicyDomainTests.CreateActivePolicy();
-            policy.Cancel("First cancellation");
+            policy.Cancel("First cancellation", DateTime.UtcNow);
 
            
             var exception = Assert.Throws<InvalidPolicyTransitionException>(() =>
-                policy.Cancel("Second cancellation")); 
-
+                policy.Cancel("Second cancellation", DateTime.UtcNow)); 
             Assert.NotNull(exception.Message);
         }
 
@@ -150,7 +149,7 @@ namespace Insurance.Tests.Unit.Policies.Exceptions
 
            
             var exception = Assert.Throws<InvalidPolicyTransitionException>(() =>
-                policy.Cancel("Cancellation")); 
+                policy.Cancel("Cancellation", DateTime.UtcNow)); 
 
             Assert.NotNull(exception.Message);
         }

@@ -22,6 +22,7 @@ public class BuildingEntityConfiguration
             .HasMaxLength(20);
 
         builder.Property(b => b.Type)
+            .HasConversion<string>()
             .IsRequired()
             .HasMaxLength(50);
 
@@ -47,5 +48,8 @@ public class BuildingEntityConfiguration
             .WithMany(c => c.Buildings)
             .HasForeignKey(b => b.CityId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(b => new { b.CityId, b.Type })
+            .HasDatabaseName("IX_Buildings_City_Type");
     }
 }

@@ -1,8 +1,10 @@
 ﻿using Insurance.Application.Abstractions.Repositories;
+using Insurance.Application.Authentication;
 using Insurance.Application.Clients.DTOs;
 using Insurance.Application.Clients.Queries;
 using Insurance.Application.Common.Paging;
 using Insurance.Application.Exceptions;
+using Insurance.Domain.Brokers;
 using Insurance.Domain.Exceptions;
 using Moq;
 using System;
@@ -17,6 +19,7 @@ namespace Insurance.Tests.Unit.Clients.Queries
     {
         private readonly Mock<IClientSearchRepository> _searchRepositoryMock = new();
         private readonly Mock<IClientReadRepository> _readRepositoryMock = new();
+        private readonly Mock<ICurrentUserContext> _currentUserContextMock = new();
 
         private readonly GetClientsQueryHandler _handler;
 
@@ -24,19 +27,26 @@ namespace Insurance.Tests.Unit.Clients.Queries
         {
             _handler = new GetClientsQueryHandler(
                 _searchRepositoryMock.Object,
-                _readRepositoryMock.Object);
+                _readRepositoryMock.Object,
+                 _currentUserContextMock.Object);
         }
 
         [Fact]
         public async Task Given_ClientId_When_ClientExists_Should_ReturnSingleItemPagedResult()
         {
             var clientId = Guid.NewGuid();
+            var brokerId = Guid.NewGuid();
 
             var clientDto = new ClientDetailsDto
             {
                 Id = clientId,
-                Name = "Test Client"
+                Name = "Test Client",
+                BrokerId = brokerId
             };
+
+            _currentUserContextMock
+                .SetupGet(x => x.BrokerId)
+                .Returns(brokerId);
 
             _readRepositoryMock
                 .Setup(r => r.GetByIdAsync(clientId, It.IsAny<CancellationToken>()))
@@ -64,12 +74,13 @@ namespace Insurance.Tests.Unit.Clients.Queries
 
         [Fact]
         public async Task Given_ClientId_When_ClientDoesNotExist_Should_ThrowNotFoundException()
-        { 
+        {
             var clientId = Guid.NewGuid();
 
             _readRepositoryMock
                 .Setup(r => r.GetByIdAsync(clientId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((ClientDetailsDto?)null);
+
 
             var query = new GetClientsQuery
             {
@@ -83,6 +94,12 @@ namespace Insurance.Tests.Unit.Clients.Queries
         [Fact]
         public async Task Given_NoClientId_Should_SearchClients()
         {
+            var brokerId = Guid.NewGuid();
+
+            _currentUserContextMock
+               .SetupGet(x => x.BrokerId)
+               .Returns(brokerId);
+
             var clients = new List<ClientDetailsDto>
             {
                 new ClientDetailsDto { Id = Guid.NewGuid(), Name = "Client 1" },
@@ -97,6 +114,7 @@ namespace Insurance.Tests.Unit.Clients.Queries
 
             _searchRepositoryMock
                 .Setup(r => r.SearchAsync(
+                    It.IsAny<Guid>(),
                     It.IsAny<string?>(),
                     It.IsAny<string?>(),
                     It.IsAny<int>(),
@@ -111,7 +129,7 @@ namespace Insurance.Tests.Unit.Clients.Queries
                 PageSize = 10
             };
 
-  
+
             var result = await _handler.Handle(query, CancellationToken.None);
 
             Assert.Equal(2, result.Items.Count);
@@ -119,6 +137,7 @@ namespace Insurance.Tests.Unit.Clients.Queries
 
             _searchRepositoryMock.Verify(
                 r => r.SearchAsync(
+                    brokerId,
                     query.Name,
                     query.IdentificationNumber,
                     query.PageNumber,

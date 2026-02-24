@@ -19,6 +19,11 @@ namespace Insurance.Tests.Integration
             var (factory, client) = CreateTestContext();
 
             var brokerId = await CreateBrokerAndGetId(client);
+
+            SetRoles(client, "Broker,Admin");
+            client.DefaultRequestHeaders.Remove("X-Test-BrokerId");
+            client.DefaultRequestHeaders.Add("X-Test-BrokerId", brokerId.ToString());
+
             var clientId = await CreateClientAndGetId(client);
             var cityId = factory.SeededCityId;
             var buildingId = await CreateBuildingAndGetId(client, cityId, clientId);
@@ -65,9 +70,8 @@ namespace Insurance.Tests.Integration
             Assert.Equal(buildingId, root.GetProperty("building").GetProperty("id").GetGuid());
 
 
-            Assert.Equal("Active", root.GetProperty("status").GetString());
+            Assert.Equal("active", root.GetProperty("status").GetString());
         }
-
         [Fact]
         public async Task CreatePolicy_WithNonExistentClient_ShouldReturnBadRequest()
         {
@@ -128,6 +132,11 @@ namespace Insurance.Tests.Integration
             var (factory, client) = CreateTestContext();
 
             var brokerId = await CreateBrokerAndGetId(client);
+
+            SetRoles(client, "Broker,Admin");
+            client.DefaultRequestHeaders.Remove("X-Test-BrokerId");
+            client.DefaultRequestHeaders.Add("X-Test-BrokerId", brokerId.ToString());
+
             var clientId = await CreateClientAndGetId(client);
             var cityId = factory.SeededCityId;
             var buildingId = await CreateBuildingAndGetId(client, cityId, clientId);

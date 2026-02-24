@@ -14,6 +14,11 @@ namespace Insurance.Application.Buildings.DTOs
         public Guid CountyId { get; set; }
         public Guid CountryId { get; set; }
 
+        public string CityName { get; set; } = string.Empty;
+        public string CountyName { get; set; } = string.Empty;
+        public string CountryName { get; set; } = string.Empty;
+        public string BrokerCode { get; set; } = string.Empty;
+
         public BuildingType BuildingType { get; set; }
         public IReadOnlyCollection<RiskIndicatorType> RiskIndicators { get; set; } = [];
     }
