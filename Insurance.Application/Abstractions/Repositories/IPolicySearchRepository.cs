@@ -16,8 +16,7 @@ namespace Insurance.Application.Abstractions.Repositories
             DateTime? startDateFrom,
             DateTime? startDateTo,
             int pageNumber,
-            int pageSize,
-            CancellationToken ct);
+            int pageSize);
     }
 
 }

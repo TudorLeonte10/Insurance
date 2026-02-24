@@ -1,9 +1,11 @@
 ﻿using Insurance.Application.Abstractions;
 using Insurance.Application.Abstractions.Repositories;
+using Insurance.Application.Authentication;
 using Insurance.Application.Buildings.Commands;
 using Insurance.Application.Buildings.DTOs;
 using Insurance.Application.Exceptions;
 using Insurance.Domain.Buildings;
+using Insurance.Domain.Clients;
 using Insurance.Domain.Exceptions;
 using Insurance.Domain.RiskIndicators;
 using Moq;
@@ -18,14 +20,23 @@ namespace Insurance.Tests.Unit.Buildings.Commands
     {
         private readonly Mock<IBuildingRepository> _buildingRepositoryMock = new();
         private readonly Mock<IUnitOfWork> _uowMock = new();
+        private readonly Mock<ICurrentUserContext> _currentUserContextMock = new();
+        private readonly Mock<IClientRepository> _clientRepositoryMock = new();
 
         private readonly UpdateBuildingCommandHandler _handler;
 
         public UpdateBuildingCommandHandlerTests()
         {
+          
+            _currentUserContextMock
+                .SetupGet(x => x.BrokerId)
+                .Returns(Guid.NewGuid());
+
             _handler = new UpdateBuildingCommandHandler(
                 _buildingRepositoryMock.Object,
-                _uowMock.Object);
+                _uowMock.Object,
+                _currentUserContextMock.Object,
+                _clientRepositoryMock.Object);
         }
 
         private static UpdateBuildingCommand CreateValidCommand(Guid buildingId)
@@ -43,10 +54,10 @@ namespace Insurance.Tests.Unit.Buildings.Commands
                 });
         }
 
-        private static Building CreateExistingBuilding(Guid id)
+        private static Building CreateExistingBuilding(Guid id, Guid clientId)
         {
             return Building.Create(
-                clientId: Guid.NewGuid(),
+                clientId: clientId,
                 cityId: Guid.NewGuid(),
                 type: BuildingType.Residential,
                 street: "Old Street",
@@ -81,11 +92,32 @@ namespace Insurance.Tests.Unit.Buildings.Commands
         public async Task Given_ValidUpdate_Should_UpdateAndSave()
         {
             var buildingId = Guid.NewGuid();
-            var existing = CreateExistingBuilding(buildingId);
+            var brokerId = Guid.NewGuid();
+            var clientId = Guid.NewGuid();
+
+            _currentUserContextMock
+                .SetupGet(x => x.BrokerId)
+                .Returns(brokerId);
+
+            var existing = CreateExistingBuilding(buildingId, clientId);
 
             _buildingRepositoryMock
                 .Setup(r => r.GetByIdAsync(buildingId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(existing);
+
+            var client = Client.Rehydrate(
+                clientId,
+                brokerId,
+                ClientType.Individual,
+                "John Doe",
+                "123456789",
+                "john@test.com",
+                "0712345678",
+                "Some address");
+
+            _clientRepositoryMock
+                .Setup(c => c.GetByIdAsync(clientId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(client);
 
             _buildingRepositoryMock
                 .Setup(r => r.UpdateAsync(

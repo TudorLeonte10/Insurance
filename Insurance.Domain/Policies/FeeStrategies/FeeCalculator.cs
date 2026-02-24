@@ -22,9 +22,12 @@ namespace Insurance.Application.Policy.FeeStrategies
             PolicyCalculationContext context,
             IEnumerable<FeeConfiguration> fees)
         {
-            foreach (var fee in fees)
+            var sortedFees = fees.OrderBy(f => f.Type).ThenBy(f => f.Id);
+            foreach (var fee in sortedFees)
             {
-                foreach (var strategy in _strategies.Where(s => s.CanHandle(fee)))
+                var strategy = _strategies.FirstOrDefault(s => s.CanHandle(fee));
+
+                if (strategy != null)
                 {
                     premium = strategy.Apply(premium, context, fee);
                 }

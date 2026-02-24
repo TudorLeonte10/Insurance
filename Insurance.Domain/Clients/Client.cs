@@ -7,6 +7,7 @@ namespace Insurance.Domain.Clients
     public class Client
     {
         public Guid Id { get; private set; }
+        public Guid BrokerId { get; private set; }
         public ClientType Type { get; private set; }
         public string Name { get; private set; } = string.Empty;
         public string IdentificationNumber { get; private set; } = string.Empty;
@@ -21,6 +22,7 @@ namespace Insurance.Domain.Clients
 
         public static Client Create(
             ClientType type,
+            Guid brokerId,
             string name,
             string identificationNumber,
             string email,
@@ -31,6 +33,7 @@ namespace Insurance.Domain.Clients
             return new Client
             {
                 Id = Guid.NewGuid(),
+                BrokerId = brokerId,
                 Type = type,
                 Name = name,
                 IdentificationNumber = identificationNumber,
@@ -55,5 +58,27 @@ namespace Insurance.Domain.Clients
             IdentificationNumber = identificationNumber;
         }
 
+        public static Client Rehydrate(
+    Guid id,
+    Guid brokerId,
+    ClientType type,
+    string name,
+    string identificationNumber,
+    string email,
+    string phoneNumber,
+    string address)
+        {
+            return new Client
+            {
+                Id = id, 
+                BrokerId = brokerId,
+                Type = type,
+                Name = name,
+                IdentificationNumber = identificationNumber,
+                Email = email,
+                PhoneNumber = phoneNumber,
+                Address = address
+            };
+        }
     }
 }

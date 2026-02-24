@@ -6,7 +6,6 @@ namespace Insurance.Application.Policy.DTOs
 {
     public class CreatePolicyDto
     {
-        public Guid BrokerId { get; set; }
         public Guid ClientId { get; set; }
         public Guid BuildingId { get; set; }
         public Guid CurrencyId { get; set; }

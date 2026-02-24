@@ -26,6 +26,10 @@ namespace Insurance.Application
                 typeof(IPipelineBehavior<,>),
                 typeof(ValidationBehaviour<,>));
 
+            services.AddTransient(
+                typeof(IPipelineBehavior<,>),
+                typeof(BrokerValidationBehaviour<,>));
+
             return services;
         }
     }

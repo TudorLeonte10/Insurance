@@ -1,7 +1,12 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="docker-compose.yml" />
+  </Folder>
   <Project Path="Insurance.Application/Insurance.Application.csproj" />
   <Project Path="Insurance.Domain/Insurance.Domain.csproj" />
   <Project Path="Insurance.Infrastructure/Insurance.Infrastructure.csproj" />
+  <Project Path="Insurance.Reporting.Infrastructure/Insurance.Reporting.Infrastructure.csproj" Id="9ce8b324-0472-4709-b181-320caf037829" />
+  <Project Path="Insurance.Reporting.Worker/Insurance.Reporting.Worker.csproj" Id="6cb53ce9-85bd-4606-af96-d8371b4032f0" />
   <Project Path="Insurance.Tests/Insurance.Tests.csproj" />
   <Project Path="Insurance.WebApi/Insurance.WebApi.csproj" />
 </Solution>

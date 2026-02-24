@@ -92,7 +92,7 @@ namespace Insurance.Domain.Policies
             ActivatedAt = now;
         }
 
-        public void Cancel(string? reason)
+        public void Cancel(string? reason, DateTime now)
         {
             if (Status != PolicyStatus.Active)
             {
@@ -101,7 +101,7 @@ namespace Insurance.Domain.Policies
 
             Status = PolicyStatus.Cancelled;
             CancellationReason = reason;
-            CancelledAt = DateTime.Now;
+            CancelledAt = now;
         }
 
         public void Expire()

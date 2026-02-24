@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Insurance.WebApi.Controllers
 {
     [ApiController]
-    //[Authorize(Roles = "Broker")]
+    [Authorize(Roles = "Broker")]
+    [ApiExplorerSettings(GroupName = "broker")]
     [Route("api/brokers/[controller]")]
     public class ClientsController : ControllerBase
     {

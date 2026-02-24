@@ -2,12 +2,14 @@
 using Insurance.Application.Metadata.Currency.DTOs;
 using Insurance.Application.Metadata.Currency.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Insurance.WebApi.Controllers.Metadata
 {
     [ApiController]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
+    [ApiExplorerSettings(GroupName = "admin")]
     [Route("api/admin/currencies")]
     public class CurrencyController : ControllerBase
     {

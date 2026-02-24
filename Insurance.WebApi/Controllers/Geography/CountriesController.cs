@@ -1,11 +1,13 @@
 ﻿using Insurance.Application.Geography.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Insurance.WebApi.Controllers.Geography
 {
     [ApiController]
-    //[Authorize(Roles = "Broker")]
+    [Authorize(Roles = "Broker")]
+    [ApiExplorerSettings(GroupName = "broker")]
     [Route("api/brokers/[controller]")]
     public class CountriesController : ControllerBase
     {

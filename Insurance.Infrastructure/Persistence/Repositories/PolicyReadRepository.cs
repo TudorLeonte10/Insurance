@@ -2,13 +2,16 @@
 using AutoMapper.QueryableExtensions;
 using Insurance.Application.Abstractions.Repositories;
 using Insurance.Application.Policy.DTOs;
+using Insurance.Domain.Buildings;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Insurance.Infrastructure.Persistence.Repositories
 {
+    [ExcludeFromCodeCoverage]
     public class PolicyReadRepository : IPolicyReadRepository
     {
         private readonly InsuranceDbContext _db;
@@ -30,6 +33,7 @@ namespace Insurance.Infrastructure.Persistence.Repositories
                 .ProjectTo<PolicyDetailsDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(ct);
         }
+
     }
 
 }

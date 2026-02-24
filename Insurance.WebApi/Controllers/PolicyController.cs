@@ -10,7 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Insurance.WebApi.Controllers
 {
     [ApiController]
-   //[Authorize(Roles = "Broker")]
+    [Authorize(Roles = "Broker")]
+    [ApiExplorerSettings(GroupName = "broker")]
     [Route("api/brokers/policies")]
     public class PolicyController : ControllerBase
     {
@@ -56,7 +57,6 @@ namespace Insurance.WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<PagedResult<PolicyDetailsDto>>> GetPolicies(
      [FromQuery] Guid? clientId,
-     [FromQuery] Guid? brokerId,
      [FromQuery] PolicyStatus? status,
      [FromQuery] DateTime? startDateFrom,
      [FromQuery] DateTime? startDateTo,
@@ -68,7 +68,6 @@ namespace Insurance.WebApi.Controllers
                 new SearchPoliciesQuery
                 {
                     ClientId = clientId,
-                    BrokerId = brokerId,
                     Status = status,
                     StartDateFrom = startDateFrom,
                     StartDateTo = startDateTo,

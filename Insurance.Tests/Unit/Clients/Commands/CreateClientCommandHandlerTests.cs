@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Insurance.Application.Abstractions;
+using Insurance.Application.Authentication;
 using Insurance.Application.Clients.Commands;
 using Insurance.Application.Clients.Commands.CreateClient;
 using Insurance.Application.Clients.DTOs;
@@ -18,6 +19,7 @@ namespace Insurance.Tests.Unit.Clients.Commands
     {
         private readonly Mock<IClientRepository> _clientRepositoryMock = new();
         private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
+        private readonly Mock<ICurrentUserContext> _currentUserContextMock = new();
 
         private readonly CreateClientCommandHandler _handler;
 
@@ -25,7 +27,8 @@ namespace Insurance.Tests.Unit.Clients.Commands
         {
             _handler = new CreateClientCommandHandler(
                 _clientRepositoryMock.Object,
-                _unitOfWorkMock.Object);
+                _unitOfWorkMock.Object,
+                _currentUserContextMock.Object);
         }
 
         [Fact]
@@ -40,6 +43,9 @@ namespace Insurance.Tests.Unit.Clients.Commands
                 Type = ClientType.Individual,
                 Address = "Str. Validului 1"
             };
+            _currentUserContextMock
+                .SetupGet(x => x.BrokerId)
+                .Returns(Guid.NewGuid());
 
             _clientRepositoryMock
                 .Setup(x => x.AddAsync(It.IsAny<Client>(), It.IsAny<CancellationToken>()))
@@ -71,6 +77,10 @@ namespace Insurance.Tests.Unit.Clients.Commands
                 PhoneNumber = "0700000000",
                 Type = ClientType.Individual
             };
+
+            _currentUserContextMock
+                .SetupGet(x => x.BrokerId)
+                .Returns(Guid.NewGuid());
 
             _clientRepositoryMock
                 .Setup(x => x.AddAsync(It.IsAny<Client>(), It.IsAny<CancellationToken>()))

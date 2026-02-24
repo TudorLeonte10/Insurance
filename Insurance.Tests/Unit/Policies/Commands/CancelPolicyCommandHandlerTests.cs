@@ -1,4 +1,6 @@
 ﻿using Insurance.Application.Abstractions;
+using Insurance.Application.Abstractions.Messaging;
+using Insurance.Application.Authentication;
 using Insurance.Application.Exceptions;
 using Insurance.Application.Policy.Commands;
 using Insurance.Domain.Policies;
@@ -18,6 +20,9 @@ namespace Insurance.Tests.Unit.Policy.Commands
             var policy = PolicyDomainTests.CreateActivePolicy();
             var cancellationReason = "Customer request";
 
+            var currentUser = new Mock<ICurrentUserContext>();
+            currentUser.SetupGet(c => c.BrokerId).Returns(policy.BrokerId);
+
             var repo = new Mock<IPolicyRepository>();
             repo.Setup(r => r.GetByIdAsync(policy.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(policy);
@@ -26,7 +31,10 @@ namespace Insurance.Tests.Unit.Policy.Commands
 
             var handler = new CancelPolicyCommandHandler(
                 repo.Object,
-                uow.Object);
+                uow.Object,
+                currentUser.Object,
+                Mock.Of<IIntegrationEventPublisher>(),
+                Mock.Of<TimeProvider>());
 
             await handler.Handle(
                 new CancelPolicyCommand(policy.Id, cancellationReason),
@@ -46,6 +54,9 @@ namespace Insurance.Tests.Unit.Policy.Commands
         {
             var policy = PolicyDomainTests.CreateActivePolicy();
 
+            var currentUser = new Mock<ICurrentUserContext>();
+            currentUser.SetupGet(c => c.BrokerId).Returns(policy.BrokerId);
+
             var repo = new Mock<IPolicyRepository>();
             repo.Setup(r => r.GetByIdAsync(policy.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(policy);
@@ -54,7 +65,10 @@ namespace Insurance.Tests.Unit.Policy.Commands
 
             var handler = new CancelPolicyCommandHandler(
                 repo.Object,
-                uow.Object);
+                uow.Object,
+                currentUser.Object,
+                Mock.Of<IIntegrationEventPublisher>(),
+                Mock.Of<TimeProvider>());
 
             await handler.Handle(
                 new CancelPolicyCommand(policy.Id, null),
@@ -72,13 +86,17 @@ namespace Insurance.Tests.Unit.Policy.Commands
         [Fact]
         public async Task Handle_WhenPolicyNotFound_ShouldThrow()
         {
+            var currentUser = new Mock<ICurrentUserContext>();
             var repo = new Mock<IPolicyRepository>();
             repo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Insurance.Domain.Policies.Policy?)null);
 
             var handler = new CancelPolicyCommandHandler(
                 repo.Object,
-                Mock.Of<IUnitOfWork>());
+                Mock.Of<IUnitOfWork>(),
+                currentUser.Object,
+                Mock.Of<IIntegrationEventPublisher>(),
+                Mock.Of<TimeProvider>());
 
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 handler.Handle(
@@ -92,6 +110,9 @@ namespace Insurance.Tests.Unit.Policy.Commands
             var policy = PolicyDomainTests.CreateActivePolicy();
             var cancellationReason = "Duplicate policy";
 
+            var currentUser = new Mock<ICurrentUserContext>();
+            currentUser.SetupGet(c => c.BrokerId).Returns(policy.BrokerId);
+
             var repo = new Mock<IPolicyRepository>();
             repo.Setup(r => r.GetByIdAsync(policy.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(policy);
@@ -100,7 +121,10 @@ namespace Insurance.Tests.Unit.Policy.Commands
 
             var handler = new CancelPolicyCommandHandler(
                 repo.Object,
-                uow.Object);
+                uow.Object,
+                currentUser.Object,
+                Mock.Of<IIntegrationEventPublisher>(),
+                Mock.Of<TimeProvider>());
 
             await handler.Handle(
                 new CancelPolicyCommand(policy.Id, cancellationReason),

@@ -1,4 +1,5 @@
 ﻿using Insurance.Application.Clients.DTOs;
+using Insurance.Application.Common;
 using Insurance.Application.Common.Paging;
 using MediatR;
 using System;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace Insurance.Application.Clients.Queries
 {
-    public class GetClientsQuery : IRequest<PagedResult<ClientDetailsDto>>
+    public class GetClientsQuery : IRequest<PagedResult<ClientDetailsDto>>, IRequireBrokerValidation
     {
         public Guid? ClientId { get; init; }
 

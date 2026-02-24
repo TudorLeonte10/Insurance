@@ -24,7 +24,8 @@ namespace Insurance.Application.Common.Behaviours
             var requestName = typeof(TRequest).Name;
             var stopwatch = Stopwatch.StartNew();
 
-            _logger.LogInformation($"Handling {requestName} {request}");
+            _logger.LogInformation("Handling {RequestName}", requestName);
+
 
             try
             {
@@ -32,7 +33,7 @@ namespace Insurance.Application.Common.Behaviours
 
                 stopwatch.Stop();
 
-                _logger.LogInformation($"Handled {requestName} in {stopwatch.ElapsedMilliseconds} ms");
+                _logger.LogInformation("Handled {RequestName} in {ElapsedMilliseconds} ms", requestName, stopwatch.ElapsedMilliseconds);
 
                 return response;
             }

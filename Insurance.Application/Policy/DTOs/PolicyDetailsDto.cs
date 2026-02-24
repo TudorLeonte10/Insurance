@@ -13,6 +13,7 @@ namespace Insurance.Application.Policy.DTOs
     public class PolicyDetailsDto
     {
         public Guid Id { get; set; }
+        public Guid BrokerId { get; set; }
         public string PolicyNumber { get; set; } = string.Empty;
         public PolicyStatus Status { get; set; }
 
