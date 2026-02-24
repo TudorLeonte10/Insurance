@@ -8,6 +8,4 @@ namespace Insurance.Application.Events
         Guid PolicyId,
         string NewStatus,
         DateTime ChangedAt);
-    
-    
 }

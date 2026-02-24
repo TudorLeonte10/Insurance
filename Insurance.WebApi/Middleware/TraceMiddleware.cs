@@ -19,8 +19,6 @@ namespace Insurance.WebApi.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-           
-
             if (context.Request.Headers.ContainsKey("xCorrelationId"))
             {
                 context.Items["xCorrelationId"] = context.Request.Headers["xCorrelationId"].ToString();
