@@ -35,29 +35,34 @@ namespace Insurance.Reporting.Worker.Consumer
         {
             var factory = new ConnectionFactory
             {
-                HostName = _configuration["Rabbit:Host"] ?? "localhost"
+                HostName = _configuration["Rabbit:Host"] ?? "localhost",
+                UserName = "guest",
+                Password = "guest"
             };
 
-            try
+            while (_connection == null)
             {
-                _connection = await factory.CreateConnectionAsync(cancellationToken);
-                _channel = await _connection.CreateChannelAsync(null, cancellationToken);
+                try
+                {
+                    Console.WriteLine("Connecting to Rabbit...");
+                    _connection = await factory.CreateConnectionAsync(cancellationToken);
+                    _channel = await _connection.CreateChannelAsync(null, cancellationToken);
 
-                await _channel.QueueDeclareAsync(
-                    queue: _configuration["Rabbit:Queue"]!,
-                    durable: true,
-                    exclusive: false,
-                    autoDelete: false,
-                    arguments: new Dictionary<string, object?>
-                    {
-                        {"x-delivery-limit", 5 }
-                    },
-                    cancellationToken: cancellationToken);
+                    await _channel.QueueDeclareAsync(
+                        queue: _configuration["Rabbit:Queue"]!,
+                        durable: true,
+                        exclusive: false,
+                        autoDelete: false,
+                        arguments: null,
+                        cancellationToken: cancellationToken);
 
-            }
-            catch (BrokerUnreachableException ex)
-            {
-                Console.WriteLine("Exception at RabbitMQ: " + ex.ToString());
+                    Console.WriteLine("Connected to Rabbit!");
+                }
+                catch
+                {
+                    Console.WriteLine("Rabbit not ready. Retrying in 5 sec...");
+                    await Task.Delay(5000, cancellationToken);
+                }
             }
 
             await base.StartAsync(cancellationToken);

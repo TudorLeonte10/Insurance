@@ -33,11 +33,7 @@ if (!builder.Environment.IsEnvironment("Test"))
 {
     builder.Services.AddSqlServerDbContext(builder.Configuration);
     builder.Services.AddReportingDbContext(builder.Configuration);
-    builder.Services.AddSingleton<RabbitMqPublisher>(sp =>
-    {
-        var config = sp.GetRequiredService<IConfiguration>();
-        return RabbitMqPublisher.CreateAsync(config, CancellationToken.None).GetAwaiter().GetResult();
-    });
+    builder.Services.AddSingleton<RabbitMqPublisher>();
     builder.Services.AddHostedService<OutboxEventsPublisher>();
     builder.Services.AddHostedService<OutboxAckListenerBackgroundService>();
 

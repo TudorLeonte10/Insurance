@@ -44,16 +44,14 @@ namespace Insurance.Infrastructure.Persistence.Outbox
                         durable: true,
                         exclusive: false,
                         autoDelete: false,
-                        arguments: new Dictionary<string, object?>
-                        {
-                            {"x-delivery-limit", 5 }
-                        },
+                        arguments: null,
                         cancellationToken: cancellationToken);
 
                 }
                 catch(BrokerUnreachableException ex)
                 {
                     Console.WriteLine("RabbitMQ not available: " + ex.ToString());
+                    throw;
                 }
 
             await base.StartAsync(cancellationToken);

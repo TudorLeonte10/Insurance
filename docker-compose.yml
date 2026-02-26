@@ -1,9 +1,95 @@
-version: '3.9'
+version: '3.8'
 
 services:
+  insurance-api:
+    build:
+      context: ./backend
+      dockerfile: Insurance.WebApi/Dockerfile
+    container_name: insurance-api
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=InsuranceDb;User Id=sa;Password=ParolaNoua123!;TrustServerCertificate=True;
+      - ConnectionStrings__ReportingDb=Server=sqlserver,1433;Database=InsuranceReportingDb;User Id=sa;Password=ParolaNoua123!;TrustServerCertificate=True;
+
+      - JWT__Key=SUPER_SECRET_KEY_AND_IT_NEEDS_TO_BE_LONGER
+      - JWT__Issuer=Insurance.Api
+      - JWT__Audience=Insurance.Api  
+      - JWT__ExpiresMinutes=60
+
+      - Rabbit__Host=rabbitmq
+      - Rabbit__Queue=policy-created-queue
+      - Rabbit__OutboxAckQueue=outbox-acks
+    depends_on:
+      - sqlserver
+      - rabbitmq
+    networks:
+      - insurance-network
+    restart: unless-stopped
+
+  insurance-worker:
+    build:
+      context: ./backend
+      dockerfile: Insurance.Reporting.Worker/Dockerfile
+    container_name: insurance-worker
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__ReportingConnection=Server=sqlserver,1433;Database=InsuranceReportingDb;User Id=sa;Password=ParolaNoua123!;TrustServerCertificate=True;
+
+      - Rabbit__Host=rabbitmq
+      - Rabbit__Queue=policy-created-queue
+      - Rabbit__OutboxAckQueue=outbox-acks
+    depends_on:
+      - sqlserver
+      - rabbitmq
+    networks:
+      - insurance-network
+    restart: unless-stopped
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: insurance-sql-server
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=ParolaNoua123!
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+    networks:
+      - insurance-network
+    restart: unless-stopped    
+
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq
+    container_name: insurance-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - insurance-network
+    volumes:
+      - rabbitmqdata:/var/lib/rabbitmq
+    restart: unless-stopped
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      retries: 10
+      start_period: 10s
+      timeout: 3s
+
+networks:
+  insurance-network:
+    driver: bridge
+
+volumes:
+  sql_data:
+    external: true
+  rabbitmqdata:
+    driver: local
+
