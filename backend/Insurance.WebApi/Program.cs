@@ -1,4 +1,5 @@
 ﻿using Insurance.Application;
+using Insurance.Application.Policy.Services;
 using Insurance.Infrastructure;
 using Insurance.Infrastructure.Messaging.Rabbit;
 using Insurance.Infrastructure.Persistence;
@@ -38,6 +39,11 @@ if (!builder.Environment.IsEnvironment("Test"))
     builder.Services.AddHostedService<OutboxAckListenerBackgroundService>();
 
 }
+
+builder.Services.AddHttpClient<IPolicyMlService, PolicyMlService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["MlService:BaseUrl"]!);
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

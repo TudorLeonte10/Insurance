@@ -22,65 +22,24 @@ namespace Insurance.Infrastructure.Persistence.Seed
             if (_context.Brokers.Any())
                 return;
 
-            var brokers = new List<BrokerEntity>
-        {
-            new()
+            var brokers = new List<BrokerEntity>();
+
+            for (int i = 1; i <= 30; i++)
             {
-                Id = Guid.NewGuid(),
-                BrokerCode = "BRK001",
-                Name = "Default Broker",
-                Email = "broker@test.ro",
-                Phone = "0700000000",
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                BrokerCode = "BRK002",
-                Name = "Premium Broker",
-                Email = "premium@test.ro",
-                Phone = "0710000000",
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                BrokerCode = "BRK003",
-                Name = "Inactive Broker",
-                Email = "inactive@test.ro",
-                Phone = "0720000000",
-                IsActive = false,
-                CreatedAt = DateTime.UtcNow
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                BrokerCode = "BRK004",
-                Name = "City Broker",
-                Email = "city@test.ro",
-                Phone = "0730000000",
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                BrokerCode = "BRK005",
-                Name = "Regional Broker",
-                Email = "region@test.ro",
-                Phone = "0740000000",
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow
+                brokers.Add(new BrokerEntity
+                {
+                    Id = Guid.NewGuid(),
+                    BrokerCode = $"BRK{i:000}",
+                    Name = $"Broker {i}",
+                    Email = $"broker{i}@test.ro",
+                    Phone = $"07{i:0000000}",
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                });
             }
-        };
 
             _context.Brokers.AddRange(brokers);
             await _context.SaveChangesAsync();
         }
     }
-
-
-
 }

@@ -17,6 +17,8 @@ namespace Insurance.Application.Policy.Services
         private readonly IFeeConfigurationReadRepository _feeReadRepository;
         private readonly IRiskFactorReadRepository _riskReadRepository;
         private readonly IPolicyPremiumCalculator _premiumCalculator;
+        private readonly IAnomalyFeatureService _anomalyFeatureService;
+        private readonly IPolicyMlService _mlService;
         private readonly TimeProvider _timeProvider;
 
         public PolicyCreationService(
@@ -26,6 +28,8 @@ namespace Insurance.Application.Policy.Services
             IFeeConfigurationReadRepository feeReadRepository,
             IRiskFactorReadRepository riskReadRepository,
             IPolicyPremiumCalculator premiumCalculator,
+            IAnomalyFeatureService anomalyFeatureService,
+            IPolicyMlService mlService,
             TimeProvider timeProvider)
         {
             _clientRepository = clientRepository;
@@ -34,6 +38,8 @@ namespace Insurance.Application.Policy.Services
             _feeReadRepository = feeReadRepository;
             _riskReadRepository = riskReadRepository;
             _premiumCalculator = premiumCalculator;
+            _anomalyFeatureService = anomalyFeatureService;
+            _mlService = mlService;
             _timeProvider = timeProvider;
         }
         public async Task<PolicyCreationResult> CreatePolicyAsync(
@@ -76,6 +82,15 @@ namespace Insurance.Application.Policy.Services
                 endDate: dto.EndDate,
                 policyNumber: GeneratePolicyNumber(),
                 now: now);
+
+            var anomalyDto = await _anomalyFeatureService.BuildAsync(policy, premiumResult, brokerId, dto.BuildingId, dto.ClientId, cancellationToken);
+
+            var score = await _mlService.AnalyzePolicyAsync(anomalyDto, cancellationToken);
+
+            if(score.IsAnomaly == 1)
+            {
+                policy.SetToReview();
+            }
 
             return new PolicyCreationResult
             {

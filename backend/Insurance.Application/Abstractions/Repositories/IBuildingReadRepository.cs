@@ -20,5 +20,7 @@ namespace Insurance.Application.Abstractions.Repositories
             CancellationToken cancellationToken);
 
         Task<bool> IsOwnedByClientAsync(Guid buildingId, Guid clientId, CancellationToken cancellationToken);
+
+        Task<BuildingAnomalyContextDto?> GetAnomalyContextAsync(Guid buildingId, CancellationToken cancellationToken);
     }
 }

@@ -10,6 +10,5 @@ namespace Insurance.Application.Abstractions.Repositories
     {
         Task<BrokerDetailsDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
         Task<PagedResult<BrokerDetailsDto>> GetPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
-
     }
 }

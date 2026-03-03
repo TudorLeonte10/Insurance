@@ -29,6 +29,7 @@ namespace Insurance.Infrastructure.Persistence.Repositories
             return entity == null ? null : PolicyMapper.ToDomain(entity);
         }
 
+
         public async Task UpdateAsync(Policy policy, CancellationToken cancellationToken)
         {
             var entity = await _dbContext.Policies

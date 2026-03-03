@@ -21,6 +21,9 @@ services:
       - Rabbit__Host=rabbitmq
       - Rabbit__Queue=policy-created-queue
       - Rabbit__OutboxAckQueue=outbox-acks
+
+      - MlService__BaseUrl=http://ml-service:8000
+
     depends_on:
       - sqlserver
       - rabbitmq
@@ -82,6 +85,17 @@ services:
       retries: 10
       start_period: 10s
       timeout: 3s
+
+  ml-service:
+    build: 
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: insurance-ml-service
+    ports:
+      - 8000:8000
+    networks:
+      - insurance-network
+    restart: unless-stopped
 
 networks:
   insurance-network:

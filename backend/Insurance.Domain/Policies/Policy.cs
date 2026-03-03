@@ -104,6 +104,25 @@ namespace Insurance.Domain.Policies
             CancelledAt = now;
         }
 
+        public void SetToReview()
+        {
+            if (Status != PolicyStatus.Draft)
+            {
+                throw new InvalidPolicyTransitionException("Only draft policies can be set to review.");
+            }
+
+            Status = PolicyStatus.UnderReview;
+        }
+
+        public void SetToDraft()
+        {
+            if (Status != PolicyStatus.UnderReview)
+            {
+                throw new InvalidPolicyTransitionException("Only policies under review can be set back to draft.");
+            }
+            Status = PolicyStatus.Draft;
+        }
+
         public void Expire()
         {
             if (Status != PolicyStatus.Active)

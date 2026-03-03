@@ -34,6 +34,64 @@ namespace Insurance.Infrastructure.Persistence.Repositories
                 .FirstOrDefaultAsync(ct);
         }
 
+        public async Task<int> GetPoliciesOfClientFromLastYearAsync(Guid clientId, CancellationToken cancellationToken)
+        {
+            return await _db.Policies.Where(p => p.ClientId == clientId && p.CreatedAt >= DateTime.UtcNow.AddYears(-1))
+                .CountAsync(cancellationToken);
+        }
+
+        public async Task<decimal> GetBrokerAveragePremiumAsync(Guid brokerId, CancellationToken cancellationToken)
+        {
+            var premiums = _db.Policies
+              .Where(p => p.BrokerId == brokerId)
+              .Select(p => (decimal?)p.FinalPremium);
+
+            var average = await premiums.AverageAsync(cancellationToken);
+
+            return average ?? 0m;
+        }
+
+        public async Task<decimal> GetClientAverageInsuredValue(Guid clientId, CancellationToken cancellationToken)
+        {
+            var insuredValues = _db.Policies
+                .Where(p => p.ClientId == clientId && p.CreatedAt >= DateTime.UtcNow.AddYears(-5))
+                .Select(p => (decimal?)p.Building.InsuredValue);
+
+            var average = await insuredValues.AverageAsync(cancellationToken);
+
+            return average ?? 0m;
+        }
+
+        public async Task<decimal> GetClientAveragePremiumRatioAsync(Guid clientId, CancellationToken cancellationToken)
+        {
+            var premiumRatios = _db.Policies
+                .Where(p => p.ClientId == clientId && p.CreatedAt >= DateTime.UtcNow.AddYears(-5))
+                .Select(p => (decimal?)(p.FinalPremium / p.Building.InsuredValue));
+
+            var average = await premiumRatios.AverageAsync(cancellationToken);
+
+            return average ?? 0m;
+        }
+
+        public async Task<decimal> GetBrokerGlobalAveragePremiumAsync(CancellationToken cancellationToken)
+        {
+            var premiums = _db.Policies
+                .Select(p => (decimal?)p.FinalPremium);
+
+            var average = await premiums.AverageAsync(cancellationToken);
+
+            return average ?? 0m;
+        }
+
+        public async Task<decimal> GetClientGlobalAverageInsuredValue(CancellationToken cancellationToken)
+        {
+            var insuredValues = _db.Policies
+                .Select(p => (decimal?)p.Building.InsuredValue);
+
+            var average = await insuredValues.AverageAsync(cancellationToken);
+
+            return average ?? 0m;
+        }
     }
 
 }

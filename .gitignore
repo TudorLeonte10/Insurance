@@ -117,3 +117,53 @@ coverage.opencover.xml
 
 # Test coverage reports
 Insurance.Tests/coveragereport/
+
+####################################
+# Python / ML
+####################################
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Compiled extensions
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ML artifacts (IMPORTANT)
+*.joblib
+*.pkl
+*.h5
+*.onnx
+
+# If you generate local CSV datasets
+*.csv
+
+# FastAPI dev reload temp
+*.reload
+
+####################################
+# ML models folder (optional)
+####################################
+
+ml-service/models/*
+!ml-service/models/.gitkeep

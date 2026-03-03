@@ -5,6 +5,7 @@ using Insurance.Application.Authentication;
 using Insurance.Application.Buildings.DTOs;
 using Insurance.Application.Events;
 using Insurance.Application.Exceptions;
+using Insurance.Application.Policy.DTOs;
 using Insurance.Application.Policy.Services;
 using Insurance.Domain.Brokers;
 using Insurance.Domain.Clients;
@@ -48,8 +49,7 @@ namespace Insurance.Application.Policy.Commands
             var brokerId = _currentUserContext.BrokerId!.Value;
 
             var policy = await _policyCreationService.CreatePolicyAsync(request.PolicyDto, brokerId, cancellationToken);
-
-        
+           
             await _policyRepository.AddAsync(policy.Policy, cancellationToken);
 
             var integrationEvent = new PolicyCreatedIntegrationEvent(
@@ -65,8 +65,8 @@ namespace Insurance.Application.Policy.Commands
                 policy.FinalPremiumInBase,
                 policy.Policy.StartDate,
                 policy.Policy.EndDate,
-                policy.Policy.CreatedAt
-   );
+                policy.Policy.CreatedAt);
+            
 
             await _eventPublisher.Publish(integrationEvent, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

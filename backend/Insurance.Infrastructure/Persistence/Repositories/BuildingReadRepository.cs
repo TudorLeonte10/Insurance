@@ -77,6 +77,19 @@ namespace Insurance.Infrastructure.Persistence.Repositories
                 .AsNoTracking()
                 .AnyAsync(b => b.Id == buildingId && b.ClientId == clientId, cancellationToken);
         }
-    }
 
+        public async Task<BuildingAnomalyContextDto?> GetAnomalyContextAsync(Guid buildingId, CancellationToken cancellationToken)
+        {
+            return await _dbContext.Buildings
+                .AsNoTracking()
+                .Where(b => b.Id == buildingId)
+                .Select(b => new BuildingAnomalyContextDto
+                {
+                    InsuredValue = b.InsuredValue,
+                    SurfaceArea = b.SurfaceArea,
+                    BuildingAge = DateTime.UtcNow.Year - b.ConstructionYear
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+    }
 }

@@ -9,6 +9,7 @@ namespace Insurance.Domain.Policies
         Draft = 1,
         Active = 2,
         Cancelled = 3,
-        Expired = 4
+        Expired = 4,
+        UnderReview = 5
     }
 }

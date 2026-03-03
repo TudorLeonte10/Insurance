@@ -87,6 +87,7 @@ namespace Insurance.Infrastructure
             services.AddScoped<IPolicyPremiumCalculator, PolicyPremiumCalculator>();
 
             services.AddScoped<IIntegrationEventPublisher, IntegrationEventPublisher>();
+            services.AddScoped<IAnomalyFeatureService, AnomalyFeatureService>();
 
             services.AddSingleton<IMongoClient>(sp =>
             {
