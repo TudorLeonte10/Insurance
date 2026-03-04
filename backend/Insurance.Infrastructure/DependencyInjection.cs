@@ -1,0 +1,130 @@
+﻿using Insurance.Application.Abstractions;
+using Insurance.Application.Abstractions.Audit;
+using Insurance.Application.Abstractions.Loggers;
+using Insurance.Application.Abstractions.Messaging;
+using Insurance.Application.Abstractions.Repositories;
+using Insurance.Application.Authentication;
+using Insurance.Application.Policy.FeeStrategies;
+using Insurance.Application.Policy.RiskStrategies;
+using Insurance.Application.Policy.Services;
+using Insurance.Domain.Brokers;
+using Insurance.Domain.Buildings;
+using Insurance.Domain.Clients;
+using Insurance.Domain.Metadata;
+using Insurance.Domain.Policies;
+using Insurance.Infrastructure.Audit;
+using Insurance.Infrastructure.Authentication;
+using Insurance.Infrastructure.Loggers;
+using Insurance.Infrastructure.Persistence;
+using Insurance.Infrastructure.Persistence.Outbox;
+using Insurance.Infrastructure.Persistence.Repositories;
+using Insurance.Infrastructure.Reports;
+using Insurance.Reporting.Infrastructure.Persistence.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
+
+namespace Insurance.Infrastructure
+{
+    [ExcludeFromCodeCoverage]
+    public static class DependencyInjection
+    {
+        public static IServiceCollection AddInfrastructure(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            services.AddScoped<IClientRepository, ClientRepository>();
+            services.AddScoped<IGeographyReadRepository, GeographyReadRepository>();
+            services.AddScoped<IBuildingRepository, BuildingRepository>();
+            services.AddScoped<IBuildingReadRepository, BuildingReadRepository>();
+            services.AddScoped<IClientReadRepository, ClientReadRepository>();
+            services.AddScoped<IClientSearchRepository, ClientSearchRepository>();
+            services.AddScoped<IBrokerRepository, BrokerRepository>();
+            services.AddScoped<IBrokerReadRepository, BrokerReadRepository>();
+            services.AddScoped<IRiskFactorConfigurationRepository, RiskFactorConfigurationRepository>();
+            services.AddScoped<IRiskFactorReadRepository, RiskFactorReadRepository>();
+            services.AddScoped<IFeeConfigurationRepository, FeeConfigurationRepository>();
+            services.AddScoped<IFeeConfigurationReadRepository, FeeConfigurationReadRepository>();
+            services.AddScoped<ICurrencyRepository, CurrencyRepository>();
+            services.AddScoped<ICurrencyReadRepository, CurrencyReadRepository>();
+            services.AddScoped<IPolicyRepository, PolicyRepository>();
+            services.AddScoped<IPolicyReadRepository, PolicyReadRepository>();
+            services.AddScoped<IPolicySearchRepository, PolicySearchRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+
+            services.AddScoped<IPolicyReportRepository, PolicyReportRepository>();
+            services.AddScoped<IPolicyReportGrouping, CountryReportGrouping>();
+            services.AddScoped<IPolicyReportGrouping, CountyReportGrouping>();
+            services.AddScoped<IPolicyReportGrouping, CityReportGrouping>();
+            services.AddScoped<IPolicyReportGrouping, BrokerReportGrouping>();
+
+            services.AddScoped<IPolicyCreationService, PolicyCreationService>();
+
+            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+            services.AddScoped<IApplicationLogger, ApplicationLogger>();
+            services.AddScoped<IAuditLogger, AuditLogger>();
+
+            services.AddScoped<IFeeCalculator, FeeCalculator>();
+            services.AddScoped<IRiskFactorCalculator, RiskFactorCalculator>();
+
+            services.AddScoped<IRiskFactorStrategy, CityRiskFactorStrategy>();
+            services.AddScoped<IRiskFactorStrategy, CountyRiskFactorStrategy>();
+            services.AddScoped<IRiskFactorStrategy, CountryRiskFactorStrategy>();
+            services.AddScoped<IRiskFactorStrategy, BuildingTypeRiskStrategy>();
+            services.AddScoped<IFeeStrategy, PercentageFeeStrategy>();
+            services.AddScoped<IFeeStrategy, RiskIndicatorFeeStrategy>();
+            services.AddScoped<IPolicyPremiumCalculator, PolicyPremiumCalculator>();
+
+            services.AddScoped<IIntegrationEventPublisher, IntegrationEventPublisher>();
+            services.AddScoped<IAnomalyFeatureService, AnomalyFeatureService>();
+
+            services.AddSingleton<IMongoClient>(sp =>
+            {
+                var connectionString = configuration.GetConnectionString("MongoDb");
+                return new MongoClient(connectionString);
+            });
+
+            services.AddScoped<IMongoDatabase>(sp =>
+            {
+                var client = sp.GetRequiredService<IMongoClient>();
+                return client.GetDatabase("insurance_audit");
+            });
+
+            services.AddScoped<IAuditLogService, MongoAuditLogService>();
+
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUserContext, CurrentUserContext>();
+
+
+            services.AddSingleton(TimeProvider.System);
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (environment != "Test")
+            {
+                services.AddJwtAuthentication(configuration);
+            }
+
+            return services;
+        }
+
+        public static IServiceCollection AddSqlServerDbContext(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddDbContext<InsuranceDbContext>(options =>
+                options.UseSqlServer(
+                    configuration.GetConnectionString("DefaultConnection")));
+            return services;
+        }
+    }
+}
