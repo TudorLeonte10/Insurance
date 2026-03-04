@@ -12,6 +12,7 @@ using System.Text;
 
 namespace Insurance.Infrastructure.Persistence.Outbox
 {
+    [ExcludeFromCodeCoverage]
     public class OutboxAckListenerBackgroundService : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;

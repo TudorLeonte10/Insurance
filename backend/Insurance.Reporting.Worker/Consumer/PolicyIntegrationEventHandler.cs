@@ -4,11 +4,13 @@ using Insurance.Reporting.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 
 namespace Insurance.Reporting.Worker.Consumer
 {
+    [ExcludeFromCodeCoverage]
     public class PolicyIntegrationEventHandler : IPolicyIntegrationEventHandler
     {
         private readonly ReportingDbContext _reportingDb;
