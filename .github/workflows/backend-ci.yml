@@ -3,7 +3,7 @@ name: Backend CI
 on:
   push:
     branches:
-      - '**'
+      - main
   pull_request:
     branches:
       - main
@@ -43,12 +43,13 @@ jobs:
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
+          projectBaseDir: backend
           args: >
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-            -Dsonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
             -Dsonar.sources=.
-            -Dsonar.exclusions=ml-service/**,frontend/**,**/Migrations/**,**/bin/**,**/obj/** 
+            -Dsonar.cs.opencover.reportsPaths=Insurance.Tests/TestResults/coverage.opencover.xml
+            -Dsonar.exclusions=**/Migrations/**,**/bin/**,**/obj/**
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
