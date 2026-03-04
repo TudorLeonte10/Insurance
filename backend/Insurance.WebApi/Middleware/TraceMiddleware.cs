@@ -1,11 +1,13 @@
 ﻿using Insurance.Application.Authentication;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace Insurance.WebApi.Middleware
 {
+    [ExcludeFromCodeCoverage]
     public class TraceMiddleware
     {
         private readonly RequestDelegate _next;

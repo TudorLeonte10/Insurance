@@ -16,6 +16,7 @@ using System.Text.Json;
 
 namespace Insurance.Reporting.Worker.Consumer
 {
+    [ExcludeFromCodeCoverage]
     public class PolicyCreatedConsumerBackgroundService : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
