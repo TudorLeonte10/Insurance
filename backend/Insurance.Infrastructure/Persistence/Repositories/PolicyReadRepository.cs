@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Insurance.Application.Abstractions.Repositories;
+using Insurance.Application.Common.Paging;
 using Insurance.Application.Policy.DTOs;
 using Insurance.Domain.Buildings;
+using Insurance.Domain.Policies;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -91,6 +93,26 @@ namespace Insurance.Infrastructure.Persistence.Repositories
             var average = await insuredValues.AverageAsync(cancellationToken);
 
             return average ?? 0m;
+        }
+
+        public async Task<PagedResult<PolicyDetailsDto>> GetPoliciesToReviewAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
+        {
+           var items = await _db.Policies
+                .AsNoTracking()
+                .Where(p => p.Status == PolicyStatus.UnderReview)
+                .OrderBy(p => p.CreatedAt)
+                .Skip(pageSize * (pageNumber - 1))
+                .Take(pageSize)
+                .ProjectTo<PolicyDetailsDto>(_mapper.ConfigurationProvider)
+                .ToListAsync(cancellationToken);
+
+            var totalCount = await _db.Policies.CountAsync(p => p.Status == PolicyStatus.UnderReview, cancellationToken);
+
+            return new PagedResult<PolicyDetailsDto>(
+                items,
+                pageNumber,
+                pageSize,
+                totalCount);
         }
     }
 

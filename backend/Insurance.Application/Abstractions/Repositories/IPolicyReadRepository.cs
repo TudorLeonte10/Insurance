@@ -1,4 +1,5 @@
-﻿using Insurance.Application.Policy.DTOs;
+﻿using Insurance.Application.Common.Paging;
+using Insurance.Application.Policy.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,6 +15,7 @@ namespace Insurance.Application.Abstractions.Repositories
         Task<decimal> GetClientAverageInsuredValue(Guid clientId, CancellationToken cancellationToken);
         Task<decimal> GetClientAveragePremiumRatioAsync(Guid clientId, CancellationToken cancellationToken);
         Task<decimal> GetClientGlobalAverageInsuredValue(CancellationToken cancellationToken);
+        Task<PagedResult<PolicyDetailsDto>> GetPoliciesToReviewAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
     }
 
 }

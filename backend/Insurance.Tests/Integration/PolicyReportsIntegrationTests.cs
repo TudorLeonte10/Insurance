@@ -2,10 +2,7 @@
 using Insurance.Reporting.Infrastructure.Persistence;
 using Insurance.Tests.Integration.Setup;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using System.Text.Json;
 
 namespace Insurance.Tests.Integration
@@ -79,7 +76,8 @@ namespace Insurance.Tests.Integration
             var from = DateTime.UtcNow.AddHours(-1).ToString("o");
             var to = DateTime.UtcNow.AddHours(1).ToString("o");
 
-            var response = await client.GetAsync($"/api/admin/reports/policies-by-city?from={Uri.EscapeDataString(from)}&to={Uri.EscapeDataString(to)}");
+            // new controller endpoint: /api/admin/policies/reports
+            var response = await client.GetAsync($"/api/admin/policies/reports?reportGroupingType=City&from={Uri.EscapeDataString(from)}&to={Uri.EscapeDataString(to)}");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var json = await response.Content.ReadAsStringAsync();
@@ -164,15 +162,19 @@ namespace Insurance.Tests.Integration
                 await db.SaveChangesAsync();
             }
 
-            var respAll = await client.GetAsync($"/api/admin/reports/policies-by-broker?from={Uri.EscapeDataString(now.AddDays(-10).ToString("o"))}&to={Uri.EscapeDataString(now.AddDays(1).ToString("o"))}");
+            var from = Uri.EscapeDataString(now.AddDays(-10).ToString("o"));
+            var to = Uri.EscapeDataString(now.AddDays(1).ToString("o"));
+
+            // first: all group by Broker
+            var respAll = await client.GetAsync($"/api/admin/policies/reports?reportGroupingType=Broker&from={from}&to={to}");
             Assert.Equal(HttpStatusCode.OK, respAll.StatusCode);
             var allJson = await respAll.Content.ReadAsStringAsync();
             using var allDoc = JsonDocument.Parse(allJson);
             var allItems = allDoc.RootElement.EnumerateArray().ToArray();
             Assert.True(allItems.Length >= 2);
 
-     
-            var respActive = await client.GetAsync($"/api/admin/reports/policies-by-broker?from={Uri.EscapeDataString(now.AddDays(-10).ToString("o"))}&to={Uri.EscapeDataString(now.AddDays(1).ToString("o"))}&status=Active");
+            // filter by status=Active
+            var respActive = await client.GetAsync($"/api/admin/policies/reports?reportGroupingType=Broker&from={from}&to={to}&status=Active");
             Assert.Equal(HttpStatusCode.OK, respActive.StatusCode);
             var activeJson = await respActive.Content.ReadAsStringAsync();
             using var activeDoc = JsonDocument.Parse(activeJson);
@@ -182,7 +184,8 @@ namespace Insurance.Tests.Integration
             Assert.Equal(1, br1Ron.GetProperty("policiesCount").GetInt32());
             Assert.Equal(100m, br1Ron.GetProperty("totalPremium").GetDecimal());
 
-            var respRon = await client.GetAsync($"/api/admin/reports/policies-by-broker?from={Uri.EscapeDataString(now.AddDays(-10).ToString("o"))}&to={Uri.EscapeDataString(now.AddDays(1).ToString("o"))}&currency=RON");
+            // filter by currency=RON
+            var respRon = await client.GetAsync($"/api/admin/policies/reports?reportGroupingType=Broker&from={from}&to={to}&currency=RON");
             Assert.Equal(HttpStatusCode.OK, respRon.StatusCode);
 
             var ronJson = await respRon.Content.ReadAsStringAsync();

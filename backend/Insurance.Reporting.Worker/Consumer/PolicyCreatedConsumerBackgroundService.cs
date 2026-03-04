@@ -36,8 +36,8 @@ namespace Insurance.Reporting.Worker.Consumer
             var factory = new ConnectionFactory
             {
                 HostName = _configuration["Rabbit:Host"] ?? "localhost",
-                UserName = "guest",
-                Password = "guest"
+                UserName = _configuration["Rabbit:UserName"] ?? "guest",
+                Password = _configuration["Rabbit:Password"] ?? "guest"
             };
 
             while (_connection == null)

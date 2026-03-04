@@ -10,8 +10,8 @@ services:
       - "5000:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=InsuranceDb;User Id=sa;Password=ParolaNoua123!;TrustServerCertificate=True;
-      - ConnectionStrings__ReportingDb=Server=sqlserver,1433;Database=InsuranceReportingDb;User Id=sa;Password=ParolaNoua123!;TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=InsuranceDb;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;
+      - ConnectionStrings__ReportingDb=Server=sqlserver,1433;Database=InsuranceReportingDb;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;
 
       - JWT__Key=SUPER_SECRET_KEY_AND_IT_NEEDS_TO_BE_LONGER
       - JWT__Issuer=Insurance.Api
@@ -38,7 +38,7 @@ services:
     container_name: insurance-worker
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__ReportingConnection=Server=sqlserver,1433;Database=InsuranceReportingDb;User Id=sa;Password=ParolaNoua123!;TrustServerCertificate=True;
+      - ConnectionStrings__ReportingConnection=Server=sqlserver,1433;Database=InsuranceReportingDb;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;
 
       - Rabbit__Host=rabbitmq
       - Rabbit__Queue=policy-created-queue
@@ -55,7 +55,7 @@ services:
     container_name: insurance-sql-server
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=ParolaNoua123!
+      - SA_PASSWORD=${DB_PASSWORD}
       - MSSQL_PID=Developer
     ports:
       - "1433:1433"
@@ -69,8 +69,8 @@ services:
     image: rabbitmq:3-management
     container_name: insurance-rabbitmq
     environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_DEFAULT_USER=${RABBIT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBIT_PASSWORD}
     ports:
       - "5672:5672"
       - "15672:15672"
