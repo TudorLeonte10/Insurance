@@ -132,6 +132,15 @@ namespace Insurance.Domain.Policies
             Status = PolicyStatus.Expired;
         }
 
+        public void Reject()
+        {
+            if(Status != PolicyStatus.UnderReview)
+            {
+                throw new InvalidPolicyTransitionException("Only policies under review can be rejected.");
+            }
+            Status = PolicyStatus.Rejected;
+        }
+
         public static Policy Rehydrate(
             Guid id,
             string policyNumber,
