@@ -7,55 +7,51 @@ on:
   pull_request:
     branches:
       - main
-  
+
 jobs:
   backend-build:
     runs-on: ubuntu-latest
 
-  defaults:
-    run:
-      working-directory: ./backend
-    
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    defaults:
+      run:
+        working-directory: ./backend
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '10.0.x'
-    
-    - name: Restore
-      run: dotnet restore
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Build
-      run: dotnet build --no-restore --configuration Release
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
 
-    - name: Test with coverage
-      run: |
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test with coverage
+        run: |
           dotnet test \
             --no-build \
             --configuration Release \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=opencover \
             /p:CoverletOutput=./TestResults/coverage.opencover.xml
-    
-    - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@v2
-      with:
-        args: >
-          -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-          -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-          -Dsonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+            -Dsonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-    
-    - name: Build WebApi image
-      run: docker build -f backend/Insurance.WebApi/Dockerfile -t insurance-webapi backend
 
-    - name: Build Worker image
-      run: docker build -f backend/Insurance.Reporting.Worker/Dockerfile -t insurance-worker backend
+      - name: Build WebApi image
+        run: docker build -f Insurance.WebApi/Dockerfile -t insurance-webapi .
 
-
-
-
+      - name: Build Worker image
+        run: docker build -f Insurance.Reporting.Worker/Dockerfile -t insurance-worker .
