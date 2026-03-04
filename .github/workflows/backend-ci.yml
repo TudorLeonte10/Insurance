@@ -48,7 +48,7 @@ jobs:
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
             -Dsonar.cs.opencover.reportsPaths=**/coverage.opencover.xml
             -Dsonar.sources=backend
-            -Dsonar.exclusions=ml-service/**,frontend/**,**/Migrations/**,**/bin/**,**/obj/**
+            -Dsonar.exclusions=ml-service/**,frontend/**,**/Migrations/**,**/bin/**,**/obj/** 
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
