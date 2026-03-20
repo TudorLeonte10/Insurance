@@ -1,4 +1,4 @@
-import type { LoaderFunction } from "react-router-dom";
+
 import apiClient from "./apiClient";
 
 export interface LoginRequest {

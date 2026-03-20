@@ -16,6 +16,7 @@ namespace Insurance.Application.Abstractions.Repositories
         Task<decimal> GetClientAveragePremiumRatioAsync(Guid clientId, CancellationToken cancellationToken);
         Task<decimal> GetClientGlobalAverageInsuredValue(CancellationToken cancellationToken);
         Task<PagedResult<PolicyDetailsDto>> GetPoliciesToReviewAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
+        Task<IEnumerable<PolicyByCityDto>> GetPolicyByCityAsync(Guid brokerId, CancellationToken cancellationToken);
     }
 
 }

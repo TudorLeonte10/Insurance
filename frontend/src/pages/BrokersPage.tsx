@@ -1,71 +1,68 @@
 import { useEffect, useState } from "react";
-import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { getBrokerClients } from "../api/brokerApi";
-import type { Client } from "../api/brokerApi";
+import { getAllBrokers } from "../api/brokerApi";
+import type { Broker } from "../api/brokerApi";
 import type { Column } from "../components/DataTable";
 import DataTable from "../components/DataTable";
-import ClientRowActions from "../components/ClientRowActions";
+import BrokerRowActions from "../components/BrokerRowActions";
 
-function ClientsPage() {
-  const [clients, setClients] = useState<Client[]>([]);
+function BrokersPage() {
+  const [brokers, setBrokers] = useState<Broker[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
   const [totalCount, setTotalCount] = useState(0);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-      setPage(1);
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, [search]);
-
-  useEffect(() => {
-    const fetchClients = async () => {
+    const fetchBrokers = async () => {
       setLoading(true);
 
       try {
-        const response = await getBrokerClients(page, pageSize, debouncedSearch);
+        const response = await getAllBrokers(page, pageSize);
 
-        setClients(response.items);
+        setBrokers(response.items);
         setTotalCount(response.totalCount);
 
       } catch (err) {
-        console.error("Error fetching clients", err);
+        console.error("Error fetching brokers", err);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchClients();
-  }, [page, debouncedSearch]);
+    useEffect(() => {
+    fetchBrokers();
+  }, [page]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
-  const columns: Column<Client>[] = [
+  const columns: Column<Broker>[] = [
     { header: "Name", accessor: "name" },
-    { header: "Identification Number", accessor: "identificationNumber" },
-    { header: "Type", accessor: "type" },
+    { header: "Broker Code", accessor: "brokerCode" },
     { header: "Email", accessor: "email" },
-    { header: "Phone", accessor: "phoneNumber" },
-    { header: "Address", accessor: "address" },
+    { header: "Phone", accessor: "phone" },
+    {
+    header: "Status",
+    render: (broker) => (
+        <span
+        className={`px-2 py-1 rounded-full text-xs font-medium ${
+            broker.isActive
+            ? "bg-green-100 text-green-700"
+            : "bg-red-100 text-red-700"
+        }`}
+        >
+        {broker.isActive ? "Active" : "Inactive"}
+        </span>
+    ),
+    },
     {
       header: "Actions",
-      render: (client) => (
-        <ClientRowActions clientId={client.id} />
+      render: (broker) => (
+        <BrokerRowActions brokerId={broker.id} isActive={broker.isActive} onStatusChange={() => fetchBrokers()}/>
       ),
     },
   ];
-
 
   const getPageNumbers = () => {
     const pages = [];
@@ -80,7 +77,7 @@ function ClientsPage() {
   if (loading) {
     return (
       <div className="p-6 text-gray-500">
-        Loading clients...
+        Loading brokers...
       </div>
     );
   }
@@ -91,31 +88,18 @@ function ClientsPage() {
       {/* HEADER */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-gray-800">
-          Clients
+          Brokers
         </h1>
 
         <button className="bg-[#00204a] text-white px-4 py-2 rounded-lg shadow hover:opacity-90"
-        onClick={() => navigate("/broker/clients/create")}>
-          + Create Client
+        onClick={() => navigate("/admin/brokers/create")}>
+          + Create Broker
         </button>
       </div>
 
-      {/* SEARCH */}
-      <div className="relative max-w-sm">
-        <Search size={18} className="absolute left-3 top-3 text-gray-400" />
-
-        <input
-          type="text"
-          placeholder="Search clients..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-9 pr-4 py-2 border rounded-lg w-full focus:ring-2 focus:ring-[#00204a]"
-        />
-      </div>
-
       {/* TABLE */}
-      <DataTable<Client>
-        data={clients}
+      <DataTable<Broker>
+        data={brokers}
         columns={columns}
       />
 
@@ -171,4 +155,4 @@ function ClientsPage() {
   );
 }
 
-export default ClientsPage; 
+export default BrokersPage; 

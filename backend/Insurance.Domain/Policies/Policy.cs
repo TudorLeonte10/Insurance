@@ -83,11 +83,6 @@ namespace Insurance.Domain.Policies
                 throw new InvalidPolicyTransitionException("Only draft policies can be activated.");
             }
 
-            if (StartDate < now)
-            {
-                throw new InvalidPolicyTransitionException("Cannot activate policy with start date in the past.");
-            }
-
             Status = PolicyStatus.Active;
             ActivatedAt = now;
         }

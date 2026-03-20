@@ -6,12 +6,12 @@ export interface Column<T> {
   render?: (item: T) => React.ReactNode;
 }
 
-interface Props<T extends { id: string | number }> {
+interface DataTableProps<T extends { id: string | number }> {
   data: T[];
   columns: Column<T>[];
 }
 
-function DataTable<T extends { id: string | number }>({ data, columns }: Props<T>) {
+function DataTable<T extends { id: string | number }>({ data, columns }: DataTableProps<T>) {
   return (
     <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
 

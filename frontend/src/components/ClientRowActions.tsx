@@ -1,4 +1,4 @@
-import { Eye, Pencil, Building } from "lucide-react";
+import { Pencil, Building } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
@@ -10,15 +10,6 @@ function ClientRowActions({ clientId }: Props) {
 
   return (
     <div className="flex gap-3">
-
-      {/* View Client */}
-      <button
-        onClick={() => navigate(`/broker/clients/${clientId}`)}
-        className="text-blue-600 hover:text-blue-800"
-        title="View client"
-      >
-        <Eye size={18} />
-      </button>
 
       {/* Add Building */}
       <button

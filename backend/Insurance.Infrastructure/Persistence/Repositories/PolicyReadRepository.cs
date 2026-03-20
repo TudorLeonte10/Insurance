@@ -114,6 +114,21 @@ namespace Insurance.Infrastructure.Persistence.Repositories
                 pageSize,
                 totalCount);
         }
+
+        public async Task<IEnumerable<PolicyByCityDto>> GetPolicyByCityAsync(Guid brokerId, CancellationToken cancellationToken)
+        {
+            var result = await _db.Policies
+                .AsNoTracking()
+                .Where(p => p.BrokerId == brokerId)
+                .GroupBy(p => p.Building.City)
+                .Select(g => new PolicyByCityDto
+                {
+                    City = g.Key.Name,
+                    PolicyCount = g.Count()
+                })
+                .ToListAsync(cancellationToken);
+            return result;
+        }
     }
 
 }

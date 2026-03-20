@@ -46,7 +46,7 @@ namespace Insurance.Application.Clients.Commands
             await _clientRepository.UpdateAsync(client, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            await AuditIdentificationNumberChangeIfNeededAsync(client, originalIdentificationNumber, cancellationToken);
+            //await AuditIdentificationNumberChangeIfNeededAsync(client, originalIdentificationNumber, cancellationToken);
 
             return client.Id;
         }

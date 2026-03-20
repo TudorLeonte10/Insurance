@@ -84,6 +84,13 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddCors(c => c.AddPolicy("AllowAll", policy =>
+{
+    policy.AllowAnyOrigin()
+          .AllowAnyMethod()
+          .AllowAnyHeader()
+          .WithExposedHeaders("Location");
+}));
 
 var app = builder.Build();
 
@@ -119,6 +126,8 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<TraceMiddleware>();
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();

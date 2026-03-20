@@ -1,43 +1,75 @@
-import {createContext, useContext, useState } from 'react'
+import { jwtDecode } from "jwt-decode";
+import { createContext, useContext, useState, useEffect } from "react";
 
-interface AuthContextType
-{
-    token : string | null,
-    role : string | null,
-    login : (token: string, role: string) => void,
-    logout : () => void
+interface AuthContextType {
+  token: string | null;
+  role: string | null;
+  username: string | null;
+  login: (token: string, role: string) => void;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({children}:{children: React.ReactNode}){
-    const[token, setToken] = useState<string | null>(null);
-    const[role, setRole] = useState<string | null>(null);
+export function AuthProvider({ children }: { children: React.ReactNode }) {
 
-    const login = (token: string, role: string) => {
-        localStorage.setItem("token", token);
-        setToken(token);
-        setRole(role);
+  const [token, setToken] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    const storedUsername = localStorage.getItem("username");
+
+    if (storedToken) {
+      setToken(storedToken);
+      setUsername(storedUsername);
     }
+  }, []);
 
-    const logout = () => {
-        localStorage.removeItem("token");
-        setToken(null);
-        setRole(null);
-    }
+  const login = (token: string, role: string) => {
 
-    return (
-        <AuthContext.Provider value ={{token, role, login, logout}}>
-            {children}
-        </AuthContext.Provider>
-    )
+    const decoded: any = jwtDecode(token);
+
+    console.log("JWT decoded:", decoded);
+
+    const extractedUsername =
+      decoded["username"] ||
+      decoded["unique_name"] ||
+      decoded["name"] ||
+      decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("username", extractedUsername);
+    localStorage.setItem("role", role);
+
+    setToken(token);
+    setRole(role);
+    setUsername(extractedUsername); 
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+
+    setToken(null);
+    setRole(null);
+    setUsername(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ token, role, username, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
-export function useAuth(){
-    const context = useContext(AuthContext);
-    if(!context){
-        throw new Error("useAuth must be used within an AuthProvider");
-    }
-    return context;
+export function useAuth() {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+
+  return context;
 }
-    

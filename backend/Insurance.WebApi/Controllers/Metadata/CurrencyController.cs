@@ -8,9 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Insurance.WebApi.Controllers.Metadata
 {
     [ApiController]
-    [Authorize(Roles = "Admin")]
-    [ApiExplorerSettings(GroupName = "admin")]
-    [Route("api/admin/currencies")]
+    [Route("api/currencies")]
     public class CurrencyController : ControllerBase
     {
         private readonly IMediator _mediator;
