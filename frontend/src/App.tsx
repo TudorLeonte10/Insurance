@@ -15,6 +15,9 @@ import EditBrokerPage from "./pages/EditBrokerPage";
 import BrokerPoliciesPage from "./pages/PoliciesPage";
 import PolicyDetailsPage from "./pages/ViewPolicyPage";
 import CreatePolicyPage from "./pages/CreatePolicyPage";
+import AdminReviewPoliciesPage from "./pages/ReviewPoliciesPage";
+import MetadataPage from "./pages/MetadataPage";
+import AdminReportsPage from "./pages/AdminReportsPage";
 
 function App() {
   const { role } = useAuth();
@@ -51,8 +54,9 @@ function App() {
         <Route path="brokers" element={<BrokersPage />} />
         <Route path="brokers/create" element={<CreateBrokerPage />} />
         <Route path="brokers/:id/edit" element={<EditBrokerPage />} />
-        <Route path="reports" element={<div>Reports coming soon</div>} />
-        <Route path="metadata" element={<div>Metadata coming soon</div>} />
+        <Route path="review-policies" element={<AdminReviewPoliciesPage />} />
+        <Route path="reports" element={<AdminReportsPage />} />
+        <Route path="metadata" element={<MetadataPage />} />
       </Route>
 
     </Routes>

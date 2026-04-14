@@ -10,6 +10,7 @@ import "leaflet/dist/leaflet.css";
 import type { LatLngExpression } from "leaflet";
 import apiClient from "../api/apiClient";
 import { cityCoordinates } from "../utils/cityCoordinates";
+import { useAuth } from "../auth/AuthContext";
 
 interface CityPolicy {
   city: string;
@@ -31,23 +32,28 @@ const getColor = (count: number) => {
 function BrokerPoliciesMap() {
   const [data, setData] = useState<CityPolicy[]>([]);
   const [loading, setLoading] = useState(true);
+  const { role } = useAuth();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await apiClient.get<CityPolicy[]>(
-          "/brokers/stats/policy-by-city"
-        );
-        setData(res.data);
-      } catch (err) {
-        console.error("Error loading map data", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+ useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const endpoint =
+        role === "Admin"
+          ? "/admin/policies/reports/policy-by-city"
+          : "/brokers/stats/policy-by-city";
 
-    fetchData();
-  }, []);
+      const res = await apiClient.get<CityPolicy[]>(endpoint);
+      setData(res.data);
+
+    } catch (err) {
+      console.error("Error loading map data", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, [role]);
 
   const topCities = [...data]
     .sort((a, b) => b.policyCount - a.policyCount)

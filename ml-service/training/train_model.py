@@ -64,10 +64,10 @@ def main():
 
     sorted_scores = np.sort(scores)
 
-    joblib.dump(model, os.path.join(MODEL_DIR, "isolation_forest_model.joblib"))
-    joblib.dump(scaler, os.path.join(MODEL_DIR, "scaler.joblib"))
-    joblib.dump(feature_cols, os.path.join(MODEL_DIR, "feature_order.joblib"))
-    joblib.dump(sorted_scores, os.path.join(MODEL_DIR, "training_scores.joblib"))
+    # joblib.dump(model, os.path.join(MODEL_DIR, "isolation_forest_model.joblib"))
+    # joblib.dump(scaler, os.path.join(MODEL_DIR, "scaler.joblib"))
+    # joblib.dump(feature_cols, os.path.join(MODEL_DIR, "feature_order.joblib"))
+    # joblib.dump(sorted_scores, os.path.join(MODEL_DIR, "training_scores.joblib"))
 
     print("\nModel and artifacts saved successfully.")
     print(np.percentile(scores, [90, 95, 97, 99]))

@@ -109,6 +109,10 @@ using (var scope = app.Services.CreateScope())
 
         var seeder = new DatabaseSeeder(context);
         await seeder.SeedAsync();
+
+        var reportingContext = scope.ServiceProvider.GetRequiredService<ReportingDbContext>();
+        await reportingContext.Database.MigrateAsync();
+        await new PolicyReportAggregateSeeder(context, reportingContext).SeedAsync();
     }
 }
 

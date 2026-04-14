@@ -9,6 +9,8 @@ namespace Insurance.Application.Policy.Enums
         Country,
         County,
         City,
-        Broker
+        Broker,
+        Status,
+        BuildingType
     }
 }

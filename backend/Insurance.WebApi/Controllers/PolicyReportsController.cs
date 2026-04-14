@@ -1,6 +1,7 @@
 ﻿using Insurance.Application.Policy.DTOs;
 using Insurance.Application.Policy.Enums;
 using Insurance.Application.Policy.Queries;
+using Insurance.Application.Statistics.Queries;
 using Insurance.Domain.Buildings;
 using Insurance.Domain.Policies;
 using MediatR;
@@ -33,5 +34,27 @@ namespace Insurance.WebApi
             return Ok(result);
         }
 
+        [HttpGet("policy-by-city")]
+        public async Task<IActionResult> GetPoliciesByCity(CancellationToken cancellationToken)
+        {
+            var query = new GetPoliciesByCityReportQuery();
+            var stats = await _mediator.Send(query, cancellationToken);
+            return Ok(stats);
+        }
+
+        [HttpGet("timeseries")]
+        public async Task<IActionResult> GetPolicyTimeseries([FromQuery] GetPolicyTimeseriesQuery request, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(request, cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpGet("summary")]
+        public async Task<IActionResult> GetPolicySummary([FromQuery] GetPolicySummaryQuery query,
+            CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
+        }
     }
 }

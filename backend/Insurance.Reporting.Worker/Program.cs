@@ -25,6 +25,8 @@ builder.Services.AddScoped<IPolicyReportGrouping, CountryReportGrouping>();
 builder.Services.AddScoped<IPolicyReportGrouping, CountyReportGrouping>();
 builder.Services.AddScoped<IPolicyReportGrouping, CityReportGrouping>();
 builder.Services.AddScoped<IPolicyReportGrouping, BrokerReportGrouping>();
+builder.Services.AddScoped<IPolicyReportGrouping, StatusReportGrouping>();
+builder.Services.AddScoped<IPolicyReportGrouping, BuildingTypeReportGrouping>();
 
 var host = builder.Build();
 host.Run();

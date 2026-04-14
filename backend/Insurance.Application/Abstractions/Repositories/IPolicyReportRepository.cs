@@ -9,5 +9,8 @@ namespace Insurance.Application.Abstractions.Repositories
     public interface IPolicyReportRepository
     {
         Task<IEnumerable<PolicyReportDto>> GetPolicyReportAsync(GetPoliciesReportQuery request, CancellationToken ct);
+        Task<IEnumerable<PolicyByCityDto>> GetPoliciesByCityReportAsync(CancellationToken ct);
+        Task<PolicySummaryDto> GetPolicySummaryAsync(DateTime? from, DateTime? to, string? status, string? currency, string? buildingType, CancellationToken ct);
+        Task<IEnumerable<PolicyTimeseriesDto>> GetPolicyTimeseriesAsync(DateTime? from, DateTime? to, string? status, string? currency, string? buildingType, CancellationToken ct);
     }
 }

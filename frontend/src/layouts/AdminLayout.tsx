@@ -19,8 +19,10 @@ function AdminLayout() {
   const navItems = [
     { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard size={20} /> },
     { name: "Brokers", path: "/admin/brokers", icon: <Users size={20} /> },
+    { name: "Policies Review", path: "/admin/review-policies", icon: <ShieldCheck size={20} /> },
     { name: "Metadata", path: "/admin/metadata", icon: <Database size={20} /> },
-    { name: "Reports", path: "/admin/reports", icon: <BarChart3 size={20} /> }
+    { name: "Reports", path: "/admin/reports", icon: <BarChart3 size={20} /> },
+
   ];
 
   return (

@@ -5,6 +5,7 @@ using Insurance.Application.Common.Paging;
 using Insurance.Application.Policy.DTOs;
 using Insurance.Domain.Buildings;
 using Insurance.Domain.Policies;
+using Insurance.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -97,14 +98,14 @@ namespace Insurance.Infrastructure.Persistence.Repositories
 
         public async Task<PagedResult<PolicyDetailsDto>> GetPoliciesToReviewAsync(int pageNumber, int pageSize, CancellationToken cancellationToken)
         {
-           var items = await _db.Policies
-                .AsNoTracking()
-                .Where(p => p.Status == PolicyStatus.UnderReview)
-                .OrderBy(p => p.CreatedAt)
-                .Skip(pageSize * (pageNumber - 1))
-                .Take(pageSize)
-                .ProjectTo<PolicyDetailsDto>(_mapper.ConfigurationProvider)
-                .ToListAsync(cancellationToken);
+            var items = await _db.Policies
+                 .AsNoTracking()
+                 .Where(p => p.Status == PolicyStatus.UnderReview)
+                 .OrderBy(p => p.CreatedAt)
+                 .Skip(pageSize * (pageNumber - 1))
+                 .Take(pageSize)
+                 .ProjectTo<PolicyDetailsDto>(_mapper.ConfigurationProvider)
+                 .ToListAsync(cancellationToken);
 
             var totalCount = await _db.Policies.CountAsync(p => p.Status == PolicyStatus.UnderReview, cancellationToken);
 
@@ -129,6 +130,6 @@ namespace Insurance.Infrastructure.Persistence.Repositories
                 .ToListAsync(cancellationToken);
             return result;
         }
-    }
 
+    }
 }

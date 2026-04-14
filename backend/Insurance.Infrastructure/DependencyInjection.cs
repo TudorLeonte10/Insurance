@@ -67,6 +67,8 @@ namespace Insurance.Infrastructure
             services.AddScoped<IPolicyReportGrouping, CountyReportGrouping>();
             services.AddScoped<IPolicyReportGrouping, CityReportGrouping>();
             services.AddScoped<IPolicyReportGrouping, BrokerReportGrouping>();
+            services.AddScoped<IPolicyReportGrouping, StatusReportGrouping>();
+            services.AddScoped<IPolicyReportGrouping, BuildingTypeReportGrouping>();
 
             services.AddScoped<IPolicyCreationService, PolicyCreationService>();
 

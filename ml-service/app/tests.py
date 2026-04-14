@@ -1,35 +1,35 @@
 from score_service import score_policy
 
 test_policy = {
-    "FinalPremiumInBase": 8500,
-    "InsuredValue": 250000,
-    "PremiumToInsuredValueRatio": 0.034,
-    "LogPremiumToInsuredValueRatio": -3.38,
-    "BuildingAge": 35,
-    "ClientPoliciesLastYear": 2,
-    "PolicyDurationDays": 365,
-    "InsuredValuePerSquareMeter": 1800,
-    "BrokerDeviationFromAverage": 0.12,
-    "ClientInsuredValueDerivationRatio": 1.1,
-    "ClientPremiumRatioDerivation": 1.05
+    "final_premium_in_base": 8500,
+    "insured_value": 250000,
+    "premium_to_insured_value_ratio": 0.034,
+    "log_premium_to_insured_value_ratio": -3.38,
+    "building_age": 31,
+    "client_policies_last_year": 2,
+    "policy_duration_days": 365,
+    "insured_value_per_square_meter": 1800,
+    "broker_deviation_from_average": 0.12,
+    "client_insured_value_derivation_ratio": 1.1,
+    "client_premium_ratio_derivation": 1.05
 }
 
 extreme_policy = {
-    "FinalPremiumInBase": 45000,        # foarte mare
-    "InsuredValue": 180000,             # relativ mic pentru premium-ul dat
-    "PremiumToInsuredValueRatio": 0.25, # enorm (normal e ~0.003–0.01)
-    "LogPremiumToInsuredValueRatio": -1.38,  
-    "BuildingAge": 5,                   # nouă
-    "ClientPoliciesLastYear": 10,       # mult peste medie
-    "PolicyDurationDays": 30,           # durată scurtă
-    "InsuredValuePerSquareMeter": 7000, # mult peste piață
-    "BrokerDeviationFromAverage": 15000,# deviație mare
-    "ClientInsuredValueDerivationRatio": 3.5,
-    "ClientPremiumRatioDerivation": 4.0
+    "final_premium_in_base": 45000,        # foarte mare
+    "insured_value": 180000,             # relativ mic pentru premium-ul dat
+    "premium_to_insured_value_ratio": 0.25, # enorm (normal e ~0.003–0.01)
+    "log_premium_to_insured_value_ratio": -1.38,  
+    "building_age": 5,                   # nouă
+    "client_policies_last_year": 10,       # mult peste medie
+    "policy_duration_days": 30,           # durată scurtă
+    "insured_value_per_square_meter": 7000, # mult peste piață
+    "broker_deviation_from_average": 15000,# deviație mare
+    "client_insured_value_derivation_ratio": 3.5,
+    "client_premium_ratio_derivation": 4.0
 }
 
 
-result = score_policy(extreme_policy)
+result = score_policy(test_policy)
 
-print("Extreme Policy Score:")
+print("Test Policy Score:")
 print(result)
