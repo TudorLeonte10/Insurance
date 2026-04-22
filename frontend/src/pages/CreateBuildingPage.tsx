@@ -171,232 +171,200 @@ function CreateBuildingPage() {
     }
   };
 
-  return (
-    <div className="p-8 max-w-3xl mx-auto space-y-6">
+  const inputClass = (hasError: boolean) =>
+    `w-full text-sm border rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 ${
+      hasError ? "border-red-300 bg-red-50/50" : "border-slate-200"
+    }`;
 
-      <h1 className="text-3xl font-bold text-gray-800">
-        Create Building
-      </h1>
+  const selectClass = (hasError = false) =>
+    `w-full text-sm border rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 ${
+      hasError ? "border-red-300 bg-red-50/50" : "border-slate-200"
+    }`;
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-6">
+
+      <div>
+        <h1 className="text-xl font-semibold text-slate-900 tracking-tight">
+          Create Building
+        </h1>
+        <p className="text-sm text-slate-500 mt-0.5">
+          Register a new building for this client
+        </p>
+      </div>
 
       {error && (
-        <div className="bg-red-100 text-red-700 p-3 rounded">
+        <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
 
       {success && (
-        <div className="bg-green-100 text-green-700 p-3 rounded">
+        <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm px-4 py-3 rounded-lg">
           {success}
         </div>
       )}
 
-      <div className="bg-white shadow-lg rounded-xl p-6 space-y-6">
+      <div className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-6">
 
         {/* ADDRESS */}
-
-        <div className="grid grid-cols-2 gap-4">
-
-          <div>
-            <label className="font-semibold text-sm">
-              Street
-            </label>
-
-            <input
-              className={`border rounded p-2 w-full ${
-                errors.street ? "border-red-500 bg-red-50" : ""
-              }`}
-              value={form.street}
-              onChange={(e) => handleChange("street", e.target.value)}
-            />
+        <div>
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Address</p>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="col-span-2">
+              <label className="block text-xs font-medium text-slate-600 mb-1.5">Street</label>
+              <input
+                className={inputClass(errors.street)}
+                value={form.street}
+                onChange={(e) => handleChange("street", e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1.5">Number</label>
+              <input
+                className={inputClass(errors.number)}
+                value={form.number}
+                onChange={(e) => handleChange("number", e.target.value)}
+              />
+            </div>
           </div>
-
-          <div>
-            <label className="font-semibold text-sm">
-              Number
-            </label>
-
-            <input
-              className={`border rounded p-2 w-full ${
-                errors.number ? "border-red-500 bg-red-50" : ""
-              }`}
-              value={form.number}
-              onChange={(e) => handleChange("number", e.target.value)}
-            />
-          </div>
-
         </div>
 
         {/* LOCATION */}
-
-        <div className="grid grid-cols-3 gap-4">
-
-          <div>
-            <label className="font-semibold text-sm">
-              Country
-            </label>
-
-            <select
-              className="border rounded p-2 w-full"
-              value={form.countryId}
-              onChange={(e) => handleCountryChange(e.target.value)}
-            >
-              <option value="">Select country</option>
-
-              {countries.map(c => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-
-            </select>
-          </div>
-
-          <div>
-            <label className="font-semibold text-sm">
-              County
-            </label>
-
-            <select
-              className="border rounded p-2 w-full"
-              value={form.countyId}
-              onChange={(e) => handleCountyChange(e.target.value)}
-            >
-              <option value="">Select county</option>
-
-              {counties.map(c => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-
-            </select>
-          </div>
-
-          <div>
-            <label className="font-semibold text-sm">
-              City
-            </label>
-
-            <select
-              className={`border rounded p-2 w-full ${
-                errors.cityId ? "border-red-500 bg-red-50" : ""
-              }`}
-              value={form.cityId}
-              onChange={(e) => handleChange("cityId", e.target.value)}
-            >
-              <option value="">Select city</option>
-
-              {cities.map(c => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-
-            </select>
-          </div>
-
-        </div>
-
-        {/* BUILDING TYPE */}
-
         <div>
-          <label className="font-semibold text-sm">
-            Building Type
-          </label>
-
-          <select
-            className="border rounded p-2 w-full"
-            value={form.type}
-            onChange={(e) => handleChange("type", Number(e.target.value))}
-          >
-            {Object.values(BuildingType)
-              .filter(v => typeof v === "number")
-              .map(v => (
-                <option key={v} value={v}>
-                  {BuildingType[v as number]}
-                </option>
-              ))}
-          </select>
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Location</p>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1.5">Country</label>
+              <select
+                className={selectClass()}
+                value={form.countryId}
+                onChange={(e) => handleCountryChange(e.target.value)}
+              >
+                <option value="">Select</option>
+                {countries.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1.5">County</label>
+              <select
+                className={selectClass()}
+                value={form.countyId}
+                onChange={(e) => handleCountyChange(e.target.value)}
+              >
+                <option value="">Select</option>
+                {counties.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1.5">City</label>
+              <select
+                className={selectClass(errors.cityId)}
+                value={form.cityId}
+                onChange={(e) => handleChange("cityId", e.target.value)}
+              >
+                <option value="">Select</option>
+                {cities.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
 
-        {/* NUMERIC VALUES */}
+        {/* BUILDING DETAILS */}
+        <div>
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Building Details</p>
 
-        <div className="grid grid-cols-3 gap-4">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1.5">Building Type</label>
+              <select
+                className={selectClass()}
+                value={form.type}
+                onChange={(e) => handleChange("type", Number(e.target.value))}
+              >
+                {Object.values(BuildingType)
+                  .filter(v => typeof v === "number")
+                  .map(v => (
+                    <option key={v} value={v}>
+                      {BuildingType[v as number]}
+                    </option>
+                  ))}
+              </select>
+            </div>
 
-          <input
-            type="number"
-            placeholder="Construction Year"
-            className="border p-2 rounded"
-            value={form.constructionYear}
-            onChange={(e) => handleNumberChange("constructionYear", e.target.value)}
-          />
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1.5">Construction Year</label>
+                <input
+                  type="number"
+                  className={inputClass(false)}
+                  value={form.constructionYear}
+                  onChange={(e) => handleNumberChange("constructionYear", e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1.5">Surface Area (m2)</label>
+                <input
+                  type="number"
+                  className={inputClass(errors.surfaceArea)}
+                  value={form.surfaceArea}
+                  onChange={(e) => handleNumberChange("surfaceArea", e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1.5">Floors</label>
+                <input
+                  type="number"
+                  className={inputClass(errors.numberOfFloors)}
+                  value={form.numberOfFloors}
+                  onChange={(e) => handleNumberChange("numberOfFloors", e.target.value)}
+                />
+              </div>
+            </div>
 
-          <input
-            type="number"
-            placeholder="Surface Area"
-            className={`border p-2 rounded ${
-              errors.surfaceArea ? "border-red-500 bg-red-50" : ""
-            }`}
-            value={form.surfaceArea}
-            onChange={(e) => handleNumberChange("surfaceArea", e.target.value)}
-          />
-
-          <input
-            type="number"
-            placeholder="Floors"
-            className={`border p-2 rounded ${
-              errors.numberOfFloors ? "border-red-500 bg-red-50" : ""
-            }`}
-            value={form.numberOfFloors}
-            onChange={(e) => handleNumberChange("numberOfFloors", e.target.value)}
-          />
-
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1.5">Insured Value</label>
+              <input
+                type="number"
+                className={inputClass(errors.insuredValue)}
+                value={form.insuredValue}
+                onChange={(e) => handleNumberChange("insuredValue", e.target.value)}
+              />
+            </div>
+          </div>
         </div>
-
-        <input
-          type="number"
-          placeholder="Insured Value"
-          className={`border p-2 rounded w-full ${
-            errors.insuredValue ? "border-red-500 bg-red-50" : ""
-          }`}
-          value={form.insuredValue}
-          onChange={(e) => handleNumberChange("insuredValue", e.target.value)}
-        />
 
         {/* RISK INDICATORS */}
-
         <div>
-
-          <label className="font-semibold text-sm">
-            Risk Indicators
-          </label>
-
-          <div className="grid grid-cols-2 gap-2 mt-2">
-
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Risk Indicators</p>
+          <div className="grid grid-cols-2 gap-2">
             {Object.values(RiskIndicator)
               .filter(v => typeof v === "number")
               .map(v => (
-
-                <label key={v} className="flex gap-2">
-
+                <label
+                  key={v}
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors text-sm text-slate-700"
+                >
                   <input
                     type="checkbox"
+                    className="rounded border-slate-300 text-teal-600 focus:ring-teal-500"
                     onChange={() => toggleRisk(v as RiskIndicator)}
                   />
-
                   {RiskIndicator[v as number]}
-
                 </label>
-
               ))}
-
           </div>
-
         </div>
 
         <button
           onClick={handleSubmit}
-          className="bg-[#00204a] text-white px-6 py-2 rounded-lg hover:opacity-90"
+          className="w-full text-sm font-medium px-4 py-2.5 rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors"
         >
           Create Building
         </button>

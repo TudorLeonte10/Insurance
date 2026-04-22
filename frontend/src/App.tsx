@@ -18,6 +18,7 @@ import CreatePolicyPage from "./pages/CreatePolicyPage";
 import AdminReviewPoliciesPage from "./pages/ReviewPoliciesPage";
 import MetadataPage from "./pages/MetadataPage";
 import AdminReportsPage from "./pages/AdminReportsPage";
+import BrokerDashboardPage from "./pages/BrokerDashboardPage";
 
 function App() {
   const { role } = useAuth();
@@ -33,7 +34,7 @@ function App() {
         //element={<BrokerLayout />}
       >
         <Route index element={<Navigate to="dashboard" />} />
-        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="dashboard" element={<BrokerDashboardPage />} />
         <Route path="clients" element={<ClientsPage />} />
         <Route path="clients/:id" element={<ClientDetailsPage />} />
         <Route path="clients/:id/buildings/create" element={<CreateBuilldingPage />} />

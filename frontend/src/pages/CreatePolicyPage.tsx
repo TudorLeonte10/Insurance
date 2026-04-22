@@ -80,101 +80,132 @@ function CreatePolicyPage() {
     );
   }
 };
+  const selectClass =
+    "w-full text-sm border border-slate-200 rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 disabled:bg-slate-50 disabled:text-slate-400";
+
+  const inputClass =
+    "w-full text-sm border border-slate-200 rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500";
+
   return (
-    <div className="p-6 space-y-6 max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold">Create Policy</h1>
+    <div className="max-w-lg mx-auto space-y-6">
+
+      <div>
+        <h1 className="text-xl font-semibold text-slate-900 tracking-tight">
+          Create Policy
+        </h1>
+        <p className="text-sm text-slate-500 mt-0.5">
+          Issue a new insurance policy
+        </p>
+      </div>
 
       {error && (
-        <div className="bg-red-100 text-red-700 p-3 rounded">
+        <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
 
       {success && (
-        <div className="bg-green-100 text-green-700 p-3 rounded">
+        <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm px-4 py-3 rounded-lg">
           {success}
         </div>
       )}
 
-      <div className="bg-white p-6 rounded-xl shadow space-y-4">
+      <div className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-5">
 
         {/* CLIENT */}
-        <select
-          className="w-full border p-2 rounded"
-          value={form.clientId}
-          onChange={(e) => handleChange("clientId", e.target.value)}
-        >
-          <option value="">Select client</option>
-          {clients.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+        <div>
+          <label className="block text-xs font-medium text-slate-600 mb-1.5">Client</label>
+          <select
+            className={selectClass}
+            value={form.clientId}
+            onChange={(e) => handleChange("clientId", e.target.value)}
+          >
+            <option value="">Select client</option>
+            {clients.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {/* BUILDING */}
-        <select
-          className="w-full border p-2 rounded"
-          value={form.buildingId}
-          onChange={(e) => handleChange("buildingId", e.target.value)}
-          disabled={!form.clientId}
-        >
-          <option value="">Select building</option>
-          {buildings.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.street} {b.number} - {b.city}
-            </option>
-          ))}
-        </select>
+        <div>
+          <label className="block text-xs font-medium text-slate-600 mb-1.5">Building</label>
+          <select
+            className={selectClass}
+            value={form.buildingId}
+            onChange={(e) => handleChange("buildingId", e.target.value)}
+            disabled={!form.clientId}
+          >
+            <option value="">Select building</option>
+            {buildings.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.street} {b.number} - {b.city}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        {/* CURRENCY */}
-        <select
-          className="w-full border p-2 rounded"
-          value={form.currencyId}
-          onChange={(e) => handleChange("currencyId", e.target.value)}
-        >
-          <option value="">Select currency</option>
-          {currencies.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.code}
-            </option>
-          ))}
-        </select>
-
-        {/* PREMIUM */}
-        <input
-          type="number"
-          placeholder="Base Premium"
-          className="w-full border p-2 rounded"
-          value={form.basePremium}
-          onChange={(e) =>
-            handleChange("basePremium", e.target.value)
-          }
-        />
+        {/* CURRENCY + PREMIUM */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1.5">Currency</label>
+            <select
+              className={selectClass}
+              value={form.currencyId}
+              onChange={(e) => handleChange("currencyId", e.target.value)}
+            >
+              <option value="">Select</option>
+              {currencies.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.code}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1.5">Base Premium</label>
+            <input
+              type="number"
+              placeholder="0.00"
+              className={inputClass}
+              value={form.basePremium}
+              onChange={(e) =>
+                handleChange("basePremium", e.target.value)
+              }
+            />
+          </div>
+        </div>
 
         {/* DATES */}
-        <input
-          type="date"
-          className="w-full border p-2 rounded"
-          onChange={(e) =>
-            handleChange("startDate", e.target.value)
-          }
-        />
-
-        <input
-          type="date"
-          className="w-full border p-2 rounded"
-          onChange={(e) =>
-            handleChange("endDate", e.target.value)
-          }
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1.5">Start Date</label>
+            <input
+              type="date"
+              className={inputClass}
+              onChange={(e) =>
+                handleChange("startDate", e.target.value)
+              }
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1.5">End Date</label>
+            <input
+              type="date"
+              className={inputClass}
+              onChange={(e) =>
+                handleChange("endDate", e.target.value)
+              }
+            />
+          </div>
+        </div>
 
         {/* SUBMIT */}
         <button
           onClick={handleSubmit}
-          className="w-full bg-linear-to-r from-indigo-500 to-purple-600
-                     text-white py-2 rounded-lg
-                     hover:opacity-90 active:scale-95 transition"
+          className="w-full text-sm font-medium px-4 py-2.5 rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors"
         >
           Create Policy
         </button>

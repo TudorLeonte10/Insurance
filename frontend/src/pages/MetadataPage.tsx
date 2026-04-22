@@ -619,7 +619,7 @@ function MetadataPage() {
     if (draft.level === RiskFactorLevel.BuildingType) {
       return (
         <select
-          className="border rounded-lg px-3 py-2"
+          className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
           value={draft.referenceId}
           onChange={e => handleRiskReferenceChange(e.target.value, mode)}
         >
@@ -638,7 +638,7 @@ function MetadataPage() {
     if (draft.level === RiskFactorLevel.Country) {
       return (
         <select
-          className="border rounded-lg px-3 py-2"
+          className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
           value={draft.selectedCountryId}
           onChange={e => handleRiskCountryChange(e.target.value, mode)}
         >
@@ -656,7 +656,7 @@ function MetadataPage() {
       return (
         <>
           <select
-            className="border rounded-lg px-3 py-2"
+            className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
             value={draft.selectedCountryId}
             onChange={e => handleRiskCountryChange(e.target.value, mode)}
           >
@@ -669,7 +669,7 @@ function MetadataPage() {
           </select>
 
           <select
-            className="border rounded-lg px-3 py-2"
+            className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
             value={draft.selectedCountyId}
             onChange={e => handleRiskCountyChange(e.target.value, mode)}
             disabled={!draft.selectedCountryId}
@@ -688,7 +688,7 @@ function MetadataPage() {
     return (
       <>
         <select
-          className="border rounded-lg px-3 py-2"
+          className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
           value={draft.selectedCountryId}
           onChange={e => handleRiskCountryChange(e.target.value, mode)}
         >
@@ -701,7 +701,7 @@ function MetadataPage() {
         </select>
 
         <select
-          className="border rounded-lg px-3 py-2"
+          className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
           value={draft.selectedCountyId}
           onChange={e => handleRiskCountyChange(e.target.value, mode)}
           disabled={!draft.selectedCountryId}
@@ -715,7 +715,7 @@ function MetadataPage() {
         </select>
 
         <select
-          className="border rounded-lg px-3 py-2"
+          className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
           value={draft.referenceId}
           onChange={e => handleRiskReferenceChange(e.target.value, mode)}
           disabled={!draft.selectedCountyId}
@@ -732,35 +732,41 @@ function MetadataPage() {
   };
 
   if (loading) {
-    return <div className="p-6">Loading metadata...</div>;
+    return (
+      <div className="space-y-4">
+        <div className="h-8 w-48 bg-slate-200 rounded animate-pulse" />
+        <div className="h-64 bg-slate-200 rounded-xl animate-pulse" />
+        <div className="h-64 bg-slate-200 rounded-xl animate-pulse" />
+      </div>
+    );
   }
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Metadata Admin</h1>
-        <p className="text-gray-600 mt-1">
-          Administrate currencies, fee configurations and risk factors.
+        <h1 className="text-xl font-semibold text-slate-900 tracking-tight">Metadata</h1>
+        <p className="text-sm text-slate-500 mt-0.5">
+          Manage currencies, fee configurations and risk factors.
         </p>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+        <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
 
       {locationWarning && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-700">
+        <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 text-sm px-4 py-3 rounded-lg">
           {locationWarning}
         </div>
       )}
 
-      <section className="bg-white border rounded-2xl p-5 shadow-sm space-y-4">
+      <section className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold">Currencies</h2>
-            <p className="text-sm text-gray-500">
+            <h2 className="text-base font-semibold text-slate-900">Currencies</h2>
+            <p className="text-sm text-slate-500 mt-0.5">
               Existing currencies are for viewing only. You can add new currencies.
             </p>
           </div>
@@ -771,7 +777,7 @@ function MetadataPage() {
           className="grid grid-cols-1 md:grid-cols-4 gap-3"
         >
           <input
-            className="border rounded-lg px-3 py-2"
+            className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
             placeholder="Code"
             value={currencyForm.code}
             onChange={e =>
@@ -779,7 +785,7 @@ function MetadataPage() {
             }
           />
           <input
-            className="border rounded-lg px-3 py-2"
+            className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
             placeholder="Name"
             value={currencyForm.name}
             onChange={e =>
@@ -787,7 +793,7 @@ function MetadataPage() {
             }
           />
           <input
-            className="border rounded-lg px-3 py-2"
+            className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
             type="number"
             step="0.0001"
             placeholder="Exchange rate"
@@ -802,16 +808,16 @@ function MetadataPage() {
           <button
             type="submit"
             disabled={saving}
-            className="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 disabled:opacity-50"
+            className="text-sm font-medium bg-teal-600 text-white rounded-lg px-4 py-2.5 hover:bg-teal-700 disabled:opacity-50 transition-colors"
           >
             Add Currency
           </button>
         </form>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm border-separate border-spacing-y-2">
+          <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-500">
+              <tr className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                 <th>Code</th>
                 <th>Name</th>
                 <th>Rate</th>
@@ -820,7 +826,7 @@ function MetadataPage() {
             </thead>
             <tbody>
               {currencies.map(currency => (
-                <tr key={currency.id} className="bg-gray-50">
+                <tr key={currency.id} className="hover:bg-slate-50/50 border-b border-slate-100">
                   <td className="p-2">{currency.code}</td>
                   <td className="p-2">{currency.name}</td>
                   <td className="p-2">{currency.exchangeRateToBase}</td>
@@ -832,18 +838,20 @@ function MetadataPage() {
         </div>
       </section>
 
-      <section className="bg-white border rounded-2xl p-5 shadow-sm space-y-4">
-        <h2 className="text-xl font-semibold">Fee Configurations</h2>
-        <p className="text-sm text-gray-500">
-          Existing fee configurations are for viewing only. You can add new fee configurations.
-        </p>
+      <section className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-5">
+        <div>
+          <h2 className="text-base font-semibold text-slate-900">Fee Configurations</h2>
+          <p className="text-sm text-slate-500 mt-0.5">
+            Existing fee configurations are for viewing only. You can add new fee configurations.
+          </p>
+        </div>
 
         <form
           onSubmit={handleCreateFee}
           className="grid grid-cols-1 md:grid-cols-5 gap-3"
         >
           <input
-            className="border rounded-lg px-3 py-2"
+            className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
             placeholder="Name"
             value={feeForm.name}
             onChange={e =>
@@ -851,7 +859,7 @@ function MetadataPage() {
             }
           />
           <select
-            className="border rounded-lg px-3 py-2"
+            className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
             value={feeForm.type}
             onChange={e =>
               setFeeForm(prev => ({
@@ -869,7 +877,7 @@ function MetadataPage() {
               ))}
           </select>
           <input
-            className="border rounded-lg px-3 py-2"
+            className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
             type="number"
             step="0.0001"
             placeholder="Percentage"
@@ -879,7 +887,7 @@ function MetadataPage() {
             }
           />
           <input
-            className="border rounded-lg px-3 py-2"
+            className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
             type="date"
             value={feeForm.effectiveFrom}
             onChange={e =>
@@ -887,7 +895,7 @@ function MetadataPage() {
             }
           />
           <input
-            className="border rounded-lg px-3 py-2"
+            className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
             type="date"
             value={feeForm.effectiveTo}
             onChange={e =>
@@ -897,7 +905,7 @@ function MetadataPage() {
           <button
             type="submit"
             disabled={saving}
-            className="md:col-span-5 bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 disabled:opacity-50"
+            className="md:col-span-5 text-sm font-medium bg-teal-600 text-white rounded-lg px-4 py-2.5 hover:bg-teal-700 disabled:opacity-50 transition-colors"
           >
             Add Fee Configuration
           </button>
@@ -910,12 +918,12 @@ function MetadataPage() {
             return (
               <div
                 key={fee.id}
-                className="border rounded-xl p-4 bg-gray-50 space-y-3"
+                className="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-3"
               >
                 {isEditing ? (
                   <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
                     <input
-                      className="border rounded-lg px-3 py-2"
+                      className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
                       value={feeDraft.name}
                       onChange={e =>
                         setFeeDraft(prev =>
@@ -925,7 +933,7 @@ function MetadataPage() {
                     />
 
                     <select
-                      className="border rounded-lg px-3 py-2"
+                      className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
                       value={feeDraft.type}
                       onChange={e =>
                         setFeeDraft(prev =>
@@ -948,7 +956,7 @@ function MetadataPage() {
                     </select>
 
                     <input
-                      className="border rounded-lg px-3 py-2"
+                      className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
                       type="number"
                       step="0.0001"
                       value={feeDraft.percentage}
@@ -960,7 +968,7 @@ function MetadataPage() {
                     />
 
                     <input
-                      className="border rounded-lg px-3 py-2"
+                      className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
                       type="date"
                       value={feeDraft.effectiveFrom}
                       onChange={e =>
@@ -971,7 +979,7 @@ function MetadataPage() {
                     />
 
                     <input
-                      className="border rounded-lg px-3 py-2"
+                      className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
                       type="date"
                       value={feeDraft.effectiveTo}
                       onChange={e =>
@@ -999,14 +1007,14 @@ function MetadataPage() {
                         type="button"
                         onClick={() => handleUpdateFee(fee.id)}
                         disabled={saving}
-                        className="bg-slate-800 text-white rounded-lg px-3 py-2 hover:bg-black disabled:opacity-50"
+                        className="text-sm font-medium bg-teal-600 text-white rounded-lg px-4 py-2 hover:bg-teal-700 disabled:opacity-50 transition-colors"
                       >
                         Save
                       </button>
                       <button
                         type="button"
                         onClick={cancelFeeEdit}
-                        className="border rounded-lg px-3 py-2 hover:bg-gray-100"
+                        className="text-sm font-medium border border-slate-200 text-slate-700 rounded-lg px-4 py-2 hover:bg-slate-50 transition-colors"
                       >
                         Cancel
                       </button>
@@ -1016,31 +1024,31 @@ function MetadataPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="grid grid-cols-1 md:grid-cols-7 gap-3 flex-1">
                       <div>
-                        <div className="text-xs text-gray-500">Name</div>
+                        <div className="text-xs text-slate-500 mb-0.5">Name</div>
                         <div>{fee.name}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-500">Type</div>
+                        <div className="text-xs text-slate-500 mb-0.5">Type</div>
                         <div>{getFeeTypeLabel(fee.type)}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-500">Risk Indicator</div>
+                        <div className="text-xs text-slate-500 mb-0.5">Risk Indicator</div>
                         <div>{getRiskIndicatorLabel(fee.riskIndicator)}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-500">Percentage</div>
+                        <div className="text-xs text-slate-500 mb-0.5">Percentage</div>
                         <div>{fee.percentage}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-500">From</div>
+                        <div className="text-xs text-slate-500 mb-0.5">From</div>
                         <div>{toDateInput(fee.effectiveFrom)}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-500">To</div>
+                        <div className="text-xs text-slate-500 mb-0.5">To</div>
                         <div>{fee.effectiveTo ? toDateInput(fee.effectiveTo) : "-"}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-500">Active</div>
+                        <div className="text-xs text-slate-500 mb-0.5">Active</div>
                         <div>{fee.isActive ? "Yes" : "No"}</div>
                       </div>
                     </div>
@@ -1048,7 +1056,7 @@ function MetadataPage() {
                     <button
                       type="button"
                       onClick={() => startFeeEdit(fee)}
-                      className="bg-slate-800 text-white rounded-lg px-3 py-2 hover:bg-black"
+                      className="text-sm font-medium text-slate-700 border border-slate-200 rounded-lg px-4 py-2 hover:bg-slate-50 transition-colors"
                     >
                       Edit
                     </button>
@@ -1060,15 +1068,15 @@ function MetadataPage() {
         </div>
       </section>
 
-      <section className="bg-white border rounded-2xl p-5 shadow-sm space-y-4">
-        <h2 className="text-xl font-semibold">Risk Factors</h2>
+      <section className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-5">
+        <h2 className="text-base font-semibold text-slate-900">Risk Factors</h2>
 
         <form
           onSubmit={handleCreateRisk}
           className="grid grid-cols-1 md:grid-cols-5 gap-3"
         >
           <select
-            className="border rounded-lg px-3 py-2"
+            className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
             value={riskForm.level}
             onChange={e =>
               handleRiskLevelChange(
@@ -1089,7 +1097,7 @@ function MetadataPage() {
           {renderRiskReferenceSelectors(riskForm, "create")}
 
           <input
-            className="border rounded-lg px-3 py-2"
+            className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
             type="number"
             step="0.0001"
             placeholder="Adjustment %"
@@ -1105,7 +1113,7 @@ function MetadataPage() {
           <button
             type="submit"
             disabled={saving}
-            className="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 disabled:opacity-50"
+            className="text-sm font-medium bg-teal-600 text-white rounded-lg px-4 py-2.5 hover:bg-teal-700 disabled:opacity-50 transition-colors"
           >
             Add Risk Factor
           </button>
@@ -1118,12 +1126,12 @@ function MetadataPage() {
             return (
               <div
                 key={risk.id}
-                className="border rounded-xl p-4 bg-gray-50 space-y-3"
+                className="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-3"
               >
                 {isEditing ? (
                   <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
                     <select
-                      className="border rounded-lg px-3 py-2"
+                      className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
                       value={riskDraft.level}
                       onChange={e =>
                         handleRiskLevelChange(
@@ -1144,7 +1152,7 @@ function MetadataPage() {
                     {renderRiskReferenceSelectors(riskDraft, "edit")}
 
                     <input
-                      className="border rounded-lg px-3 py-2"
+                      className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
                       type="number"
                       step="0.0001"
                       value={riskDraft.adjustmentPercentage}
@@ -1175,14 +1183,14 @@ function MetadataPage() {
                         type="button"
                         onClick={() => handleUpdateRisk(risk.id)}
                         disabled={saving}
-                        className="bg-slate-800 text-white rounded-lg px-3 py-2 hover:bg-black disabled:opacity-50"
+                        className="text-sm font-medium bg-teal-600 text-white rounded-lg px-4 py-2 hover:bg-teal-700 disabled:opacity-50 transition-colors"
                       >
                         Save
                       </button>
                       <button
                         type="button"
                         onClick={cancelRiskEdit}
-                        className="border rounded-lg px-3 py-2 hover:bg-gray-100"
+                        className="text-sm font-medium border border-slate-200 text-slate-700 rounded-lg px-4 py-2 hover:bg-slate-50 transition-colors"
                       >
                         Cancel
                       </button>
@@ -1192,19 +1200,19 @@ function MetadataPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-3 flex-1">
                       <div>
-                        <div className="text-xs text-gray-500">Level</div>
+                        <div className="text-xs text-slate-500 mb-0.5">Level</div>
                         <div>{getRiskLevelLabel(risk.level)}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-500">Reference</div>
+                        <div className="text-xs text-slate-500 mb-0.5">Reference</div>
                         <div>{getReferenceLabel(risk)}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-500">Adjustment</div>
+                        <div className="text-xs text-slate-500 mb-0.5">Adjustment</div>
                         <div>{risk.adjustmentPercentage}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-500">Active</div>
+                        <div className="text-xs text-slate-500 mb-0.5">Active</div>
                         <div>{risk.isActive ? "Yes" : "No"}</div>
                       </div>
                     </div>
@@ -1212,7 +1220,7 @@ function MetadataPage() {
                     <button
                       type="button"
                       onClick={() => startRiskEdit(risk)}
-                      className="bg-slate-800 text-white rounded-lg px-3 py-2 hover:bg-black"
+                      className="text-sm font-medium text-slate-700 border border-slate-200 rounded-lg px-4 py-2 hover:bg-slate-50 transition-colors"
                     >
                       Edit
                     </button>

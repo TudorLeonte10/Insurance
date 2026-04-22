@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { useState } from "react";
-import { LayoutDashboard, Users, ShieldCheck, LogOut, Menu} from "lucide-react";
+import { LayoutDashboard, Users, FileText, LogOut, Menu, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 function BrokerLayout() {
@@ -11,18 +11,20 @@ function BrokerLayout() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { name: "Dashboard", path: "/broker/dashboard", icon: <LayoutDashboard size={20} /> },
-    { name: "Clients", path: "/broker/clients", icon: <Users size={20} /> },
-    { name: "Policies", path: "/broker/policies", icon: <ShieldCheck size={20} /> }
+    { name: "Dashboard", path: "/broker/dashboard", icon: <LayoutDashboard size={18} /> },
+    { name: "Clients", path: "/broker/clients", icon: <Users size={18} /> },
+    { name: "Policies", path: "/broker/policies", icon: <FileText size={18} /> }
   ];
 
+  const isActivePath = (path: string) => location.pathname.startsWith(path);
+
   return (
-    <div className="flex h-screen bg-[#f8fafc] overflow-hidden text-slate-900">
+    <div className="flex h-screen bg-slate-50 overflow-hidden text-slate-900">
       
       {/* MOBILE OVERLAY */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden transition-opacity"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -30,51 +32,63 @@ function BrokerLayout() {
       {/* SIDEBAR */}
       <aside
         className={`
-          fixed md:static z-50 h-full w-72 bg-[#00204a] text-white p-6 flex flex-col
-          transform transition-all duration-300 ease-in-out border-r border-white/10
+          fixed md:static z-50 h-full w-64 bg-slate-900 text-white flex flex-col
+          transform transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
       >
         {/* LOGO */}
-        <div className="flex items-center gap-3 mb-10 px-2">
-          <div className="bg-blue-500 p-2 rounded-lg">
-            <ShieldCheck size={24} className="text-white" />
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06]">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center">
+              <span className="text-xs font-bold tracking-tight">IP</span>
+            </div>
+            <span className="text-[15px] font-semibold tracking-tight">InsurePro</span>
           </div>
-          <span className="text-xl font-bold tracking-tight">InsurePro</span>
+          <button 
+            onClick={() => setIsOpen(false)} 
+            className="md:hidden p-1 hover:bg-white/10 rounded"
+          >
+            <X size={18} />
+          </button>
         </div>
 
         {/* NAVIGATION */}
-        <nav className="flex-1 space-y-1">
+        <nav className="flex-1 px-3 py-4 space-y-0.5">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500 px-3 mb-3">
+            Menu
+          </p>
           {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
+            const isActive = isActivePath(item.path);
             return (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={() => setIsOpen(false)}
                 className={`
-                  flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
+                  flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] transition-all duration-150
                   ${isActive 
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20" 
-                    : "text-slate-300 hover:bg-white/10 hover:text-white"}
+                    ? "bg-teal-600/15 text-teal-400 font-medium" 
+                    : "text-slate-400 hover:bg-white/[0.05] hover:text-slate-200"}
                 `}
               >
-                {item.icon}
-                <span className="font-medium">{item.name}</span>
+                <span className={isActive ? "text-teal-400" : "text-slate-500"}>{item.icon}</span>
+                <span>{item.name}</span>
+                {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-teal-400" />}
               </Link>
             );
           })}
         </nav>
 
         {/* USER PROFILE & LOGOUT */}
-        <div className="mt-auto pt-6 border-t border-white/10">
-          <div className="flex items-center gap-3 px-2 mb-4">
-            <div className="w-10 h-10 rounded-full bg-slate-500 flex items-center justify-center text-sm font-bold border-2 border-white/20">
-              {username?.charAt(0).toUpperCase()}{username?.charAt(1).toUpperCase()}
+        <div className="px-3 py-4 border-t border-white/[0.06]">
+          <div className="flex items-center gap-3 px-3 mb-3">
+            <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-semibold text-slate-300">
+              {username?.charAt(0).toUpperCase()}{username?.charAt(1)?.toUpperCase()}
             </div>
             <div className="overflow-hidden">
-              <p className="text-sm font-medium truncate">{username}</p>
-              <p className="text-xs text-slate-400 truncate">Broker Partner</p>
+              <p className="text-[13px] font-medium text-slate-200 truncate">{username}</p>
+              <p className="text-[11px] text-slate-500 truncate">Broker</p>
             </div>
           </div>
           
@@ -83,10 +97,10 @@ function BrokerLayout() {
               logout();
               navigate("/");
             }}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] text-slate-500 hover:bg-red-500/10 hover:text-red-400 transition-colors"
           >
-            <LogOut size={20} />
-            <span className="font-medium">Logout</span>
+            <LogOut size={16} />
+            <span>Sign out</span>
           </button>
         </div>
       </aside>
@@ -94,26 +108,18 @@ function BrokerLayout() {
       {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         
-        {/* HEADER (Visible only on mobile or as top-bar) */}
-        <header className="md:hidden flex items-center justify-between p-4 bg-white border-b border-slate-200">
-          <button onClick={() => setIsOpen(true)} className="p-2 hover:bg-slate-100 rounded-lg">
-            <Menu size={24} />
+        {/* MOBILE HEADER */}
+        <header className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200/80">
+          <button onClick={() => setIsOpen(true)} className="p-2 -ml-2 hover:bg-slate-100 rounded-lg">
+            <Menu size={20} />
           </button>
-          <span className="font-bold text-[#00204a]">InsurePro</span>
-          <div className="w-8" /> {/* Placeholder for balance */}
+          <span className="text-sm font-semibold text-slate-900">InsurePro</span>
+          <div className="w-8" />
         </header>
 
         {/* SCROLLABLE CONTENT */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
-          <div className="max-w-6xl mx-auto">
-            {/* Titlu Dinamic bazat pe locație (opțional) */}
-            <header className="mb-8 hidden md:block">
-              <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wide mb-1">
-                Management System
-              </h2>
-              <p className="text-slate-500">Welcome back! Here's what's happening today.</p>
-            </header>
-            
+        <main className="flex-1 overflow-y-auto custom-scrollbar">
+          <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-6 md:py-8">
             <Outlet />
           </div>
         </main>

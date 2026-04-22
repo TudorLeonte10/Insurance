@@ -13,16 +13,16 @@ interface DataTableProps<T extends { id: string | number }> {
 
 function DataTable<T extends { id: string | number }>({ data, columns }: DataTableProps<T>) {
   return (
-    <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden shadow-sm">
 
       <table className="w-full text-sm">
 
-        <thead className="bg-gray-50 text-gray-600">
-          <tr>
+        <thead>
+          <tr className="bg-slate-50/80 border-b border-slate-200/80">
             {columns.map((col, index) => (
               <th
                 key={index}
-                className="text-left px-4 py-3 font-semibold"
+                className="text-left px-5 py-3 text-[11px] font-semibold text-slate-500 uppercase tracking-wider"
               >
                 {col.header}
               </th>
@@ -31,13 +31,17 @@ function DataTable<T extends { id: string | number }>({ data, columns }: DataTab
         </thead>
 
         <tbody>
-          {data.map((item) => (
+          {data.map((item, rowIndex) => (
             <tr
               key={item.id}
-              className="border-t hover:bg-gray-50 transition"
+              className={`
+                transition-colors duration-100 border-b border-slate-100 last:border-0
+                ${rowIndex % 2 === 1 ? "bg-slate-50/40" : ""}
+                hover:bg-teal-50/50
+              `}
             >
               {columns.map((col, index) => (
-                <td key={index} className="px-4 py-3">
+                <td key={index} className="px-5 py-3.5 text-slate-700">
 
                   {col.render
                     ? col.render(item)
@@ -52,6 +56,12 @@ function DataTable<T extends { id: string | number }>({ data, columns }: DataTab
         </tbody>
 
       </table>
+
+      {data.length === 0 && (
+        <div className="text-center py-16 text-sm text-slate-400">
+          No records found
+        </div>
+      )}
 
     </div>
   );

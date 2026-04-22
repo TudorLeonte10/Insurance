@@ -85,61 +85,80 @@ function EditBrokerPage() {
     }
   };
 
+  const inputClass = (hasError: boolean) =>
+    `w-full text-sm border rounded-lg px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 ${
+      hasError ? "border-red-300 bg-red-50/50" : "border-slate-200"
+    }`;
+
   if (loading) {
-    return <div className="p-6">Loading...</div>;
+    return (
+      <div className="max-w-lg mx-auto space-y-4">
+        <div className="h-8 w-48 bg-slate-200 rounded animate-pulse" />
+        <div className="h-64 bg-slate-200 rounded-xl animate-pulse" />
+      </div>
+    );
   }
 
   return (
-    <div className="p-8 max-w-2xl mx-auto space-y-6">
+    <div className="max-w-lg mx-auto space-y-6">
 
-      <h1 className="text-3xl font-bold text-gray-800">
-        Edit Broker
-      </h1>
+      <div>
+        <h1 className="text-xl font-semibold text-slate-900 tracking-tight">
+          Edit Broker
+        </h1>
+        <p className="text-sm text-slate-500 mt-0.5">
+          Update broker information
+        </p>
+      </div>
 
       {error && (
-        <div className="bg-red-100 text-red-700 p-3 rounded">
+        <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
 
       {success && (
-        <div className="bg-green-100 text-green-700 p-3 rounded">
+        <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm px-4 py-3 rounded-lg">
           {success}
         </div>
       )}
 
-      <div className="bg-white shadow-lg rounded-xl p-6 space-y-6">
+      <div className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-5">
 
-        <input
-          placeholder="Name"
-          className={`border p-2 rounded w-full ${
-            errors.name ? "border-red-500 bg-red-50" : ""
-          }`}
-          value={form.name}
-          onChange={(e) => handleChange("name", e.target.value)}
-        />
+        <div>
+          <label className="block text-xs font-medium text-slate-600 mb-1.5">Name</label>
+          <input
+            placeholder="Full name"
+            className={inputClass(errors.name)}
+            value={form.name}
+            onChange={(e) => handleChange("name", e.target.value)}
+          />
+        </div>
 
-        <input
-          placeholder="Email"
-          className={`border p-2 rounded w-full ${
-            errors.email ? "border-red-500 bg-red-50" : ""
-          }`}
-          value={form.email}
-          onChange={(e) => handleChange("email", e.target.value)}
-        />
-
-        <input
-          placeholder="Phone"
-          className={`border p-2 rounded w-full ${
-            errors.phone ? "border-red-500 bg-red-50" : ""
-          }`}
-          value={form.phone}
-          onChange={(e) => handleChange("phone", e.target.value)}
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1.5">Email</label>
+            <input
+              placeholder="email@example.com"
+              className={inputClass(errors.email)}
+              value={form.email}
+              onChange={(e) => handleChange("email", e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1.5">Phone</label>
+            <input
+              placeholder="+40..."
+              className={inputClass(errors.phone)}
+              value={form.phone}
+              onChange={(e) => handleChange("phone", e.target.value)}
+            />
+          </div>
+        </div>
 
         <button
           onClick={handleSubmit}
-          className="bg-[#00204a] text-white px-6 py-2 rounded-lg w-full hover:opacity-90"
+          className="w-full text-sm font-medium px-4 py-2.5 rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors"
         >
           Update Broker
         </button>

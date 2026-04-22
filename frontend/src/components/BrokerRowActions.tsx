@@ -1,4 +1,4 @@
-import { Pencil, CheckCircle } from "lucide-react";
+import { Pencil, Power, PowerOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { activateBroker, deactivateBroker } from "../api/brokerApi";
 
@@ -10,41 +10,43 @@ interface Props {
 
 function BrokerRowActions({ brokerId, isActive, onStatusChange }: Props) {
   const navigate = useNavigate();
-  
+
   const handleStatusChange = async () => {
-    try{
-        if(isActive) {
-            await deactivateBroker(brokerId.toString());
-        }
-        else {
-            await activateBroker(brokerId.toString());
-        }
-        onStatusChange();        
+    try {
+      if (isActive) {
+        await deactivateBroker(brokerId.toString());
+      } else {
+        await activateBroker(brokerId.toString());
+      }
+      onStatusChange();
     } catch (error) {
-        console.error("Error changing broker status:", error);
+      console.error("Error changing broker status:", error);
     }
   };
 
-
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-1">
 
-      {/* Activate/Deactivate Broker */}
+      {/* Activate / Deactivate */}
       <button
         onClick={handleStatusChange}
-        className={`text-${isActive ? "red" : "green"}-600 hover:text-${isActive ? "red" : "green"}-800`}
+        className={`p-1.5 rounded-md transition-colors ${
+          isActive
+            ? "text-slate-400 hover:text-red-600 hover:bg-red-50"
+            : "text-slate-400 hover:text-emerald-600 hover:bg-emerald-50"
+        }`}
         title={isActive ? "Deactivate broker" : "Activate broker"}
       >
-        <CheckCircle size={18} />
+        {isActive ? <PowerOff size={16} /> : <Power size={16} />}
       </button>
 
       {/* Edit Broker */}
       <button
         onClick={() => navigate(`/admin/brokers/${brokerId}/edit`)}
-        className="text-gray-600 hover:text-black"
+        className="p-1.5 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
         title="Edit broker"
       >
-        <Pencil size={18} />
+        <Pencil size={16} />
       </button>
 
     </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getBrokerClients } from "../api/brokerApi";
 import type { Client } from "../api/brokerApi";
@@ -52,14 +52,25 @@ function ClientsPage() {
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   const columns: Column<Client>[] = [
-    { header: "Name", accessor: "name" },
-    { header: "Identification Number", accessor: "identificationNumber" },
-    { header: "Type", accessor: "type" },
+    {
+      header: "Name",
+      render: (client) => (
+        <span className="font-medium text-slate-900">{client.name}</span>
+      ),
+    },
+    { header: "ID Number", accessor: "identificationNumber" },
+    {
+      header: "Type",
+      render: (client) => (
+        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-600">
+          {client.type}
+        </span>
+      ),
+    },
     { header: "Email", accessor: "email" },
     { header: "Phone", accessor: "phoneNumber" },
-    { header: "Address", accessor: "address" },
     {
-      header: "Actions",
+      header: "",
       render: (client) => (
         <ClientRowActions clientId={client.id} />
       ),
@@ -79,37 +90,47 @@ function ClientsPage() {
 
   if (loading) {
     return (
-      <div className="p-6 text-gray-500">
-        Loading clients...
+      <div className="space-y-4">
+        <div className="h-8 w-48 bg-slate-200 rounded animate-pulse" />
+        <div className="h-10 w-72 bg-slate-200 rounded animate-pulse" />
+        <div className="h-64 bg-slate-200 rounded-xl animate-pulse" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
 
       {/* HEADER */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-gray-800">
-          Clients
-        </h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold text-slate-900 tracking-tight">
+            Clients
+          </h1>
+          <p className="text-sm text-slate-500 mt-0.5">
+            {totalCount} total client{totalCount !== 1 ? "s" : ""} in your portfolio
+          </p>
+        </div>
 
-        <button className="bg-[#00204a] text-white px-4 py-2 rounded-lg shadow hover:opacity-90"
-        onClick={() => navigate("/broker/clients/create")}>
-          + Create Client
+        <button
+          onClick={() => navigate("/broker/clients/create")}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+        >
+          <Plus size={15} />
+          Add Client
         </button>
       </div>
 
       {/* SEARCH */}
-      <div className="relative max-w-sm">
-        <Search size={18} className="absolute left-3 top-3 text-gray-400" />
+      <div className="relative max-w-xs">
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
 
         <input
           type="text"
-          placeholder="Search clients..."
+          placeholder="Search by name..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-9 pr-4 py-2 border rounded-lg w-full focus:ring-2 focus:ring-[#00204a]"
+          className="pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg w-full bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
         />
       </div>
 
@@ -120,48 +141,44 @@ function ClientsPage() {
       />
 
       {/* PAGINATION */}
-      <div className="flex items-center justify-between mt-6">
+      <div className="flex items-center justify-between">
 
-        {/* LEFT */}
-        <span className="text-sm text-gray-500">
-          Showing page <strong>{page}</strong> of <strong>{totalPages}</strong>
+        <span className="text-sm text-slate-500">
+          Page <span className="font-medium text-slate-700">{page}</span> of{" "}
+          <span className="font-medium text-slate-700">{totalPages}</span>
         </span>
 
-        {/* RIGHT */}
         <div className="flex gap-1 items-center">
 
-          {/* PREV */}
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
-            className="px-3 py-1 rounded-md border bg-white hover:bg-gray-100 disabled:opacity-50"
+            className="p-1.5 rounded-md border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            ←
+            <ChevronLeft size={16} />
           </button>
 
-          {/* PAGE NUMBERS */}
           {getPageNumbers().map((p) => (
             <button
               key={p}
               onClick={() => setPage(p)}
               className={`
-                px-3 py-1 rounded-md border text-sm
+                w-8 h-8 rounded-md text-sm font-medium transition-colors
                 ${p === page
-                  ? "bg-[#00204a] text-white"
-                  : "bg-white hover:bg-gray-100"}
+                  ? "bg-teal-600 text-white"
+                  : "text-slate-600 hover:bg-slate-100"}
               `}
             >
               {p}
             </button>
           ))}
 
-          {/* NEXT */}
           <button
             disabled={page === totalPages}
             onClick={() => setPage((p) => p + 1)}
-            className="px-3 py-1 rounded-md border bg-white hover:bg-gray-100 disabled:opacity-50"
+            className="p-1.5 rounded-md border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            →
+            <ChevronRight size={16} />
           </button>
 
         </div>
@@ -171,4 +188,4 @@ function ClientsPage() {
   );
 }
 
-export default ClientsPage; 
+export default ClientsPage;
